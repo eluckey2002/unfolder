@@ -50,7 +50,26 @@ Empty / incoherent / clearly-wrong corpus results → surface to user immediatel
 
 **Anti-pattern to avoid:** chaining `find` / `ls` / `grep` / `Read` on a large unfamiliar file. The first tool call for structural questions should be `ToolSearch` for smart-explore, then `smart_outline` / `smart_search`.
 
-## 3. Other rules
+## 3. When to build or rebuild corpora (use the `/corpus` skill)
 
-- When you've read the same large file twice in one session, propose building a corpus.
+The `/corpus` skill handles the mechanics. These rules tell you *when* to invoke it.
+
+**Propose `/corpus build "<description>"` when:**
+- A file appears in ≥3 observations across ≥2 sessions and isn't covered by any existing corpus.
+- You just recorded a decision-type observation and ≥5 decisions exist project-wide without a `decisions-corpus`.
+- A subagent reads ≥5 files from the same directory that isn't covered by any corpus.
+- You've read the same large file twice in one session.
+
+**Propose `/corpus rebuild <name>` when:**
+- A corpus query returns wrong / incoherent results.
+- ≥5 new observations relevant to a corpus's scope have been recorded since it was built.
+
+**Suggest `/corpus audit` at the start of a session that:**
+- Touches a domain you haven't worked in for weeks.
+- Precedes a refactor where decisions need to be checked.
+
+Always propose, then wait for user confirmation. Never auto-build.
+
+## 4. Other rules
+
 - Long-form corpus inventory: `~/.claude/projects/-Users-eluckey-Developer-origami/memory/project_corpora.md`. Keep the table in section 1 in sync when adding or retiring corpora.
