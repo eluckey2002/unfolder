@@ -6,7 +6,7 @@ coverage/
 *.log
 
 # Local reference implementations — not vendored
-references/
+/references/
 
 # macOS
 .DS_Store
