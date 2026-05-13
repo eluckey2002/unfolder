@@ -21,16 +21,23 @@ Detailed v1-v6 phase definitions are in `README.md`.
 
 ## Sessions planned
 
-Sessions 3 through 10 complete v1. Detailed plan:
+Sessions 4 through 11 complete v1. Detailed plan:
 
-- **Session 3** — First ADR. Based on what we learned from `paperfoldmodels`, decide and document the v1 algorithm and data structures.
-- **Session 4** — Bootstrap the build (Vite + TypeScript + pnpm). Dev server, hello world.
-- **Session 5** — Mesh generation script. Generate STL files for the test corpus (tetrahedron, cube, octahedron) programmatically.
-- **Session 6** — Mesh loading. Parse STL, render triangles on a canvas via three.js.
-- **Session 7** — Face adjacency graph (dual graph).
-- **Session 8** — Depth-first spanning tree (cut/fold edge classification).
-- **Session 9** — Unfolding rotation math (2D coordinates for every triangle).
-- **Session 10** — SVG export. v1 complete: end-to-end pipeline on platonic solids.
+- **Session 4** — Establish queue and working-agreement updates. (This
+  session.)
+- **Session 5** — Bootstrap the build (Vite + TypeScript + pnpm). Dev
+  server, hello world.
+- **Session 6** — Mesh generation script. Generate STL files for the
+  test corpus (tetrahedron, cube, octahedron) programmatically.
+- **Session 7** — Mesh loading. Parse STL, render triangles on a canvas
+  via three.js.
+- **Session 8** — Face adjacency graph (dual graph).
+- **Session 9** — Depth-first spanning tree (cut/fold edge
+  classification).
+- **Session 10** — Unfolding rotation math (2D coordinates for every
+  triangle).
+- **Session 11** — SVG export. v1 complete: end-to-end pipeline on
+  platonic solids.
 
 ## Key decisions made so far
 
@@ -69,14 +76,31 @@ How Evan and the strategist Claude work together. These have evolved during the 
 - **The repo is the source of truth.** Anything not committed effectively doesn't exist for future sessions. Chat is ephemeral.
 - **Evan is currently involved in most decisions.** He will signal explicitly when he trusts a category of recommendations to flow through silently. Until then, surface choices.
 - **Premature optimization is a watched-for failure mode.** The naive-before-optimized principle is enforced; push back on cleverness in v1-v2.
+- **Strategist autonomy is calibrated by stakes.** High-confidence prose
+  decisions inside Evan-approved structures flow silently. Medium-
+  confidence calls on permanent artifacts (ADR substance, commit
+  messages, file names) get surfaced briefly then proceeded with. Low-
+  confidence calls and anything crossing a project-shape boundary
+  (conventions, scope, working agreements) get surfaced and wait for
+  Evan's input.
+- **Session done = merged to `main`.** Each session ends with the work
+  merged to `main`, not just committed somewhere. Pre-merge worktree
+  commits are still drafts; immutability applies once merged.
+- **The strategist actively manages deferrals via `docs/queue.md`.** No
+  item is silently dropped; no item lingers indefinitely. See the
+  process in `docs/queue.md`.
+- **When opening a new Cowork chat to resume the project**, paste this
+  re-orientation message: "Continue the unfolder project. Read
+  `docs/project-state.md`, `docs/project-rationale.md`, and
+  `docs/project-history.md` in that order, then `docs/queue.md` and the
+  two most recent session logs in `docs/sessions/`. Then we'll plan
+  Session NNNN."
 
 ## Open questions / things in flight
 
-- The `paperfoldmodels` writeup may benefit from Evan skimming it before Session 3. If he hasn't, suggest he does.
-- Session 3 (first ADR) is the next session.
 - We have not yet committed to a final project name. `unfolder` is the working name. Worth revisiting before v6.
 - No GitHub remote yet. Worth revisiting once we have a working v1.
-- Test corpus is currently empty. Will be populated in Session 5.
+- Test corpus is currently empty. Will be populated in Session 6.
 
 ## Where to look
 
@@ -84,7 +108,7 @@ How Evan and the strategist Claude work together. These have evolved during the 
 - `docs/project-state.md` — this file (current state, working agreements)
 - `docs/project-rationale.md` — why we made the decisions we made
 - `docs/project-history.md` — narrative arc of how the project evolved
-- `docs/decisions/` — ADRs (currently none yet; first one comes in Session 3)
+- `docs/decisions/` — ADRs (ADR 0001 captures the v1 pipeline architecture)
 - `docs/references/` — writeups of external implementations we've studied
 - `docs/sessions/` — logs of completed Claude Code sessions
 - `docs/sessions/prompts/` — saved prompts (convention starts when we move to Cowork)
