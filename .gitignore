@@ -1,0 +1,12 @@
+node_modules/
+dist/
+build/
+coverage/
+.vite/
+*.log
+
+# Local reference implementations — not vendored
+references/
+
+# macOS
+.DS_Store
