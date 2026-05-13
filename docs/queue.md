@@ -46,3 +46,6 @@ Category tags are free-form (current ones: `convention`, `docs`,
 - [process] Restructuring prompts should include a consistency-scan
   step for cross-references (catches stale session numbers, file
   paths, etc.). Surfaced 0004.
+- [process] Before writing config-heavy prompts involving external
+  libraries, fetch current docs and verify the patterns are still
+  canonical. Surfaced 0005.

@@ -9,12 +9,18 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:run": "vitest run",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "generate-corpus": "vite-node scripts/generate-corpus.ts"
   },
   "devDependencies": {
     "@types/node": "^25.7.0",
+    "@types/three": "^0.184.1",
     "typescript": "^6.0.3",
     "vite": "^8.0.12",
+    "vite-node": "^6.0.0",
     "vitest": "^4.1.6"
+  },
+  "dependencies": {
+    "three": "^0.184.0"
   }
 }
