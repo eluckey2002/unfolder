@@ -49,3 +49,11 @@ Category tags are free-form (current ones: `convention`, `docs`,
 - [process] Before writing config-heavy prompts involving external
   libraries, fetch current docs and verify the patterns are still
   canonical. Surfaced 0005.
+- [convention] Clarify worktree-vs-direct-main pattern: should every
+  Claude Code session use a worktree branch + ff-merge, or is
+  direct-`main` work acceptable when the change is low-risk?
+  Surfaced 0006.
+- [convention] Clarify when work warrants session-number ceremony
+  (saved prompt, session log, status entry) vs. when it can land as
+  a plain maintenance commit. The roadmap-add commit is the first
+  precedent for the latter. Surfaced post-0006.

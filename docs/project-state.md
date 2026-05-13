@@ -95,6 +95,10 @@ How Evan and the strategist Claude work together. These have evolved during the 
   `docs/project-history.md` in that order, then `docs/queue.md` and the
   two most recent session logs in `docs/sessions/`. Then we'll plan
   Session NNNN."
+- **The strategist maintains `docs/roadmap.md`.** Status flags
+  flip from planned to completed when a session commits; phase
+  descriptions only change when a phase's ship-state commitment
+  itself changes (an ADR-worthy event).
 
 ## Open questions / things in flight
 
@@ -105,6 +109,7 @@ How Evan and the strategist Claude work together. These have evolved during the 
 ## Where to look
 
 - `README.md` — project vision and phase plan
+- `docs/roadmap.md` — v1–v6 phase plan and v1 session-level status at a glance
 - `docs/project-state.md` — this file (current state, working agreements)
 - `docs/project-rationale.md` — why we made the decisions we made
 - `docs/project-history.md` — narrative arc of how the project evolved
