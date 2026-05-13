@@ -43,7 +43,6 @@ Category tags are free-form (current ones: `convention`, `docs`,
   be amended. Surfaced 0003.
 - [cleanup] Backfill Session 0001 and 0002 session-log files in `main`.
   They exist in worktrees but never landed. Surfaced 0003.
-- [docs] Add a "standard re-orientation prompt" snippet to
-  `project-state.md` for opening a new Cowork chat (tells the new
-  strategist instance which docs to read to get up to speed). Surfaced
-  0003.
+- [process] Restructuring prompts should include a consistency-scan
+  step for cross-references (catches stale session numbers, file
+  paths, etc.). Surfaced 0004.
