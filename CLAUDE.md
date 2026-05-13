@@ -1,42 +1,56 @@
 # Origami project — Claude guidance
 
-## Claude-mem knowledge corpora
+All claude-mem tools are deferred MCP. Each section's load step must run before first use.
 
-Knowledge corpora are pre-compressed, primed AI sessions you query like a database. They replace re-reading reference repos on every session. Always use them when available.
+## 1. Knowledge corpora
 
-### Active corpora
-
-| Corpus | Triggers (any topic / file path containing these) | Coverage |
+| Corpus | Triggers (topic words / path fragments) | Coverage |
 |---|---|---|
-| `paperfoldmodels-algorithm` | `paperfoldmodels`, crease pattern, fold mechanics, unfolding, face overlap, dual graph, `references/paperfoldmodels/` | 8 observations, ~13k tokens of algorithm detail |
+| `paperfoldmodels-algorithm` | `paperfoldmodels`, crease pattern, fold mechanics, unfolding, face overlap, dual graph, `references/paperfoldmodels/` | 8 observations, ~13k tokens |
 
-### Required workflow (apply on every matching prompt)
+**Workflow on any trigger match:**
 
-**Step 1 — Load the MCP tool (once per session).** `query_corpus` is a deferred tool, so before first use:
-```
-ToolSearch(query="select:mcp__plugin_claude-mem_mcp-search__query_corpus", max_results=1)
-```
+1. Load once per session:
+   ```
+   ToolSearch(query="select:mcp__plugin_claude-mem_mcp-search__query_corpus", max_results=1)
+   ```
+2. Call:
+   ```
+   query_corpus(name="<corpus-name>", question="...")
+   ```
+3. Spawning a subagent on triggers? Paste this verbatim — subagents do not see CLAUDE.md:
+   ```
+   The corpus "paperfoldmodels-algorithm" is primed in claude-mem.
+   First: ToolSearch(query="select:mcp__plugin_claude-mem_mcp-search__query_corpus", max_results=1)
+   Then: query_corpus(name="paperfoldmodels-algorithm", question="...")
+   Read source files only if the corpus lacks needed detail.
+   ```
 
-**Step 2 — Query the corpus BEFORE reading any reference file or spawning any subagent** on a corpus's triggers:
-```
-query_corpus(name="paperfoldmodels-algorithm", question="<your specific question>")
-```
+Empty / incoherent / clearly-wrong corpus results → surface to user immediately. Do NOT silently fall back to `Read`.
 
-**Step 3 — When spawning a subagent on a corpus's triggers, paste this entire block verbatim into its prompt.** The subagent does NOT see this CLAUDE.md and will read reference files unless told otherwise:
-```
-A knowledge corpus "paperfoldmodels-algorithm" is primed in claude-mem.
-Before reading any reference files, load and query it:
-  ToolSearch(query="select:mcp__plugin_claude-mem_mcp-search__query_corpus", max_results=1)
-  query_corpus(name="paperfoldmodels-algorithm", question="<your question>")
-Only read source files if the corpus lacks needed detail.
-```
+## 2. Smart-explore (use BEFORE Read / find / grep on large or unfamiliar code)
 
-### Failure handling
+**Triggers:** "show me the structure of X", "what's in directory X", "find X across the codebase", "extract exports from X", any file >500 lines.
 
-If `query_corpus` returns empty / incoherent / clearly-wrong results, **surface this to the user immediately**. Do not silently fall back to `Read`. The likely fix is `rebuild_corpus` + `reprime_corpus`.
+**Workflow on any trigger match:**
 
-## Other rules
+1. Load once per session:
+   ```
+   ToolSearch(query="select:mcp__plugin_claude-mem_mcp-search__smart_outline,mcp__plugin_claude-mem_mcp-search__smart_search,mcp__plugin_claude-mem_mcp-search__smart_unfold", max_results=3)
+   ```
+2. Pick the right tool:
 
-- For files >500 lines that aren't covered by a corpus, prefer `smart_outline` and `smart_search` (also deferred MCP tools — load via `ToolSearch` first) over `Read`.
+   | Goal | Tool |
+   |---|---|
+   | Find symbols / files across a directory | `smart_search(query="...", path="./src")` |
+   | Structural skeleton of one file | `smart_outline(file_path="...")` |
+   | Full source of one specific symbol | `smart_unfold(file_path="...", symbol_name="...")` |
+
+3. Only `Read` after smart-explore has narrowed to a specific small region you actually need.
+
+**Anti-pattern to avoid:** chaining `find` / `ls` / `grep` / `Read` on a large unfamiliar file. The first tool call for structural questions should be `ToolSearch` for smart-explore, then `smart_outline` / `smart_search`.
+
+## 3. Other rules
+
 - When you've read the same large file twice in one session, propose building a corpus.
-- Long-form corpus inventory and history lives in `~/.claude/projects/-Users-eluckey-Developer-origami/memory/project_corpora.md`. Keep the table above in sync when adding/retiring corpora.
+- Long-form corpus inventory: `~/.claude/projects/-Users-eluckey-Developer-origami/memory/project_corpora.md`. Keep the table in section 1 in sync when adding or retiring corpora.
