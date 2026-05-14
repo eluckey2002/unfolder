@@ -113,18 +113,39 @@ The "useful on its own" requirement is what makes intermediate stopping points r
 
 ---
 
-## Local git only, no GitHub remote
+## Local git only through v2; public GitHub remote at v3
 
-**Chose:** Initialize git in the project root, commit frequently, but no remote configured yet.
+**Chose, v1–v2:** Initialize git in the project root, commit
+frequently, no remote configured. **Revisited at the v2→v3
+boundary:** a public GitHub remote at
+`github.com/eluckey2002/unfolder`, with CI.
 
 **Rejected:**
-- *GitHub remote from day one* (public or private).
+- *GitHub remote from day one* (public or private) — at v1.
 - *No version control at all early on.*
+- *Private remote, public only at v6* — at the v3 revisit. It
+  preserved more optionality but forced nothing, and matched a more
+  cautious posture than the project's stated identity.
 
-**Why this choice:**
-Evan's preference. The benefits of git (history, rollback, clean session boundaries) come from git itself, not from the remote. We can add a remote anytime once there's something worth pushing. Skipping the GitHub setup avoids a small but real decision (public vs private, repo name, license commitment to a public-facing artifact) that doesn't need to be made yet.
+**Why local-only through v2:**
+Evan's preference. The benefits of git — history, rollback, clean
+session boundaries — come from git itself, not from the remote.
+Skipping the GitHub setup early avoided a cluster of decisions —
+public vs. private, repo name, a license committed to a
+public-facing artifact — that didn't need to be made yet.
 
-Worth revisiting once v1 is working. Public visibility might be the right call for a project that aims at eventual community use (v6).
+**Why public, and why now:**
+By the v2→v3 boundary the deferred decisions were due. The codebase
+audit had flagged the absence of CI, and CI has nowhere to run
+without a remote; v3's PDF-export work and growing test surface make
+CI more valuable still. The project's stated identity is eventual
+public release for community use — building in the open from v3 is
+consistent with that, where private-until-v6 would have been a more
+cautious posture than the identity calls for. The repo name
+`unfolder` stays the working name; the final-name decision and the
+rest remain genuinely deferred to v6. Private→public is a one-click
+change, so the cost of having chosen public early is low if the
+posture ever needs revisiting.
 
 ---
 

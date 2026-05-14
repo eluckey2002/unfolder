@@ -68,9 +68,9 @@ Decisions that aren't yet ADRs but are real commitments. The reasoning is in `pr
 - **polygon-clipping** for 2D overlap detection (added in v2)
 - **pdf-lib** for PDF export (added in v3)
 - **React + react-three-fiber** for the UI (added in v4)
-- **Local git only** for now; no GitHub remote yet
+- **Public GitHub remote** at `github.com/eluckey2002/unfolder` — wired at the v2→v3 boundary; the project builds in the open from v3 onward
 - **Conventional Commits** style for commit messages
-- **MIT license** (planned, not yet committed to the repo)
+- **MIT license** — committed to the repo as `LICENSE`
 - **`src/core/` vs `src/app/` separation** is structural — `core/` is pure logic, `app/` is UI. Matters most in v4.
 - **Naive before optimized** — pick the simplest correct algorithm first, watch it fail, then optimize.
 - **Visual debugging from day one** — every module that touches geometry has a way to render its current state.
@@ -134,12 +134,14 @@ in `docs/retrospectives/v1-complete.md`.
   exceptions, even for rough sessions.
 - **Session done = merged to `main`.** Pre-merge worktree commits
   are drafts; immutability applies once merged.
-- **Numbered session vs. maintenance commit.** Work gets a
-  numbered session if it matches an entry in a phase's session
-  plan, or produces new functionality, code, or substantive
-  structural changes. Otherwise it lands as a plain maintenance
-  commit — no session log, no number, descriptive prompt filename
-  without a numeric prefix.
+- **Three kinds of work: numbered session, maintenance commit,
+  spike.** Work gets a numbered session if it matches an entry in a
+  phase's session plan, or produces new functionality, code, or
+  substantive structural changes. Exploratory work where the
+  approach itself is in question runs as a spike session (see
+  "Spike sessions for genuinely uncertain work" below). Everything
+  else lands as a plain maintenance commit — no session log, no
+  number, descriptive prompt filename without a numeric prefix.
 - **Worktree by default for numbered sessions; direct-`main` OK
   for maintenance commits.** Worktrees exist for the pre-merge
   amendment freedom — bugs caught between commit and merge fold in
@@ -230,8 +232,9 @@ in `docs/retrospectives/v1-complete.md`.
   > Continue the unfolder project — a browser-based papercraft
   > unfolding tool. Read, in order: `docs/project-state.md`,
   > `docs/strategist-protocol.md`, `docs/project-rationale.md`,
-  > `docs/project-history.md`, the latest retrospective in
-  > `docs/retrospectives/`, `docs/queue.md`, `docs/roadmap.md`,
+  > `docs/project-history.md`, the latest phase's retrospectives in
+  > `docs/retrospectives/` (both the `-complete.md` and the
+  > `-retrospective.md`), `docs/queue.md`, `docs/roadmap.md`,
   > and the two or three most recent session logs in
   > `docs/sessions/`. Then run `git log --oneline -20` to catch
   > anything that landed outside a chat. Then we'll plan the next
@@ -250,7 +253,6 @@ in `docs/retrospectives/v1-complete.md`.
 ## Open questions / things in flight
 
 - We have not yet committed to a final project name. `unfolder` is the working name. Worth revisiting before v6.
-- No GitHub remote yet. This is now a live decision at the v2→v3 boundary: CI has nowhere to run without a remote, and v3's PDF-export work, growing test surface, and the new end-to-end integration test all make CI more valuable. Settle it at the boundary or early in v3.
 
 ## Where to look
 
@@ -259,7 +261,7 @@ in `docs/retrospectives/v1-complete.md`.
 - `docs/project-state.md` — this file (current state, working agreements)
 - `docs/project-rationale.md` — why the project decisions were made
 - `docs/project-history.md` — narrative arc of how the project evolved
-- `docs/retrospectives/` — phase-boundary retrospectives (`v1-complete.md`, `v2-complete.md`)
+- `docs/retrospectives/` — per-phase retrospectives: a `-complete.md` (what shipped) and a `-retrospective.md` (how we worked). v1: `v1-complete.md`. v2: `v2-complete.md`, `v2-retrospective.md`.
 - `docs/audits/` — point-in-time codebase assessments (`codebase-assessment-2026-05-14.md` is the first)
 - `docs/decisions/` — ADRs (0001 pipeline architecture, 0002 adjacency-as-stage, 0003 DFS spanning tree, 0004 dihedral-weighted MST, 0005 greedy set-cover recut)
 - `docs/references/` — writeups of external implementations we've studied
