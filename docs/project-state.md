@@ -10,7 +10,19 @@ The full vision and phase plan (v1 through v6) lives in `README.md`. Read it.
 
 ## Current phase
 
-**v1 — Walking Skeleton is complete.** The end-to-end pipeline loads a platonic solid and produces a printable SVG net rendered alongside the 3D viewport. The current phase is v2 — functional unfolder (dihedral-weighted spanning tree, overlap detection and automatic recut, glue tabs with edge labels, multi-page layout). v2's session-level plan is in `docs/roadmap.md`; session 0017 (glue tabs with edge labels) is complete, and session 0018 (multi-page layout) is next.
+**v2 — Functional Unfolder is complete.** The pipeline runs ten
+pure-function stages end to end — parse, adjacency, dihedral weighting,
+spanning tree, flatten, overlap detection, recut, tabs, pagination,
+emit — and produces buildable papercraft for real low-poly meshes:
+every piece internally overlap-free, glue-tabbed, edge-labelled, and
+bin-packed onto printable Letter pages at one consistent scale. An
+end-to-end integration test (`test/integration/pipeline.test.ts`)
+guards that ship state.
+
+The current phase is v3 — quality output (optimized cuts via
+topological surgery, audit visualization, color/texture passthrough,
+real PDF export). v3's session-level plan does not exist yet — drafting
+it is the first task of the next session. See `docs/roadmap.md`.
 
 Detailed v1-v6 phase definitions are in `README.md`.
 
@@ -34,17 +46,14 @@ Detailed v1-v6 phase definitions are in `README.md`.
 - **Session 0016 — Automatic recut.** Added `src/core/recut.ts` — a pure `recut(tree, layout, overlaps)` that splits the overlapping net via greedy set-cover over the overlap tree-paths (ADR 0005). No re-flattening: rigid unfolding is local, so each piece's positions are selected from the original layout. The baseline harness now reports per-model piece counts alongside the pre-recut overlap count and verifies every piece is internally overlap-free; the regenerated `docs/baseline-pipeline.md` is the v2 payoff — the first time the v2 corpus produces buildable output. Concave models split (croissant 15, deer 28, ginger-bread 5, meat-sausage 3); convex models stay at 1. Multi-piece rendering deferred to 0017. Log: `docs/sessions/0016-automatic-recut.md`.
 - **Session 0017 — Glue tabs with edge labels.** Added `src/core/tabs.ts` — `buildRenderablePieces` classifies each piece's edges fold/cut, labels each cut with a shared sequential integer across mating sides, and computes a trapezoidal glue tab on the lower-face-index side. `recut` extended to return `RecutResult { pieces, cuts }` and `Piece` extended with `faces: number[]` (the mesh face indices); both surface data `recut` already computed. `emitSvg` refactored to serialize one `RenderablePiece` (folds dashed, cuts solid, tabs as polygons, labels as text); the app loops over every piece. The session's algorithmic decisions are within-stage and naive (sequential-integer labels, lower-face-index tab side, trapezoidal tabs sized as a fraction of edge length); no new ADR. Baseline numbers unchanged from 0016. Log: `docs/sessions/0017-glue-tabs-edge-labels.md`.
 - **Session 0018 — Multi-page layout.** Added `src/core/paginate.ts` — a pure stage that bin-packs `RenderablePiece[]` onto US-Letter pages at one uniform scale. The most-constrained piece sets the scale; pieces shelf-pack axis-aligned (sort by scaled height desc, tie-break by sourceIndex). `emitSvg` refactored to take a `Page` and emit physical-mm dimensions (`width="215.9mm"`, `viewBox="0 0 215.9 279.4"`); per-piece bbox/size/bump computation removed and stroke widths / dash pattern / font size became mm-absolute constants. `LETTER` and `A4` ship as PageSpec constants; `A4` switch is a one-argument change. App and baseline harness loop pages instead of pieces; baseline gains a `pages` column while `overlaps` and `pieces` stay byte-identical. No new ADR — uniform-scale-to-fit and naive shelf packing are session-log decisions, flagged as a candidate future ADR if per-piece scaling or piece-tiling ever lands. Log: `docs/sessions/0018-multi-page-layout.md`.
+- **Session 0019 — v2 integration and retrospective.** End-to-end integration test in `test/integration/pipeline.test.ts` codifying v2's ship-state guarantee (every corpus model completes the pipeline; every recut piece internally overlap-free; every piece fits a page; `Piece` structure well-formed). A connectedness guard in `buildSpanningTree` that throws on a disconnected dual graph (closes audit finding A1). The overlap-free invariant promoted from `it.todo` to a real property test (closes A4); `Piece` now structurally asserted (closes A6). `docs/retrospectives/v2-complete.md` written; handoff docs refreshed; v2 closed. Log: `docs/sessions/0019-v2-integration-retrospective.md`.
 
 ## Sessions planned
 
-v2's session-level plan is drafted — see `docs/roadmap.md` for the
-full arc. Per the planning decision, the first three sessions are
-specified in detail; sessions 0016–0019 are a deliberate sketch,
-refined as the early sessions land.
-
-- **0019 — v2 integration and retrospective.** Full pipeline run on
-  the 0013 corpus, ship-state validation, handoff-doc updates, and
-  `docs/retrospectives/v2-complete.md`. The next session.
+v2 is complete. v3 — quality output — does not have a session-level
+plan yet; drafting it is the first task of the next Cowork session, the
+same way v2's plan was drafted fresh after v1. See `docs/roadmap.md`
+for the v1-v6 phase arc.
 
 ## Key decisions made so far
 
@@ -209,7 +218,7 @@ in `docs/retrospectives/v1-complete.md`.
 ## Open questions / things in flight
 
 - We have not yet committed to a final project name. `unfolder` is the working name. Worth revisiting before v6.
-- No GitHub remote yet. Worth revisiting once we have a working v1.
+- No GitHub remote yet. This is now a live decision at the v2→v3 boundary: CI has nowhere to run without a remote, and v3's PDF-export work, growing test surface, and the new end-to-end integration test all make CI more valuable. Settle it at the boundary or early in v3.
 
 ## Where to look
 
@@ -218,7 +227,8 @@ in `docs/retrospectives/v1-complete.md`.
 - `docs/project-state.md` — this file (current state, working agreements)
 - `docs/project-rationale.md` — why the project decisions were made
 - `docs/project-history.md` — narrative arc of how the project evolved
-- `docs/retrospectives/` — phase-boundary retrospectives (`v1-complete.md` is the first)
+- `docs/retrospectives/` — phase-boundary retrospectives (`v1-complete.md`, `v2-complete.md`)
+- `docs/audits/` — point-in-time codebase assessments (`codebase-assessment-2026-05-14.md` is the first)
 - `docs/decisions/` — ADRs (0001 pipeline architecture, 0002 adjacency-as-stage, 0003 DFS spanning tree, 0004 dihedral-weighted MST, 0005 greedy set-cover recut)
 - `docs/references/` — writeups of external implementations we've studied
 - `docs/sessions/` — logs of completed Claude Code sessions

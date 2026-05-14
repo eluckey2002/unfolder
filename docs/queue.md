@@ -42,23 +42,11 @@ Category tags are free-form (current ones: `convention`, `docs`,
   or 2 vertex lines). Both error paths are documented in
   `src/core/parse-stl.ts:11-13` but currently uncovered by tests.
   Surfaced during test-suite review.
-- [robustness] Disconnected dual graph is silently mishandled: Kruskal
-  produces a forest, non-root component faces get `parent[i] === -1`
-  (ambiguous with the root marker), and `buildLayout` then reads
-  undefined positions for unreachable faces. Needs an explicit
-  connectedness check — a throw-guard in `buildSpanningTree`, or a
-  formal ADR 0006 if the contract deserves one.
-  `src/core/spanning-tree.ts`, `src/core/flatten.ts`. Surfaced by the
-  2026-05-14 codebase assessment (finding A1).
-- [test] Promote the overlap-free invariant from `it.todo` to a real
-  property test. It is v2's headline guarantee (ADR 0005) and is
-  currently only checked by the baseline harness on the corpus.
-  `test/property/pipeline.test.ts`. Surfaced by the 2026-05-14 codebase
-  assessment (finding A4).
 - [test] Add a property test for `dihedral.ts`: weights land in
   `[0, π]` and the stage is deterministic. `src/core/dihedral.ts` has
   no property test. Surfaced by the 2026-05-14 codebase assessment
   (finding A5).
-- [test] Assert `Piece` structure in `recut.test.ts` — the pipeline's
-  output type currently has zero test references. `src/core/recut.ts`.
-  Surfaced by the 2026-05-14 codebase assessment (finding A6).
+- [cleanup] `scripts/baseline-pipeline.ts` runs `paginate` inside the
+  `recut` try-block, so a `paginate` throw is mislabelled "failed at
+  recut". Give `paginate` its own try-block or relabel. Surfaced by
+  session 0018.

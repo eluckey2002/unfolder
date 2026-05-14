@@ -110,3 +110,26 @@ describe("buildSpanningTree — MST behavior", () => {
     }
   });
 });
+
+describe("buildSpanningTree — connectedness guard", () => {
+  it("throws on two isolated faces with no adjacency", () => {
+    const dual: DualGraph = {
+      adjacencies: [],
+      byFace: [[], []],
+    };
+    expect(() => buildSpanningTree(dual, [])).toThrow(
+      /connected dual graph/i,
+    );
+  });
+
+  it("throws when a component is unreachable from root", () => {
+    // 3 faces, two components: {0,1} connected, {2} isolated.
+    const dual: DualGraph = {
+      adjacencies: [{ faceA: 0, faceB: 1, edge: [0, 1] }],
+      byFace: [[0], [0], []],
+    };
+    expect(() => buildSpanningTree(dual, [0])).toThrow(
+      /connected dual graph/i,
+    );
+  });
+});

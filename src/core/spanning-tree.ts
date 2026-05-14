@@ -145,5 +145,15 @@ export function buildSpanningTree(
     }
   }
 
+  let unreached = 0;
+  for (let i = 0; i < faceCount; i++) {
+    if (!visited[i]) unreached++;
+  }
+  if (unreached > 0) {
+    throw new Error(
+      `buildSpanningTree requires a connected dual graph (single mesh component); ${unreached} of ${faceCount} faces were unreachable from root ${root}.`,
+    );
+  }
+
   return { root, parent, folds, cuts };
 }

@@ -252,11 +252,17 @@ describe("Smoke tests on fixed polyhedra", () => {
   });
 });
 
-describe("v2 target — no overlap in layout", () => {
-  // Overlap detection and automatic recut are explicit v2 work
-  // (sessions 0015 and 0016). The property is intentionally a todo so it shows
-  // up in the report. Promote to a real test once polygon-clipping lands.
-  it.todo(
-    "no two non-adjacent FlatFace polygons overlap (requires v2 overlap detection)",
-  );
+describe("v2 invariant — overlap-free pieces after recut (property)", () => {
+  it("every recut piece is internally overlap-free", () => {
+    fc.assert(
+      fc.property(closedMeshArb, (mesh) => {
+        const { tree, layout } = pipeline(mesh);
+        const overlaps = detectOverlaps(layout);
+        const result = recut(tree, layout, overlaps);
+        for (const piece of result.pieces) {
+          expect(detectOverlaps(piece.layout)).toEqual([]);
+        }
+      }),
+    );
+  });
 });

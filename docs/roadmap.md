@@ -12,9 +12,10 @@ agreements and open questions, and the individual session logs in
 
 ## Where we are now
 
-**Phase:** v2 — Functional Unfolder. Implementation underway.
-**Last completed session:** 0018 — Multi-page layout.
-**Next planned session:** 0019 — v2 integration and retrospective.
+**Phase:** v3 — Quality Output. Not yet started; session plan pending.
+**Last completed session:** 0019 — v2 integration and retrospective.
+**Next planned session:** v3 session-level plan, drafted at the start
+of the next Cowork session.
 
 Run `git log` for exact repo state — this document tracks phase and
 session status, not commit hashes.
@@ -166,9 +167,12 @@ open until 0014 lands and informs the granularity.
   packing, axis-aligned, no rotation. `emitSvg` refactored to take a
   `Page` and emit physical-mm dimensions. Baseline numbers
   unchanged; only the new `pages` column was added.
-- **0019 — v2 integration and retrospective.** ⏭ Full pipeline run
-  on the 0013 corpus, ship-state validation, handoff-doc updates,
-  and `docs/retrospectives/v2-complete.md`.
+- **0019 — v2 integration and retrospective.** ✅ End-to-end
+  integration test codifying v2 ship state; a connectedness guard in
+  `buildSpanningTree` (closes audit A1); the overlap-free invariant
+  promoted from `it.todo` to a real property test (closes A4); `Piece`
+  structurally asserted (closes A6); `docs/retrospectives/v2-complete.md`
+  written and handoff docs refreshed. v2 complete.
 
 ## Maintaining this document
 

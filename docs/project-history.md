@@ -172,6 +172,52 @@ the repo rather than a conversation that evaporates.
 
 ---
 
+## v2: the functional unfolder
+
+v2 turned the walking skeleton into a tool that produces buildable
+papercraft. It ran eight sessions, 0012 through 0019, and unlike v1 its
+session order was not a matter of preference — the pipeline's
+dependency chain fixed it.
+
+Session 0012 added the OBJ parser, so the corpus could be more than
+three.js-generated STL solids. Session 0013 built that corpus: eleven
+models, four from a CC0 Kenney pack, a low-poly deer, two procedurally
+generated convex baselines, every one verified a closed two-manifold —
+and, more importantly, a baseline showing only 5 of the 11 unfolded
+cleanly under v1's plain DFS. That failure baseline drove the rest of
+the phase. Session 0014 replaced the DFS with a dihedral-weighted
+minimum spanning tree (ADR 0004) and moved the baseline to 7 of 11 —
+with regressions on the most concave shapes that prompted a research
+survey to confirm the architecture was sound. Session 0015 added
+overlap detection on top of `polygon-clipping`. Session 0016 added
+automatic recut — greedy set-cover over the overlap tree-paths (ADR
+0005) — and that was the payoff: every piece of every model now
+internally overlap-free. Sessions 0017 and 0018 made the output
+buildable and printable — glue tabs with matched edge labels, then
+multi-page bin-packing onto physical Letter pages at one consistent
+scale. Session 0019 closed the phase: an end-to-end integration test
+that codifies v2's ship-state guarantee, a guard against the one latent
+bug a mid-phase audit had found, and the v2 retrospective.
+
+---
+
+## A mid-phase audit
+
+Something new happened in the middle of v2. Between sessions 0016 and
+0017, a full four-axis codebase audit was run — architecture, tech
+debt, test coverage, roadmap-versus-reality — as a read-only
+assessment. It found no critical bugs but one genuine latent P1: a
+disconnected input mesh would be silently mishandled rather than
+rejected. It surfaced real test gaps. And the strategist's triage of it
+did something worth recording: it argued back. Several findings the
+audit rated P1 were recalibrated — already owned by an ADR, or
+unreachable through the type system, or gated on a decision not yet due
+— and only the genuine items were queued. The audit became a committed
+artifact (`docs/audits/`), and the practice — a mid-phase audit,
+triaged rather than rubber-stamped — is one v3 should repeat.
+
+---
+
 ## What this history teaches
 
 Three patterns worth noting for future sessions:
@@ -186,16 +232,20 @@ Three patterns worth noting for future sessions:
 
 ## The current moment
 
-As of the v1 wrap-up commit, v1 — the walking skeleton — is
-complete and merged to `main`. The pipeline runs end to end. Three
-ADRs, eleven session logs, a managed queue, a live roadmap
-artifact, and a working method documented in
-`docs/retrospectives/v1-complete.md` are all in the repo.
+As of the v2 wrap-up, v2 — the functional unfolder — is complete and
+merged to `main`. The pipeline runs ten stages end to end and produces
+buildable papercraft for real low-poly meshes: every piece overlap-free,
+tabbed, labelled, and packed onto printable pages. Five ADRs, nineteen
+session logs, two phase retrospectives, a managed queue, and an
+end-to-end integration test that guards the ship state are all in the
+repo.
 
-The next phase is v2 — the functional unfolder. Its session-level
-plan does not exist yet; drafting it is the first task of the next
-Cowork session, which will pick up the project fresh, using this
-updated handoff package as its entry point. If the package is
-good, the new strategist loses nothing. That is the test.
+The next phase is v3 — quality output: optimized cuts, audit
+visualization, color and texture passthrough, real PDF export. Its
+session-level plan does not exist yet; drafting it is the first task of
+the next Cowork session, which will pick up the project using this
+updated handoff package as its entry point. The test is the same as it
+was at the v1 boundary: if the package is good, the next strategist
+loses nothing.
 
-Welcome to v2.
+Welcome to v3.
