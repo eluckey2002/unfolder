@@ -13,8 +13,8 @@ agreements and open questions, and the individual session logs in
 ## Where we are now
 
 **Phase:** v1 — Walking Skeleton.
-**Last completed session:** 0006 (test corpus generation).
-**Next planned session:** 0007 — Mesh loading.
+**Last completed session:** 0007 (mesh loading).
+**Next planned session:** 0008 — Face adjacency graph.
 **Main HEAD:** `1ed6b09`.
 
 ## Phase plan (v1–v6)
@@ -71,9 +71,9 @@ Sessions 0001–0011 complete v1. Sessions 0001–0006 are committed to
   Vitest toolchain.
 - **0006 — Generate the test corpus.** ✅ Three.js-generated STL
   files for tetrahedron, cube, octahedron.
-- **0007 — Mesh loading.** ⏭ Parse STL files; render triangles on a
+- **0007 — Mesh loading.** ✅ Parse STL files; render triangles on a
   canvas via three.js. First `src/core/` and `src/app/` code.
-- **0008 — Face adjacency graph.** Build the dual graph (one node
+- **0008 — Face adjacency graph.** ⏭ Build the dual graph (one node
   per face, edges between adjacent faces).
 - **0009 — Spanning tree.** DFS over the adjacency graph; classify
   each edge as fold or cut.

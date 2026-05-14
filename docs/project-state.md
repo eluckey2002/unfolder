@@ -99,6 +99,10 @@ How Evan and the strategist Claude work together. These have evolved during the 
   flip from planned to completed when a session commits; phase
   descriptions only change when a phase's ship-state commitment
   itself changes (an ADR-worthy event).
+- **The strategist updates the `unfolder-roadmap` Cowork artifact
+  at each session-end.** Same trigger as the roadmap.md status
+  flip — both happen together. The artifact carries a baked
+  snapshot of session statuses, queue, and recent commits.
 
 ## Open questions / things in flight
 
