@@ -10,7 +10,7 @@ The full vision and phase plan (v1 through v6) lives in `README.md`. Read it.
 
 ## Current phase
 
-**v1 — Walking Skeleton is complete.** The end-to-end pipeline loads a platonic solid and produces a printable SVG net rendered alongside the 3D viewport. The current phase is v2 — functional unfolder (dihedral-weighted spanning tree, overlap detection and automatic recut, glue tabs with edge labels, multi-page layout). v2's session-level plan is drafted in `docs/roadmap.md`; session 0012 (OBJ parser) is next. v2 implementation has not started.
+**v1 — Walking Skeleton is complete.** The end-to-end pipeline loads a platonic solid and produces a printable SVG net rendered alongside the 3D viewport. The current phase is v2 — functional unfolder (dihedral-weighted spanning tree, overlap detection and automatic recut, glue tabs with edge labels, multi-page layout). v2's session-level plan is in `docs/roadmap.md`; session 0012 (OBJ parser) is complete, and session 0013 (sourced model test corpus) is next.
 
 Detailed v1-v6 phase definitions are in `README.md`.
 
@@ -27,6 +27,7 @@ Detailed v1-v6 phase definitions are in `README.md`.
 - **Session 0009 — Spanning tree.** DFS spanning tree over the dual graph in `src/core/spanning-tree.ts`; ADR 0003 commits "plain DFS for v1, weighted MST deferred to v2." Log: `docs/sessions/0009-spanning-tree.md`.
 - **Session 0010 — Flatten.** Rigid unfolding in `src/core/flatten.ts` — `getThirdPoint` primitive and `buildLayout` walking the spanning tree, with an explicit geometric side test for apex placement. Log: `docs/sessions/0010-flatten.md`.
 - **Session 0011 — SVG export.** `emitSvg` in `src/core/emit-svg.ts`; full pipeline wired into the browser app with a split 3D/net layout. v1 walking skeleton complete. Log: `docs/sessions/0011-svg-export.md`.
+- **Session 0012 — OBJ parser.** Wavefront OBJ parser in `src/core/parse-obj.ts` producing the v1 `Mesh3D` — geometry-only, with shared-vertex indexing (1-based, negative indices), the four face-reference forms, and fan-triangulation of quad/n-gon faces. Vertex dedup mirrors the STL parser. First v2 implementation session. Log: `docs/sessions/0012-obj-parser.md`.
 
 ## Sessions planned
 
@@ -35,10 +36,9 @@ full arc. Per the planning decision, the first three sessions are
 specified in detail; sessions 0015–0019 are a deliberate sketch,
 refined as the early sessions land.
 
-- **0012 — OBJ parser.** `src/core/parse-obj.ts` producing the v1
-  `Mesh3D`. The next session.
 - **0013 — Sourced model test corpus.** CC-licensed low-poly OBJ
   models in `test/corpus/`, plus the v1-pipeline overlap baseline.
+  The next session.
 - **0014 — Dihedral-weighted spanning tree.** Weighted MST over the
   dual graph; ADR 0004 commits the weighting heuristic.
 

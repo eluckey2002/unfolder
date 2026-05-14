@@ -12,11 +12,9 @@ agreements and open questions, and the individual session logs in
 
 ## Where we are now
 
-**Phase:** v2 — Functional Unfolder. Planning complete;
-implementation not started.
-**Last completed session:** 0011 — SVG export (v1 walking skeleton
-complete).
-**Next planned session:** 0012 — OBJ parser.
+**Phase:** v2 — Functional Unfolder. Implementation underway.
+**Last completed session:** 0012 — OBJ parser.
+**Next planned session:** 0013 — Sourced model test corpus.
 
 Run `git log` for exact repo state — this document tracks phase and
 session status, not commit hashes.
@@ -99,7 +97,7 @@ Per the planning decision, the first three sessions are specified
 in detail; 0015–0019 are a deliberate sketch, refined as the early
 sessions land. Sessions continue the global numbering.
 
-- **0012 — OBJ parser.** Add `src/core/parse-obj.ts`, producing the
+- **0012 — OBJ parser.** ✅ Add `src/core/parse-obj.ts`, producing the
   same `Mesh3D` the STL parser produces. Geometry only — normals,
   texture coordinates, groups, and materials are skipped or
   parsed-and-ignored. Handles OBJ's shared-vertex indexing
@@ -109,7 +107,7 @@ sessions land. Sessions continue the global numbering.
   session-log decisions unless triangulation proves load-bearing,
   in which case it earns an ADR.
 
-- **0013 — Sourced model test corpus.** Source four to six
+- **0013 — Sourced model test corpus.** ⏭ Source four to six
   CC-licensed low-poly OBJ models matching the v2 ship-state target
   — faceted animal heads, geometric busts, low-poly props —
   spanning a range of face counts and topological variety: some
@@ -156,6 +154,6 @@ open until 0014 lands and informs the granularity.
 
 Updated by the strategist at the end of any session whose status
 changes. Status flags (`✅`, `⏭`, blank for planned-but-not-active)
-live in the active phase's session plan. Phase descriptions only change when a
-phase's ship-state commitment itself changes — a substantive enough
-event to warrant its own ADR.
+live in the active phase's session plan. Phase descriptions only
+change when a phase's ship-state commitment itself changes — a
+substantive enough event to warrant its own ADR.
