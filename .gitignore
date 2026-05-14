@@ -8,5 +8,8 @@ coverage/
 # Local reference implementations — not vendored
 /references/
 
+# Claude Code local state (worktrees, machine-local config)
+.claude/
+
 # macOS
 .DS_Store
