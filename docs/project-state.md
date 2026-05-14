@@ -23,12 +23,12 @@ Detailed v1-v6 phase definitions are in `README.md`.
 - **Session 0005 — Bootstrap the build.** Vite + TypeScript + pnpm + Vitest toolchain. Log: `docs/sessions/0005-bootstrap-the-build.md`.
 - **Session 0006 — Generate the test corpus.** Three.js-generated ASCII STL files for tetrahedron, cube, octahedron. Log: `docs/sessions/0006-generate-test-corpus.md`.
 - **Session 0007 — Mesh loading.** ASCII STL parser in `src/core/` with vertex dedup; three.js viewport in `src/app/` with OrbitControls. First `src/core/` and `src/app/` code. Log: `docs/sessions/0007-mesh-loading.md`.
+- **Session 0008 — Face adjacency graph.** `DualGraph` output stage in `src/core/adjacency.ts`; ADR 0002 commits the "adjacency as separate stage" decision deferred from ADR 0001. Log: `docs/sessions/0008-face-adjacency-graph.md`.
 
 ## Sessions planned
 
-Sessions 0008 through 0011 complete v1. Detailed plan in `docs/roadmap.md`.
+Sessions 0009 through 0011 complete v1. Detailed plan in `docs/roadmap.md`.
 
-- **Session 0008** — Face adjacency graph (dual graph).
 - **Session 0009** — Spanning tree (cut/fold edge classification).
 - **Session 0010** — Flatten — 2D coordinates for every triangle by walking the spanning tree.
 - **Session 0011** — SVG export. v1 complete: end-to-end pipeline on platonic solids.

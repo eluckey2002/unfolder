@@ -13,9 +13,9 @@ agreements and open questions, and the individual session logs in
 ## Where we are now
 
 **Phase:** v1 — Walking Skeleton.
-**Last completed session:** 0007 (mesh loading).
-**Next planned session:** 0008 — Face adjacency graph.
-**Main HEAD:** `a69dcf3`.
+**Last completed session:** 0008 (face adjacency graph).
+**Next planned session:** 0009 — Spanning tree.
+**Main HEAD:** `7fc7564`.
 
 ## Phase plan (v1–v6)
 
@@ -73,9 +73,9 @@ Sessions 0001–0011 complete v1. Sessions 0001–0006 are committed to
   files for tetrahedron, cube, octahedron.
 - **0007 — Mesh loading.** ✅ Parse STL files; render triangles on a
   canvas via three.js. First `src/core/` and `src/app/` code.
-- **0008 — Face adjacency graph.** ⏭ Build the dual graph (one node
+- **0008 — Face adjacency graph.** ✅ Build the dual graph (one node
   per face, edges between adjacent faces).
-- **0009 — Spanning tree.** DFS over the adjacency graph; classify
+- **0009 — Spanning tree.** ⏭ DFS over the adjacency graph; classify
   each edge as fold or cut.
 - **0010 — Flatten.** Walk the spanning tree to assign 2D
   coordinates to every face.
