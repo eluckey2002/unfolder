@@ -10,6 +10,7 @@ import { buildSpanningTree } from "../src/core/spanning-tree.js";
 import { buildLayout } from "../src/core/flatten.js";
 import { emitSvg } from "../src/core/emit-svg.js";
 import { detectOverlaps } from "../src/core/overlap.js";
+import { LETTER, paginate } from "../src/core/paginate.js";
 import { recut } from "../src/core/recut.js";
 import { buildRenderablePieces } from "../src/core/tabs.js";
 
@@ -40,6 +41,7 @@ type Result = {
   pipeline: string;
   overlaps: string;
   pieces: string;
+  pages: string;
   piecesClean: boolean;
 };
 
@@ -55,6 +57,7 @@ for (const fname of entries) {
     pipeline: "completed",
     overlaps: "—",
     pieces: "—",
+    pages: "—",
     piecesClean: true,
   };
 
@@ -114,7 +117,9 @@ for (const fname of entries) {
       (p) => detectOverlaps(p.layout).length === 0,
     );
     const renderable = buildRenderablePieces(result);
-    for (const piece of renderable) emitSvg(piece);
+    const pages = paginate(renderable, LETTER);
+    r.pages = String(pages.length);
+    for (const page of pages) emitSvg(page);
   } catch {
     r.pipeline = "failed at recut";
     results.push(r);
@@ -131,6 +136,7 @@ const headers = [
   "pipeline",
   "overlaps (pre-recut)",
   "pieces",
+  "pages",
 ];
 const rows = results.map((r) => [
   r.model,
@@ -139,6 +145,7 @@ const rows = results.map((r) => [
   r.pipeline,
   r.overlaps,
   r.pieces,
+  r.pages,
 ]);
 const widths = headers.map((h, i) =>
   Math.max(h.length, ...rows.map((row) => row[i].length)),
@@ -154,11 +161,15 @@ const pieceCounts = completed
 const minPieces = pieceCounts.length ? Math.min(...pieceCounts) : 0;
 const maxPieces = pieceCounts.length ? Math.max(...pieceCounts) : 0;
 const totalPieces = pieceCounts.reduce((s, n) => s + n, 0);
+const pageCounts = completed
+  .map((r) => Number.parseInt(r.pages, 10))
+  .filter((n) => Number.isFinite(n));
+const totalPages = pageCounts.reduce((s, n) => s + n, 0);
 const dirty = completed.filter((r) => !r.piecesClean);
 
 const today = new Date().toISOString().slice(0, 10);
 const summaryLines = [
-  `**Summary:** ${completed.length} models completed the pipeline; recut produced ${totalPieces} pieces total (per-model range ${minPieces}–${maxPieces}).`,
+  `**Summary:** ${completed.length} models completed the pipeline; recut produced ${totalPieces} pieces total (per-model range ${minPieces}–${maxPieces}); paginate produced ${totalPages} pages total.`,
 ];
 if (dirty.length === 0) {
   summaryLines.push("Every piece is internally overlap-free.");

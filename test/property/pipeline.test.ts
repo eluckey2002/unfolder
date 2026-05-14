@@ -15,6 +15,7 @@ import { buildLayout } from "../../src/core/flatten.js";
 import type { Mesh3D, Vec3 } from "../../src/core/mesh.js";
 import { emitSvg } from "../../src/core/emit-svg.js";
 import { detectOverlaps } from "../../src/core/overlap.js";
+import { LETTER, paginate } from "../../src/core/paginate.js";
 import { recut } from "../../src/core/recut.js";
 import { buildSpanningTree } from "../../src/core/spanning-tree.js";
 import { buildRenderablePieces } from "../../src/core/tabs.js";
@@ -206,16 +207,17 @@ describe("Layout connectivity (property)", () => {
 });
 
 describe("SVG output (property)", () => {
-  it("has 3 line elements per face across all pieces and well-formed viewBoxes", () => {
+  it("has 3 line elements per face across all pages and well-formed viewBoxes", () => {
     fc.assert(
       fc.property(closedMeshArb, (mesh) => {
         const { tree, layout } = pipeline(mesh);
         const overlaps = detectOverlaps(layout);
         const result = recut(tree, layout, overlaps);
         const renderable = buildRenderablePieces(result);
+        const pages = paginate(renderable, LETTER);
         let totalLines = 0;
-        for (const piece of renderable) {
-          const svg = emitSvg(piece);
+        for (const page of pages) {
+          const svg = emitSvg(page);
           expect(svg.startsWith("<svg")).toBe(true);
           expect(svg.includes('viewBox="')).toBe(true);
           totalLines += (svg.match(/<line /g) ?? []).length;

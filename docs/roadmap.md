@@ -13,8 +13,8 @@ agreements and open questions, and the individual session logs in
 ## Where we are now
 
 **Phase:** v2 — Functional Unfolder. Implementation underway.
-**Last completed session:** 0017 — Glue tabs with edge labels.
-**Next planned session:** 0018 — Multi-page layout.
+**Last completed session:** 0018 — Multi-page layout.
+**Next planned session:** 0019 — v2 integration and retrospective.
 
 Run `git log` for exact repo state — this document tracks phase and
 session status, not commit hashes.
@@ -160,11 +160,15 @@ open until 0014 lands and informs the granularity.
   refactored to serialize one piece; the app loops over every
   piece. Baseline numbers unchanged (the algorithm was not
   touched).
-- **0018 — Multi-page layout.** ⏭ Pack the multi-piece net across
-  printable pages; naive bin-packing first.
-- **0019 — v2 integration and retrospective.** Full pipeline run on
-  the 0013 corpus, ship-state validation, handoff-doc updates, and
-  `docs/retrospectives/v2-complete.md`.
+- **0018 — Multi-page layout.** ✅ `src/core/paginate.ts` — a pure
+  stage that bin-packs `RenderablePiece[]` onto US-Letter pages at
+  one uniform scale (most-constrained piece sets the scale). Shelf
+  packing, axis-aligned, no rotation. `emitSvg` refactored to take a
+  `Page` and emit physical-mm dimensions. Baseline numbers
+  unchanged; only the new `pages` column was added.
+- **0019 — v2 integration and retrospective.** ⏭ Full pipeline run
+  on the 0013 corpus, ship-state validation, handoff-doc updates,
+  and `docs/retrospectives/v2-complete.md`.
 
 ## Maintaining this document
 

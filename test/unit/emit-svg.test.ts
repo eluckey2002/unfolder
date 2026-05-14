@@ -9,6 +9,7 @@ import { computeDihedralWeights } from "../../src/core/dihedral.js";
 import { emitSvg } from "../../src/core/emit-svg.js";
 import { buildLayout } from "../../src/core/flatten.js";
 import { detectOverlaps } from "../../src/core/overlap.js";
+import { LETTER, paginate } from "../../src/core/paginate.js";
 import { parseStl } from "../../src/core/parse-stl.js";
 import { recut } from "../../src/core/recut.js";
 import { buildSpanningTree } from "../../src/core/spanning-tree.js";
@@ -34,8 +35,9 @@ const pipelineFromCorpus = (name: string): SvgPipeline => {
   const overlaps = detectOverlaps(layout);
   const result = recut(tree, layout, overlaps);
   const renderable = buildRenderablePieces(result);
+  const pages = paginate(renderable, LETTER);
   return {
-    svg: emitSvg(renderable[0]),
+    svg: emitSvg(pages[0]),
     faceCount: mesh.faces.length,
     foldCount: tree.folds.length,
     cutCount: result.cuts.length,
@@ -56,11 +58,13 @@ const countTexts = (svg: string): number =>
   (svg.match(/<text/g) ?? []).length;
 
 describe("emitSvg", () => {
-  it("produces a well-formed SVG document", () => {
+  it("produces a well-formed SVG document with mm-sized viewBox", () => {
     const { svg } = pipelineFromCorpus("tetrahedron");
     expect(svg.startsWith("<svg")).toBe(true);
     expect(svg.endsWith("</svg>")).toBe(true);
-    expect(svg).toContain("viewBox=");
+    expect(svg).toContain(`viewBox="0 0 ${LETTER.widthMm} ${LETTER.heightMm}"`);
+    expect(svg).toContain(`width="${LETTER.widthMm}mm"`);
+    expect(svg).toContain(`height="${LETTER.heightMm}mm"`);
   });
 
   it("tetrahedron: one line per face-edge (12 total)", () => {

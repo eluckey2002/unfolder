@@ -33,6 +33,7 @@ Detailed v1-v6 phase definitions are in `README.md`.
 - **Session 0015 — Overlap detection.** Added `src/core/overlap.ts` — `detectOverlaps(layout)`, a pure predicate built on `polygon-clipping` that finds every face pair with positive 2D triangle-triangle intersection. `scripts/baseline-pipeline.ts` now uses it in place of the hand-rolled Sutherland–Hodgman check from session 0013. The 7-of-11 overlap-free summary is unchanged; the four concave models shift slightly upward (+3 to +16 pairs) as the new detector catches sliver overlaps `AREA_EPS=1e-10` was missing. `docs/references/unfolding-algorithm-survey.md` committed alongside. No ADR — `polygon-clipping` was already the committed stack decision. Log: `docs/sessions/0015-overlap-detection.md`.
 - **Session 0016 — Automatic recut.** Added `src/core/recut.ts` — a pure `recut(tree, layout, overlaps)` that splits the overlapping net via greedy set-cover over the overlap tree-paths (ADR 0005). No re-flattening: rigid unfolding is local, so each piece's positions are selected from the original layout. The baseline harness now reports per-model piece counts alongside the pre-recut overlap count and verifies every piece is internally overlap-free; the regenerated `docs/baseline-pipeline.md` is the v2 payoff — the first time the v2 corpus produces buildable output. Concave models split (croissant 15, deer 28, ginger-bread 5, meat-sausage 3); convex models stay at 1. Multi-piece rendering deferred to 0017. Log: `docs/sessions/0016-automatic-recut.md`.
 - **Session 0017 — Glue tabs with edge labels.** Added `src/core/tabs.ts` — `buildRenderablePieces` classifies each piece's edges fold/cut, labels each cut with a shared sequential integer across mating sides, and computes a trapezoidal glue tab on the lower-face-index side. `recut` extended to return `RecutResult { pieces, cuts }` and `Piece` extended with `faces: number[]` (the mesh face indices); both surface data `recut` already computed. `emitSvg` refactored to serialize one `RenderablePiece` (folds dashed, cuts solid, tabs as polygons, labels as text); the app loops over every piece. The session's algorithmic decisions are within-stage and naive (sequential-integer labels, lower-face-index tab side, trapezoidal tabs sized as a fraction of edge length); no new ADR. Baseline numbers unchanged from 0016. Log: `docs/sessions/0017-glue-tabs-edge-labels.md`.
+- **Session 0018 — Multi-page layout.** Added `src/core/paginate.ts` — a pure stage that bin-packs `RenderablePiece[]` onto US-Letter pages at one uniform scale. The most-constrained piece sets the scale; pieces shelf-pack axis-aligned (sort by scaled height desc, tie-break by sourceIndex). `emitSvg` refactored to take a `Page` and emit physical-mm dimensions (`width="215.9mm"`, `viewBox="0 0 215.9 279.4"`); per-piece bbox/size/bump computation removed and stroke widths / dash pattern / font size became mm-absolute constants. `LETTER` and `A4` ship as PageSpec constants; `A4` switch is a one-argument change. App and baseline harness loop pages instead of pieces; baseline gains a `pages` column while `overlaps` and `pieces` stay byte-identical. No new ADR — uniform-scale-to-fit and naive shelf packing are session-log decisions, flagged as a candidate future ADR if per-piece scaling or piece-tiling ever lands. Log: `docs/sessions/0018-multi-page-layout.md`.
 
 ## Sessions planned
 
@@ -41,13 +42,9 @@ full arc. Per the planning decision, the first three sessions are
 specified in detail; sessions 0016–0019 are a deliberate sketch,
 refined as the early sessions land.
 
-- **0018 — Multi-page layout.** Pack the multi-piece net across
-  printable pages; naive bin-packing first. The pieces currently
-  render at their original recut positions (still overlapping
-  each other on the plane), so 0018 arranges them. The next
-  session.
-
-Sketched beyond that: 0019 v2 integration and retrospective.
+- **0019 — v2 integration and retrospective.** Full pipeline run on
+  the 0013 corpus, ship-state validation, handoff-doc updates, and
+  `docs/retrospectives/v2-complete.md`. The next session.
 
 ## Key decisions made so far
 
