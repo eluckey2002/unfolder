@@ -8,8 +8,11 @@ coverage/
 # Local reference implementations — not vendored
 /references/
 
-# Claude Code local state (worktrees, machine-local config)
-.claude/
+# Claude Code local state (worktrees, machine-local config — settings.json
+# and skills/ are versioned; worktrees and other state are not)
+.claude/*
+!/.claude/settings.json
+!/.claude/skills/
 
 # macOS
 .DS_Store

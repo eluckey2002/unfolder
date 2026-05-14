@@ -108,6 +108,12 @@ in `docs/retrospectives/v1-complete.md`.
 
 ### Session and commit mechanics
 
+- **Multi-file sessions plan first.** Any session touching more
+  than ~2 files or producing new functionality enters plan mode
+  and produces a written plan — files to create/modify,
+  verification steps, commit/merge strategy — and waits for
+  approval before implementing. Single-file fixes and pure
+  documentation tweaks don't need this.
 - **Each session ends with a commit and a session log entry.** No
   exceptions, even for rough sessions.
 - **Session done = merged to `main`.** Pre-merge worktree commits

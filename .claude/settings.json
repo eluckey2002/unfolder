@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwd && git branch --show-current && git worktree list"
+          }
+        ]
+      }
+    ]
+  }
+}
