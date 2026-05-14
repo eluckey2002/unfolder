@@ -188,3 +188,21 @@ Not every decision has been made. A few that are explicitly open:
 - **Whether to integrate with Evan's generative art workflows (String Theory, etc.).** Possible v4+ direction; deferred until we have a working unfolder.
 
 Deferring decisions is a feature, not a bug. Making decisions too early locks in choices before we have the information to make them well.
+
+---
+
+## Working-method rationale lives in the retrospectives
+
+This document captures the reasoning behind the *project*
+decisions — tech stack, phasing, structure. The reasoning behind
+the *working method* — spec-style prompts, the implementation-
+report pattern, the autonomy framework, the code-review subagent,
+session bundling — was developed across v1 and is captured in
+`docs/retrospectives/v1-complete.md`.
+
+The split is deliberate. Project decisions are made once and
+rarely revisited. The working method evolved continuously across
+v1 and will keep evolving; the retrospectives are its running
+record, written at each phase boundary. A reader wanting to know
+*why we work the way we do* should read the latest retrospective;
+this document explains *why the project is shaped the way it is*.

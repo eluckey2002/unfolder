@@ -37,7 +37,4 @@ Category tags are free-form (current ones: `convention`, `docs`,
 
 ## Open items
 
-- [convention] Consolidate the working-agreements section in
-  `project-state.md` into themed subsections when it starts feeling
-  unwieldy. Currently at ~22 bullets after this housekeeping commit.
-  Surfaced post-0007 housekeeping.
+(none currently)

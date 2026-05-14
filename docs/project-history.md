@@ -92,6 +92,86 @@ That three-document handoff is the artifact you (a new Claude session, or future
 
 ---
 
+## v1 in Cowork: eleven sessions
+
+The Cowork transition held. The three handoff documents carried the
+project across the context boundary, and Session 0003 — the first
+ADR — opened v1's implementation arc in the new configuration.
+
+v1 ran eleven sessions. Session 0003 wrote ADR 0001, committing the
+pipeline as a sequence of pure-function stages. Session 0004 stood
+up `docs/queue.md` and the first consolidation of working
+agreements. Session 0005 bootstrapped the build — Vite, TypeScript,
+pnpm, Vitest. Session 0006 generated the platonic-solid test
+corpus. Sessions 0007 through 0011 built the pipeline itself, stage
+by stage: STL parsing and a three.js viewport, the face adjacency
+graph (ADR 0002), the DFS spanning tree (ADR 0003), the
+rigid-unfolding flatten stage, and finally SVG export — at which
+point the walking skeleton stood. Load a platonic solid, get a
+printable net.
+
+Between the numbered sessions ran maintenance commits — a roadmap
+document, a housekeeping pass that cleared the queue and promoted
+process learnings, small fixes. The distinction between numbered
+sessions and maintenance commits became its own working agreement.
+
+---
+
+## The working method, forged session by session
+
+The more consequential story of v1 is not the pipeline — it is the
+working method, which did not exist when v1 started and was
+substantial by the time it ended.
+
+v1 opened with the strategist writing verbatim code into prompts
+and Claude Code transcribing it. That pattern concentrated all the
+implementation risk in the strategist's knowledge — and the
+strategist's knowledge had blind spots. The shift to spec-style
+prompts — describe the behavior, let Claude Code write the code
+with current API knowledge — came mid-v1, and with it the
+implementation-report pattern: Claude Code reporting back its
+decisions, deviations, and concerns rather than silently
+transcribing. That single change turned Claude Code from a typist
+into a thinking collaborator, and it began catching real bugs the
+strategist had missed.
+
+Other practices accreted the same way, each from a friction point:
+the autonomy framework, after Evan asked the strategist to stop
+seeking approval for every small call; active queue management,
+after deferred items started accumulating; doc-fetch-and-probe,
+after stale library knowledge shipped bugs; the code-review
+subagent, tried twice and kept for fragile work; session bundling
+with internal checkpoints, validated on the v1-completing
+0010+0011 bundle. The live roadmap artifact was built, hit an
+architectural wall, and was rebuilt as a baked snapshot. None of
+this was designed up front. It emerged.
+
+---
+
+## What v1's mistakes taught
+
+v1's mistakes were instructive, and most traced to one root: the
+strategist's knowledge going stale. A Vitest config pattern that
+had changed versions. An assumption about which binary ships with
+which package. A three.js renderer call dictated from memory that
+was simply wrong — and that one shipped to `main` before anyone
+caught it. Test counts mispredicted in prompts, twice. The pattern
+was clear enough by the end of v1 that the corrective practices —
+doc-fetch-and-probe, specs-describe-intent-not-call-signatures,
+don't-predict-test-counts — became working agreements rather than
+mere notes.
+
+The other recurring lesson was about continuity. Work landed
+outside the Cowork chat without the strategist's awareness; the
+handoff documents themselves drifted out of date while everyone
+watched `project-state.md` and forgot the other two. The fix —
+`git log` at the start of every chat, and a discipline of updating
+all the handoff docs at phase boundaries — is why the v1 wrap-up
+commit exists, and why v1 closes with a retrospective committed to
+the repo rather than a conversation that evaporates.
+
+---
+
 ## What this history teaches
 
 Three patterns worth noting for future sessions:
@@ -106,10 +186,16 @@ Three patterns worth noting for future sessions:
 
 ## The current moment
 
-As of the writing of this document, we are between Session 0002 and Session 0003. v1 is in progress. We've completed the project skeleton and the `paperfoldmodels` reading. The next session is the first ADR, deciding the v1 algorithm and data structures based on what we learned.
+As of the v1 wrap-up commit, v1 — the walking skeleton — is
+complete and merged to `main`. The pipeline runs end to end. Three
+ADRs, eleven session logs, a managed queue, a live roadmap
+artifact, and a working method documented in
+`docs/retrospectives/v1-complete.md` are all in the repo.
 
-The strategist is also transitioning from chat to Cowork. This document is part of that handoff. After Cowork is set up, Session 0003 will be the first session in the new working configuration.
+The next phase is v2 — the functional unfolder. Its session-level
+plan does not exist yet; drafting it is the first task of the next
+Cowork session, which will pick up the project fresh, using this
+updated handoff package as its entry point. If the package is
+good, the new strategist loses nothing. That is the test.
 
-The project arc ahead is long — five more v1 sessions, then v2-v6. But the foundation is set: clear vision, explicit reasoning, documented working agreements, and a record of how we got here.
-
-Welcome to the project.
+Welcome to v2.

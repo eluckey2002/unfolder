@@ -56,84 +56,131 @@ Decisions that aren't yet ADRs but are real commitments. The reasoning is in `pr
 
 ## Working agreements
 
-How Evan and the strategist Claude work together. These have evolved during the project; treat them as current state, not eternal.
+How Evan, the strategist Claude, and Claude Code work together.
+These evolved across v1 — treat them as current state, not
+eternal. Grouped into themes; the reasoning behind most of them is
+in `docs/retrospectives/v1-complete.md`.
 
-- **Evan is the director.** He decides what we build and when, sets the bar for quality, and makes the call when alternatives exist.
-- **Strategist Claude is the planner and reviewer.** Drafts session prompts, reviews Claude Code output, maintains documentation, surfaces decisions with reasoning.
-- **Claude Code is the implementer.** Runs prompts the strategist drafts, produces code, makes commits.
-- **Decisions are surfaced with recommendations and reasoning, not options.** Lead with the recommended choice and why; don't ask Evan to do synthesis work. He'll override when needed.
-- **Confidence gets marked.** When a recommendation is uncertain, say so.
-- **Mechanical work goes to Claude Code, not Evan.** Inspections, file creation, commits, even reading file contents — if it's mechanical, Claude Code does it. Evan relays, reviews, decides.
-- **Each session ends with a commit and a session log entry.** No exceptions, even for rough sessions.
-- **Session prompts are saved as files**, ideally at `docs/sessions/prompts/NNNN-short-title.md`, before being pasted into Claude Code. The prompt becomes a tracked artifact, not chat ephemera.
-- **The repo is the source of truth.** Anything not committed effectively doesn't exist for future sessions. Chat is ephemeral.
-- **Evan is currently involved in most decisions.** He will signal explicitly when he trusts a category of recommendations to flow through silently. Until then, surface choices.
-- **Premature optimization is a watched-for failure mode.** The naive-before-optimized principle is enforced; push back on cleverness in v1-v2.
-- **Strategist autonomy is calibrated by stakes.** High-confidence prose
-  decisions inside Evan-approved structures flow silently. Medium-
-  confidence calls on permanent artifacts (ADR substance, commit
-  messages, file names) get surfaced briefly then proceeded with. Low-
-  confidence calls and anything crossing a project-shape boundary
-  (conventions, scope, working agreements) get surfaced and wait for
-  Evan's input.
-- **Session done = merged to `main`.** Each session ends with the work
-  merged to `main`, not just committed somewhere. Pre-merge worktree
-  commits are still drafts; immutability applies once merged.
-- **The strategist actively manages deferrals via `docs/queue.md`.** No
-  item is silently dropped; no item lingers indefinitely. See the
-  process in `docs/queue.md`.
-- **When opening a new Cowork chat to resume the project**, paste this
-  re-orientation message: "Continue the unfolder project. Read
-  `docs/project-state.md`, `docs/project-rationale.md`, and
-  `docs/project-history.md` in that order, then `docs/queue.md` and the
-  two most recent session logs in `docs/sessions/`. Then run
-  `git log --oneline -20` to catch any work that landed outside this
-  chat. Then we'll plan Session NNNN."
+### Roles
+
+- **Evan is the director.** He decides what we build and when,
+  sets the bar for quality, and makes the call when alternatives
+  exist.
+- **Strategist Claude is the planner and reviewer.** Drafts
+  session prompts, reviews Claude Code output, maintains
+  documentation, surfaces decisions with reasoning.
+- **Claude Code is the implementer.** Runs prompts the strategist
+  drafts, produces code, makes commits, and reports back.
+
+### Decisions and communication
+
+- **Recommendations, not options.** Lead with the recommended
+  choice and why; don't offload synthesis onto Evan. He overrides
+  when needed.
+- **Confidence gets marked.** When a recommendation is uncertain,
+  say so.
+- **Strategist autonomy is calibrated by stakes.** High-confidence
+  prose decisions inside Evan-approved structures flow silently.
+  Medium-confidence calls on permanent artifacts (ADR substance,
+  commit messages, file names) get surfaced briefly, then
+  proceeded with. Low-confidence calls and anything crossing a
+  project-shape boundary (conventions, scope, working agreements)
+  get surfaced and wait for Evan's input.
+- **Evan is involved in most decisions for now.** He signals
+  explicitly when he trusts a category of recommendations to flow
+  silently.
+- **Premature optimization is a watched failure mode.** Naive
+  before optimized; push back on cleverness in v1-v2.
+
+### Session and commit mechanics
+
+- **Each session ends with a commit and a session log entry.** No
+  exceptions, even for rough sessions.
+- **Session done = merged to `main`.** Pre-merge worktree commits
+  are drafts; immutability applies once merged.
+- **Numbered session vs. maintenance commit.** Work gets a
+  numbered session if it matches an entry in a phase's session
+  plan, or produces new functionality, code, or substantive
+  structural changes. Otherwise it lands as a plain maintenance
+  commit — no session log, no number, descriptive prompt filename
+  without a numeric prefix.
+- **Worktree by default for numbered sessions; direct-`main` OK
+  for maintenance commits.** Worktrees exist for the pre-merge
+  amendment freedom — bugs caught between commit and merge fold in
+  without violating immutability. Maintenance commits don't carry
+  that risk surface.
+- **Session prompts are saved as files** at
+  `docs/sessions/prompts/` before being pasted into Claude Code,
+  and commit with the session log (or commit) they describe.
+- **Prompt files in worktrees: copy, don't reconstruct.** When a
+  numbered session runs in a worktree, Claude Code copies the
+  authoritative prompt file from the main checkout into the
+  worktree (that path is readable from a worktree) and commits
+  that copy. Reconstructing the prompt from the pasted message is
+  lossy. At fast-forward, expect a collision with the main
+  checkout's untracked copy; resolve by verifying byte-identical
+  (`diff -q`) and removing the main copy before the FF.
+- **Fresh worktrees lack `node_modules`.** Numbered-session
+  prompts include `pnpm install` as the first verification step.
+
+### How the strategist works
+
+- **Mechanical work goes to Claude Code, not Evan.** Inspections,
+  file creation, commits, reading file contents — if it's
+  mechanical, Claude Code does it.
+- **Doc-fetch and probe before writing prompts.** Before a prompt
+  that involves new tools, libraries, or restructuring: (a) fetch
+  current documentation for any external library used — including
+  method semantics, not just import paths; (b) probe the actual
+  response shape with a sample call rather than assuming; (c) scan
+  related files for cross-references that could go stale.
+- **Prompts specify behavior, not code.** Algorithm, render, and
+  test code are described as specifications; Claude Code
+  implements using current library API knowledge. Specs describe
+  intent — they never dictate specific library call signatures
+  (that's implementing from stale memory). Verbatim appendix
+  content is reserved for type contracts, configuration files,
+  and document content where the wording IS the deliverable.
+  Claude Code produces an implementation report at session-end:
+  decisions made, deviations from spec, library APIs verified,
+  concerns worth a strategist eye, stale content noticed.
+- **The strategist does not predict cumulative test counts.**
+  Stating "N tests should pass" invites off-by-one errors as the
+  suite grows. Prompts say the new tests should pass and ask
+  Claude Code to report the total.
+- **The strategist actively manages deferrals via
+  `docs/queue.md`.** No item silently dropped; none left in
+  indefinite limbo.
 - **The strategist maintains `docs/roadmap.md`.** Status flags
-  flip from planned to completed when a session commits; phase
-  descriptions only change when a phase's ship-state commitment
-  itself changes (an ADR-worthy event).
+  flip when a session commits; phase descriptions change only
+  when a phase's ship-state commitment itself changes.
 - **The strategist updates the `unfolder-roadmap` Cowork artifact
-  at each session-end.** Same trigger as the roadmap.md status
-  flip — both happen together. The artifact carries a baked
-  snapshot of session statuses, queue, and recent commits.
-- **Before writing a prompt that involves new tools, libraries, or
-  restructuring**, the strategist does three things: (a) fetches current
-  documentation for any external library used, (b) probes the actual
-  response shape with a sample call rather than assuming, and (c) scans
-  related files for cross-references that could go stale after the
-  change. All three, not any one in isolation.
-- **Worktree by default for numbered sessions; direct-`main` OK for
-  maintenance commits.** The pre-merge amendment freedom that worktrees
-  enable is the actual reason for the rule — bugs caught between commit
-  and merge can be folded in without violating immutability. Maintenance
-  commits don't carry that risk surface and can land directly.
-- **Work gets a numbered session if it matches an entry in the v1 (or
-  later) session plan, or produces new functionality, code, or
-  substantive structural changes.** Otherwise it lands as a plain
-  maintenance commit — no session log, no number, descriptive prompt
-  filename without numeric prefix, clear conventional-commit message.
-- **Prompt files commit with the session log (or commit) they describe**,
-  in the same commit. Amendment/merge sub-prompts get swept in by the
-  next session's commit if they weren't part of the original.
-- **Prompts specify behavior, not code, for implementation work.**
-  Algorithm code, render code, and test bodies are described as
-  specifications; Claude Code writes the implementation using current
-  library API knowledge. Verbatim content in appendices is reserved for
-  type contracts, configuration files, and document content where the
-  wording IS the deliverable. Claude Code produces an implementation
-  report at session-end naming decisions made, deviations from spec,
-  library APIs verified, and concerns worth a strategist eye.
-- **Fresh worktrees may lack `node_modules`.** Numbered-session
-  prompts include `pnpm install` as the first verification step
-  before the type-check/test/build trio, since worktrees created
-  fresh don't inherit the main checkout's installed dependencies.
-- **Prompt files create a fast-forward collision pattern on
-  worktree merge.** When fast-forwarding a worktree session whose
-  commit includes the prompt file (per the prompt-cadence rule),
-  expect a collision with the main checkout's untracked copy of
-  the same prompt. Resolution: verify byte-identical via `diff -q`,
-  remove the main copy, then FF.
+  at session-end** — and after maintenance commits that
+  materially change displayed state (queue, recent commits,
+  HEAD).
+- **Handoff docs stay current at phase boundaries.**
+  `project-state.md` is kept current continuously;
+  `project-history.md` and `project-rationale.md` are updated at
+  each phase boundary rather than left to drift. Each completed
+  phase produces a retrospective in `docs/retrospectives/` — the
+  durable capture of working-method lessons that would otherwise
+  live only in a Cowork chat.
+
+### Repo and orientation
+
+- **The repo is the source of truth.** Anything not committed
+  effectively doesn't exist for future sessions. Chat is
+  ephemeral.
+- **When opening a new Cowork chat to resume the project**, paste
+  this re-orientation message:
+  > Continue the unfolder project — a browser-based papercraft
+  > unfolding tool. Read, in order: `docs/project-state.md`,
+  > `docs/project-rationale.md`, `docs/project-history.md`, the
+  > latest retrospective in `docs/retrospectives/`,
+  > `docs/queue.md`, `docs/roadmap.md`, and the two or three most
+  > recent session logs in `docs/sessions/`. Then run
+  > `git log --oneline -20` to catch anything that landed outside
+  > a chat. Then we'll plan the next session.
 
 ## Open questions / things in flight
 
@@ -143,14 +190,15 @@ How Evan and the strategist Claude work together. These have evolved during the 
 ## Where to look
 
 - `README.md` — project vision and phase plan
-- `docs/roadmap.md` — v1–v6 phase plan and v1 session-level status at a glance
+- `docs/roadmap.md` — v1-v6 phase plan and session-level status at a glance
 - `docs/project-state.md` — this file (current state, working agreements)
-- `docs/project-rationale.md` — why we made the decisions we made
+- `docs/project-rationale.md` — why the project decisions were made
 - `docs/project-history.md` — narrative arc of how the project evolved
-- `docs/decisions/` — ADRs (ADR 0001 captures the v1 pipeline architecture)
+- `docs/retrospectives/` — phase-boundary retrospectives (`v1-complete.md` is the first)
+- `docs/decisions/` — ADRs (0001 pipeline architecture, 0002 adjacency-as-stage, 0003 DFS spanning tree)
 - `docs/references/` — writeups of external implementations we've studied
 - `docs/sessions/` — logs of completed Claude Code sessions
-- `docs/sessions/prompts/` — saved prompts (convention starts when we move to Cowork)
+- `docs/sessions/prompts/` — the saved prompt that produced each session or maintenance commit
 - `references/` — gitignored clones of external repos for reading
 
 ## Preferences specific to Evan
