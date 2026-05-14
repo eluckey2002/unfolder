@@ -62,7 +62,7 @@ export function createViewport(container: HTMLElement, mesh: Mesh3D): () => void
   const handleResize = (): void => {
     const w = container.clientWidth;
     const h = container.clientHeight;
-    renderer.setSize(w, h, false);
+    renderer.setSize(w, h);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
   };
