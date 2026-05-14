@@ -10,7 +10,7 @@ The full vision and phase plan (v1 through v6) lives in `README.md`. Read it.
 
 ## Current phase
 
-**v1 — Walking Skeleton is complete.** The end-to-end pipeline loads a platonic solid and produces a printable SVG net rendered alongside the 3D viewport. The current phase is v2 — functional unfolder (dihedral-weighted spanning tree, overlap detection and automatic recut, glue tabs with edge labels, multi-page layout). v2's session-level plan is in `docs/roadmap.md`; session 0015 (overlap detection) is complete, and session 0016 (automatic recut) is next.
+**v1 — Walking Skeleton is complete.** The end-to-end pipeline loads a platonic solid and produces a printable SVG net rendered alongside the 3D viewport. The current phase is v2 — functional unfolder (dihedral-weighted spanning tree, overlap detection and automatic recut, glue tabs with edge labels, multi-page layout). v2's session-level plan is in `docs/roadmap.md`; session 0016 (automatic recut) is complete, and session 0017 (glue tabs with edge labels) is next.
 
 Detailed v1-v6 phase definitions are in `README.md`.
 
@@ -31,6 +31,7 @@ Detailed v1-v6 phase definitions are in `README.md`.
 - **Session 0013 — Sourced model test corpus.** Seven v2 corpus models in `test/corpus/` (four CC0 Kenney Food Kit models, a low-poly deer, two procedural convex baselines), all verified closed two-manifold; `PROVENANCE.md` records source/license per model; `scripts/prepare-corpus.py` is the reproducible record of how the sourced and generated models were produced. `scripts/baseline-pipeline.ts` and `docs/baseline-v1-pipeline.md` capture the v1 baseline: 5 of 11 models produce overlap-free nets under v1's plain DFS. Log: `docs/sessions/0013-sourced-model-test-corpus.md`.
 - **Session 0014 — Dihedral-weighted spanning tree.** Replaced v1's plain DFS with a Kruskal-based dihedral-weighted MST (ADR 0004). `src/core/dihedral.ts` computes per-adjacency fold weights from outward face-normal angles; `buildSpanningTree` now takes a `weights` parameter. The 0013 baseline was re-run (renamed `docs/baseline-pipeline.md`): 5 → 7 overlap-free models, with mixed effects on the concave shapes — improvements on cylinder, egg, ginger-bread; regressions on croissant, deer, meat-sausage. First v2 algorithm session. Log: `docs/sessions/0014-dihedral-weighted-spanning-tree.md`.
 - **Session 0015 — Overlap detection.** Added `src/core/overlap.ts` — `detectOverlaps(layout)`, a pure predicate built on `polygon-clipping` that finds every face pair with positive 2D triangle-triangle intersection. `scripts/baseline-pipeline.ts` now uses it in place of the hand-rolled Sutherland–Hodgman check from session 0013. The 7-of-11 overlap-free summary is unchanged; the four concave models shift slightly upward (+3 to +16 pairs) as the new detector catches sliver overlaps `AREA_EPS=1e-10` was missing. `docs/references/unfolding-algorithm-survey.md` committed alongside. No ADR — `polygon-clipping` was already the committed stack decision. Log: `docs/sessions/0015-overlap-detection.md`.
+- **Session 0016 — Automatic recut.** Added `src/core/recut.ts` — a pure `recut(tree, layout, overlaps)` that splits the overlapping net via greedy set-cover over the overlap tree-paths (ADR 0005). No re-flattening: rigid unfolding is local, so each piece's positions are selected from the original layout. The baseline harness now reports per-model piece counts alongside the pre-recut overlap count and verifies every piece is internally overlap-free; the regenerated `docs/baseline-pipeline.md` is the v2 payoff — the first time the v2 corpus produces buildable output. Concave models split (croissant 15, deer 28, ginger-bread 5, meat-sausage 3); convex models stay at 1. Multi-piece rendering deferred to 0017. Log: `docs/sessions/0016-automatic-recut.md`.
 
 ## Sessions planned
 
@@ -39,15 +40,14 @@ full arc. Per the planning decision, the first three sessions are
 specified in detail; sessions 0016–0019 are a deliberate sketch,
 refined as the early sessions land.
 
-- **0016 — Automatic recut.** The first consumer of
-  `detectOverlaps`: for each overlapping pair, find the path
-  between the two faces in the spanning tree and promote a fold
-  edge on it to a cut, splitting the net into multiple
-  non-overlapping pieces. Likely ADR 0005 on recut strategy. The
-  next session.
+- **0017 — Glue tabs with edge labels.** The first consumer of
+  `Piece[]` for rendering: tab geometry on the cut edges between
+  pieces, plus matching edge labels so a builder knows which cut
+  edge mates to which. This is where `emitSvg` and the app
+  pipeline get their multi-piece rendering. The next session.
 
-Sketched beyond that: 0017 glue tabs with edge labels, 0018
-multi-page layout, 0019 v2 integration and retrospective.
+Sketched beyond that: 0018 multi-page layout, 0019 v2 integration
+and retrospective.
 
 ## Key decisions made so far
 
@@ -222,7 +222,7 @@ in `docs/retrospectives/v1-complete.md`.
 - `docs/project-rationale.md` — why the project decisions were made
 - `docs/project-history.md` — narrative arc of how the project evolved
 - `docs/retrospectives/` — phase-boundary retrospectives (`v1-complete.md` is the first)
-- `docs/decisions/` — ADRs (0001 pipeline architecture, 0002 adjacency-as-stage, 0003 DFS spanning tree, 0004 dihedral-weighted MST)
+- `docs/decisions/` — ADRs (0001 pipeline architecture, 0002 adjacency-as-stage, 0003 DFS spanning tree, 0004 dihedral-weighted MST, 0005 greedy set-cover recut)
 - `docs/references/` — writeups of external implementations we've studied
 - `docs/sessions/` — logs of completed Claude Code sessions
 - `docs/sessions/prompts/` — the saved prompt that produced each session or maintenance commit

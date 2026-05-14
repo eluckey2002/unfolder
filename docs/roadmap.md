@@ -13,8 +13,8 @@ agreements and open questions, and the individual session logs in
 ## Where we are now
 
 **Phase:** v2 — Functional Unfolder. Implementation underway.
-**Last completed session:** 0015 — Overlap detection.
-**Next planned session:** 0016 — Automatic recut.
+**Last completed session:** 0016 — Automatic recut.
+**Next planned session:** 0017 — Glue tabs with edge labels.
 
 Run `git log` for exact repo state — this document tracks phase and
 session status, not commit hashes.
@@ -141,11 +141,20 @@ open until 0014 lands and informs the granularity.
   Sutherland–Hodgman check; the 7-of-11 overlap-free summary is
   unchanged, with small upward drift on the four concave models
   (+3 to +16 pairs).
-- **0016 — Automatic recut.** ⏭ The control loop: on detected
-  overlap, promote a fold edge to a cut, re-flatten, repeat. The
-  net becomes multi-piece here. Likely ADR 0005 on recut strategy.
-- **0017 — Glue tabs with edge labels.** Tab geometry on cut edges
-  plus matching edge labels. Likely forces a refactor of v1's naive
+- **0016 — Automatic recut.** ✅ `src/core/recut.ts` — greedy
+  set-cover over the overlap tree-paths, splitting the fold forest
+  into connected pieces (ADR 0005). No re-flattening: rigid
+  unfolding is local, so each piece's positions are selected from
+  the original layout. `scripts/baseline-pipeline.ts` now reports
+  the pre-recut overlap count and per-model piece count; the
+  regenerated `docs/baseline-pipeline.md` shows the v2 payoff —
+  every piece across the 11-model corpus is internally
+  overlap-free. Concave models split (croissant 15, deer 28,
+  ginger-bread 5, meat-sausage 3); convex models stay at 1 piece.
+  Multi-piece rendering deferred to 0017.
+- **0017 — Glue tabs with edge labels.** ⏭ Tab geometry on cut
+  edges plus matching edge labels — the first consumer of
+  `Piece[]` for rendering. Likely forces a refactor of v1's naive
   per-face-per-edge SVG emit, which does not carry edge identity.
 - **0018 — Multi-page layout.** Pack the multi-piece net across
   printable pages; naive bin-packing first.

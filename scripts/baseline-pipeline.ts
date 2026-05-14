@@ -10,11 +10,13 @@ import { buildSpanningTree } from "../src/core/spanning-tree.js";
 import { buildLayout } from "../src/core/flatten.js";
 import { emitSvg } from "../src/core/emit-svg.js";
 import { detectOverlaps } from "../src/core/overlap.js";
+import { recut } from "../src/core/recut.js";
 
 /**
  * Run the unfolding pipeline over every mesh in test/corpus/ and
- * record a baseline: pipeline completion plus the count of
- * overlapping face pairs from the canonical `detectOverlaps` stage.
+ * record a baseline: pipeline completion, the pre-recut count of
+ * overlapping face pairs, and the post-recut piece count. Verifies
+ * every piece is internally overlap-free.
  */
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -36,6 +38,8 @@ type Result = {
   faces: string;
   pipeline: string;
   overlaps: string;
+  pieces: string;
+  piecesClean: boolean;
 };
 
 const results: Result[] = [];
@@ -49,6 +53,8 @@ for (const fname of entries) {
     faces: "—",
     pipeline: "completed",
     overlaps: "—",
+    pieces: "—",
+    piecesClean: true,
   };
 
   let mesh;
@@ -105,12 +111,38 @@ for (const fname of entries) {
     continue;
   }
 
-  r.overlaps = String(detectOverlaps(layout).length);
+  const overlaps = detectOverlaps(layout);
+  r.overlaps = String(overlaps.length);
+
+  try {
+    const pieces = recut(tree, layout, overlaps);
+    r.pieces = String(pieces.length);
+    r.piecesClean = pieces.every((p) => detectOverlaps(p.layout).length === 0);
+  } catch {
+    r.pipeline = "failed at recut";
+    results.push(r);
+    continue;
+  }
+
   results.push(r);
 }
 
-const headers = ["model", "format", "faces", "pipeline", "overlapping face pairs"];
-const rows = results.map((r) => [r.model, r.format, r.faces, r.pipeline, r.overlaps]);
+const headers = [
+  "model",
+  "format",
+  "faces",
+  "pipeline",
+  "overlaps (pre-recut)",
+  "pieces",
+];
+const rows = results.map((r) => [
+  r.model,
+  r.format,
+  r.faces,
+  r.pipeline,
+  r.overlaps,
+  r.pieces,
+]);
 const widths = headers.map((h, i) =>
   Math.max(h.length, ...rows.map((row) => row[i].length)),
 );
@@ -119,9 +151,26 @@ const formatRow = (cells: string[]) =>
 const sepRow = "| " + widths.map((w) => "-".repeat(w)).join(" | ") + " |";
 
 const completed = results.filter((r) => r.pipeline === "completed");
-const clean = completed.filter((r) => r.overlaps === "0");
+const pieceCounts = completed
+  .map((r) => Number.parseInt(r.pieces, 10))
+  .filter((n) => Number.isFinite(n));
+const minPieces = pieceCounts.length ? Math.min(...pieceCounts) : 0;
+const maxPieces = pieceCounts.length ? Math.max(...pieceCounts) : 0;
+const totalPieces = pieceCounts.reduce((s, n) => s + n, 0);
+const dirty = completed.filter((r) => !r.piecesClean);
 
 const today = new Date().toISOString().slice(0, 10);
+const summaryLines = [
+  `**Summary:** ${completed.length} models completed the pipeline; recut produced ${totalPieces} pieces total (per-model range ${minPieces}–${maxPieces}).`,
+];
+if (dirty.length === 0) {
+  summaryLines.push("Every piece is internally overlap-free.");
+} else {
+  summaryLines.push(
+    `WARNING: piece(s) with internal overlap in: ${dirty.map((r) => r.model).join(", ")}.`,
+  );
+}
+
 const md = [
   "# Pipeline baseline",
   "",
@@ -131,7 +180,7 @@ const md = [
   sepRow,
   ...rows.map(formatRow),
   "",
-  `**Summary:** ${clean.length} of ${completed.length} models that completed the pipeline produced an overlap-free net.`,
+  ...summaryLines,
   "",
 ].join("\n");
 
@@ -141,7 +190,5 @@ console.log(formatRow(headers));
 console.log(sepRow);
 for (const row of rows) console.log(formatRow(row));
 console.log();
-console.log(
-  `${clean.length} of ${completed.length} models produce overlap-free nets.`,
-);
+for (const line of summaryLines) console.log(line.replace(/\*\*/g, ""));
 console.log(`\nWrote ${outputPath}`);
