@@ -24,12 +24,12 @@ Detailed v1-v6 phase definitions are in `README.md`.
 - **Session 0006 — Generate the test corpus.** Three.js-generated ASCII STL files for tetrahedron, cube, octahedron. Log: `docs/sessions/0006-generate-test-corpus.md`.
 - **Session 0007 — Mesh loading.** ASCII STL parser in `src/core/` with vertex dedup; three.js viewport in `src/app/` with OrbitControls. First `src/core/` and `src/app/` code. Log: `docs/sessions/0007-mesh-loading.md`.
 - **Session 0008 — Face adjacency graph.** `DualGraph` output stage in `src/core/adjacency.ts`; ADR 0002 commits the "adjacency as separate stage" decision deferred from ADR 0001. Log: `docs/sessions/0008-face-adjacency-graph.md`.
+- **Session 0009 — Spanning tree.** DFS spanning tree over the dual graph in `src/core/spanning-tree.ts`; ADR 0003 commits "plain DFS for v1, weighted MST deferred to v2." Log: `docs/sessions/0009-spanning-tree.md`.
 
 ## Sessions planned
 
-Sessions 0009 through 0011 complete v1. Detailed plan in `docs/roadmap.md`.
+Sessions 0010 through 0011 complete v1. Detailed plan in `docs/roadmap.md`.
 
-- **Session 0009** — Spanning tree (cut/fold edge classification).
 - **Session 0010** — Flatten — 2D coordinates for every triangle by walking the spanning tree.
 - **Session 0011** — SVG export. v1 complete: end-to-end pipeline on platonic solids.
 
@@ -125,6 +125,16 @@ How Evan and the strategist Claude work together. These have evolved during the 
   wording IS the deliverable. Claude Code produces an implementation
   report at session-end naming decisions made, deviations from spec,
   library APIs verified, and concerns worth a strategist eye.
+- **Fresh worktrees may lack `node_modules`.** Numbered-session
+  prompts include `pnpm install` as the first verification step
+  before the type-check/test/build trio, since worktrees created
+  fresh don't inherit the main checkout's installed dependencies.
+- **Prompt files create a fast-forward collision pattern on
+  worktree merge.** When fast-forwarding a worktree session whose
+  commit includes the prompt file (per the prompt-cadence rule),
+  expect a collision with the main checkout's untracked copy of
+  the same prompt. Resolution: verify byte-identical via `diff -q`,
+  remove the main copy, then FF.
 
 ## Open questions / things in flight
 
