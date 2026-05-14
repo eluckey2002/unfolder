@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 import { buildAdjacency } from "../../src/core/adjacency.js";
+import { computeDihedralWeights } from "../../src/core/dihedral.js";
 import { buildLayout, getThirdPoint } from "../../src/core/flatten.js";
 import type { Layout2D, Vec2 } from "../../src/core/flatten.js";
 import type { Mesh3D } from "../../src/core/mesh.js";
@@ -23,7 +24,9 @@ interface Pipeline {
 const layoutFromCorpus = (name: string): Pipeline => {
   const stl = readFileSync(join(corpusDir, `${name}.stl`), "utf-8");
   const mesh = parseStl(stl);
-  const tree = buildSpanningTree(buildAdjacency(mesh));
+  const dual = buildAdjacency(mesh);
+  const weights = computeDihedralWeights(mesh, dual);
+  const tree = buildSpanningTree(dual, weights);
   const layout = buildLayout(mesh, tree);
   return { mesh, tree, layout };
 };

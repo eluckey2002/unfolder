@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 import { buildAdjacency } from "../../src/core/adjacency.js";
+import { computeDihedralWeights } from "../../src/core/dihedral.js";
 import { emitSvg } from "../../src/core/emit-svg.js";
 import { buildLayout } from "../../src/core/flatten.js";
 import { parseStl } from "../../src/core/parse-stl.js";
@@ -21,7 +22,9 @@ interface SvgPipeline {
 const pipelineFromCorpus = (name: string): SvgPipeline => {
   const stl = readFileSync(join(corpusDir, `${name}.stl`), "utf-8");
   const mesh = parseStl(stl);
-  const tree = buildSpanningTree(buildAdjacency(mesh));
+  const dual = buildAdjacency(mesh);
+  const weights = computeDihedralWeights(mesh, dual);
+  const tree = buildSpanningTree(dual, weights);
   const layout = buildLayout(mesh, tree);
   return {
     svg: emitSvg(layout, tree),

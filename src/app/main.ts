@@ -1,6 +1,7 @@
 import tetrahedronStl from "../../test/corpus/tetrahedron.stl?raw";
 
 import { buildAdjacency } from "../core/adjacency.js";
+import { computeDihedralWeights } from "../core/dihedral.js";
 import { emitSvg } from "../core/emit-svg.js";
 import { buildLayout } from "../core/flatten.js";
 import { parseStl } from "../core/parse-stl.js";
@@ -24,7 +25,8 @@ console.log(
 createViewport(viewportContainer, mesh);
 
 const dual = buildAdjacency(mesh);
-const tree = buildSpanningTree(dual);
+const weights = computeDihedralWeights(mesh, dual);
+const tree = buildSpanningTree(dual, weights);
 const layout = buildLayout(mesh, tree);
 const svg = emitSvg(layout, tree);
 

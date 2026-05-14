@@ -10,6 +10,7 @@ import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 
 import { buildAdjacency } from "../../src/core/adjacency.js";
+import { computeDihedralWeights } from "../../src/core/dihedral.js";
 import { buildLayout } from "../../src/core/flatten.js";
 import type { Mesh3D, Vec3 } from "../../src/core/mesh.js";
 import { emitSvg } from "../../src/core/emit-svg.js";
@@ -75,7 +76,8 @@ const triangleArea2D = (
 
 const pipeline = (mesh: Mesh3D) => {
   const dual = buildAdjacency(mesh);
-  const tree = buildSpanningTree(dual);
+  const weights = computeDihedralWeights(mesh, dual);
+  const tree = buildSpanningTree(dual, weights);
   const layout = buildLayout(mesh, tree);
   return { dual, tree, layout };
 };

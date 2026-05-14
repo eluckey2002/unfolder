@@ -13,8 +13,8 @@ agreements and open questions, and the individual session logs in
 ## Where we are now
 
 **Phase:** v2 — Functional Unfolder. Implementation underway.
-**Last completed session:** 0013 — Sourced model test corpus.
-**Next planned session:** 0014 — Dihedral-weighted spanning tree.
+**Last completed session:** 0014 — Dihedral-weighted spanning tree.
+**Next planned session:** 0015 — Overlap detection.
 
 Run `git log` for exact repo state — this document tracks phase and
 session status, not commit hashes.
@@ -117,24 +117,24 @@ sessions land. Sessions continue the global numbering.
   overlap-free nets under v1's plain DFS — the failure corpus that
   drives every later v2 session.
 
-- **0014 — Dihedral-weighted spanning tree.** ⏭ Replace v1's plain
-  DFS (deferred to v2 by ADR 0003) with a dihedral-weighted minimum
-  spanning tree over the dual graph: each edge weighted by the
-  dihedral angle of its mesh edge, so the tree prefers folding flat
-  edges and cutting sharp ones. ADR 0004 commits the weighting
-  heuristic — the load-bearing decision of the session. Includes
-  dihedral-angle computation, the weighted tree, tests, and a
-  re-run of the 0013 baseline showing the overlap picture change.
-  The MST algorithm itself (Prim or Kruskal, naive is fine) is a
-  session-log decision. Code-review subagent: yes. Depends on 0013
-  for a corpus with real dihedral variety.
+- **0014 — Dihedral-weighted spanning tree.** ✅ Replaced v1's plain
+  DFS with a Kruskal-based dihedral-weighted MST over the dual graph
+  (ADR 0004 commits the weighting heuristic). `src/core/dihedral.ts`
+  computes one weight per adjacency from the angle between adjacent
+  faces' outward unit normals; `buildSpanningTree` now takes a
+  `weights` parameter. The 0013 baseline (renamed
+  `docs/baseline-pipeline.md`) was re-run: 5 → 7 overlap-free
+  models, with mixed effects on concave shapes (cylinder, egg,
+  ginger-bread improved; croissant, deer, meat-sausage regressed)
+  — the heuristic is genuinely mediocre on highly concave organic
+  shapes, which 0015/0016 are what address.
 
 ### v2 sketch — 0015 onward
 
 Refined as the early sessions land; session count and bundling stay
 open until 0014 lands and informs the granularity.
 
-- **0015 — Overlap detection.** `polygon-clipping` integration; a
+- **0015 — Overlap detection.** ⏭ `polygon-clipping` integration; a
   pure predicate over the 2D layout that finds face-pair overlaps.
   Detection only, no fixing.
 - **0016 — Automatic recut.** The control loop: on detected

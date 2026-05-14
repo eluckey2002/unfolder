@@ -1,10 +1,16 @@
 /**
  * Spanning tree over the face adjacency graph.
  *
- * Per ADR 0003, v1 uses plain iterative DFS rooted at face 0
- * (configurable). The output classifies each adjacency as fold
- * (tree edge) or cut (non-tree edge); downstream stages walk the
- * tree via the parent-pointer array.
+ * Per ADR 0004, v2 builds a dihedral-weighted minimum spanning
+ * tree. Weights (one per adjacency, parallel-indexed) come from
+ * `computeDihedralWeights`: flat edges weigh near 0 and prefer to
+ * fold; sharp creases weigh near π and prefer to cut. The MST
+ * minimizes total fold-weight. The result is rooted at `root`
+ * and `parent[]` derived by traversing fold edges.
+ *
+ * Implementation: Kruskal with union-find. Output shape is the
+ * v1 `SpanningTree` contract (root, parent, folds, cuts); only
+ * the input signature changed — `weights` is now required.
  */
 
 import type { Adjacency, DualGraph } from "./adjacency.js";
@@ -15,22 +21,64 @@ import type { Adjacency, DualGraph } from "./adjacency.js";
  * are the non-tree edges (faces "separate" along these).
  */
 export interface SpanningTree {
-  /** Root face index. The traversal starts here; `parent[root] === -1`. */
+  /** Root face index. `parent[root] === -1`. */
   root: number;
   /**
    * Parent face for each face, by face index. For non-root faces,
-   * `parent[i]` is the face that discovered `i` during DFS. For
-   * the root, `parent[root] === -1`.
+   * `parent[i]` is the face that discovered `i` while traversing
+   * the rooted MST. For the root, `parent[root] === -1`.
    */
   parent: number[];
-  /** Adjacencies classified as fold (tree edges). */
+  /** Adjacencies selected into the MST (tree edges). */
   folds: Adjacency[];
-  /** Adjacencies classified as cut (non-tree edges). */
+  /** Adjacencies not selected (non-tree edges). */
   cuts: Adjacency[];
 }
 
+interface UnionFind {
+  find: (x: number) => number;
+  /** Returns true if `a` and `b` were in different sets (the union happened). */
+  union: (a: number, b: number) => boolean;
+}
+
+const makeUnionFind = (n: number): UnionFind => {
+  const parent = new Array<number>(n);
+  for (let i = 0; i < n; i++) parent[i] = i;
+  const rank = new Array<number>(n).fill(0);
+
+  const find = (x: number): number => {
+    let r = x;
+    while (parent[r] !== r) r = parent[r];
+    let cur = x;
+    while (parent[cur] !== r) {
+      const next = parent[cur];
+      parent[cur] = r;
+      cur = next;
+    }
+    return r;
+  };
+
+  const union = (a: number, b: number): boolean => {
+    const ra = find(a);
+    const rb = find(b);
+    if (ra === rb) return false;
+    if (rank[ra] < rank[rb]) {
+      parent[ra] = rb;
+    } else if (rank[ra] > rank[rb]) {
+      parent[rb] = ra;
+    } else {
+      parent[rb] = ra;
+      rank[ra]++;
+    }
+    return true;
+  };
+
+  return { find, union };
+};
+
 export function buildSpanningTree(
   dual: DualGraph,
+  weights: number[],
   root: number = 0,
 ): SpanningTree {
   const faceCount = dual.byFace.length;
@@ -40,33 +88,60 @@ export function buildSpanningTree(
       `Root face ${root} out of range; valid range is [0, ${faceCount}).`,
     );
   }
+  if (weights.length !== dual.adjacencies.length) {
+    throw new Error(
+      `weights.length (${weights.length}) must equal dual.adjacencies.length (${dual.adjacencies.length}).`,
+    );
+  }
 
-  const visited: boolean[] = new Array(faceCount).fill(false);
-  const parent: number[] = new Array(faceCount).fill(-1);
-  const stack: number[] = [root];
-  visited[root] = true;
+  const order = new Array<number>(dual.adjacencies.length);
+  for (let i = 0; i < order.length; i++) order[i] = i;
+  order.sort((a, b) => weights[a] - weights[b]);
 
-  while (stack.length > 0) {
-    const face = stack.pop() as number;
-    for (const adjacencyIndex of dual.byFace[face]) {
-      const adj = dual.adjacencies[adjacencyIndex];
-      const neighbor = adj.faceA === face ? adj.faceB : adj.faceA;
-      if (!visited[neighbor]) {
-        visited[neighbor] = true;
-        parent[neighbor] = face;
-        stack.push(neighbor);
-      }
+  const uf = makeUnionFind(faceCount);
+  const isFold = new Array<boolean>(dual.adjacencies.length).fill(false);
+  for (const idx of order) {
+    const { faceA, faceB } = dual.adjacencies[idx];
+    if (uf.union(faceA, faceB)) {
+      isFold[idx] = true;
     }
   }
 
   const folds: Adjacency[] = [];
   const cuts: Adjacency[] = [];
-
-  for (const adj of dual.adjacencies) {
-    if (parent[adj.faceA] === adj.faceB || parent[adj.faceB] === adj.faceA) {
-      folds.push(adj);
+  for (let i = 0; i < dual.adjacencies.length; i++) {
+    if (isFold[i]) {
+      folds.push(dual.adjacencies[i]);
     } else {
-      cuts.push(adj);
+      cuts.push(dual.adjacencies[i]);
+    }
+  }
+
+  const foldNeighbors: number[][] = Array.from(
+    { length: faceCount },
+    () => [],
+  );
+  for (let i = 0; i < dual.adjacencies.length; i++) {
+    if (isFold[i]) {
+      const adj = dual.adjacencies[i];
+      foldNeighbors[adj.faceA].push(adj.faceB);
+      foldNeighbors[adj.faceB].push(adj.faceA);
+    }
+  }
+
+  const parent = new Array<number>(faceCount).fill(-1);
+  const visited = new Array<boolean>(faceCount).fill(false);
+  visited[root] = true;
+  const queue = [root];
+  let head = 0;
+  while (head < queue.length) {
+    const face = queue[head++];
+    for (const neighbor of foldNeighbors[face]) {
+      if (!visited[neighbor]) {
+        visited[neighbor] = true;
+        parent[neighbor] = face;
+        queue.push(neighbor);
+      }
     }
   }
 
