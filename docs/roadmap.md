@@ -13,8 +13,8 @@ agreements and open questions, and the individual session logs in
 ## Where we are now
 
 **Phase:** v2 — Functional Unfolder. Implementation underway.
-**Last completed session:** 0012 — OBJ parser.
-**Next planned session:** 0013 — Sourced model test corpus.
+**Last completed session:** 0013 — Sourced model test corpus.
+**Next planned session:** 0014 — Dihedral-weighted spanning tree.
 
 Run `git log` for exact repo state — this document tracks phase and
 session status, not commit hashes.
@@ -107,18 +107,17 @@ sessions land. Sessions continue the global numbering.
   session-log decisions unless triangulation proves load-bearing,
   in which case it earns an ADR.
 
-- **0013 — Sourced model test corpus.** ⏭ Source four to six
-  CC-licensed low-poly OBJ models matching the v2 ship-state target
-  — faceted animal heads, geometric busts, low-poly props —
-  spanning a range of face counts and topological variety: some
-  that v1's plain DFS unfolds cleanly, some that overlap. Files
-  land in `test/corpus/` with a `PROVENANCE.md` recording source
-  and license per model. The session's core deliverable beyond the
-  files is the baseline: run the full v1 pipeline on every model
-  and record which flatten cleanly and which overlap — the failure
-  corpus that drives every later v2 session. Depends on 0012.
+- **0013 — Sourced model test corpus.** ✅ Seven CC0/project-authored
+  models in `test/corpus/` — four Kenney Food Kit models, a low-poly
+  deer, and two procedural convex baselines — all verified closed
+  two-manifold, single component, genus 0. `PROVENANCE.md` records
+  source and license per model. The session's core deliverable
+  beyond the files is the v1 baseline at
+  `docs/baseline-v1-pipeline.md`: 5 of 11 corpus models produce
+  overlap-free nets under v1's plain DFS — the failure corpus that
+  drives every later v2 session.
 
-- **0014 — Dihedral-weighted spanning tree.** Replace v1's plain
+- **0014 — Dihedral-weighted spanning tree.** ⏭ Replace v1's plain
   DFS (deferred to v2 by ADR 0003) with a dihedral-weighted minimum
   spanning tree over the dual graph: each edge weighted by the
   dihedral angle of its mesh edge, so the tree prefers folding flat

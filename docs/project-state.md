@@ -10,7 +10,7 @@ The full vision and phase plan (v1 through v6) lives in `README.md`. Read it.
 
 ## Current phase
 
-**v1 — Walking Skeleton is complete.** The end-to-end pipeline loads a platonic solid and produces a printable SVG net rendered alongside the 3D viewport. The current phase is v2 — functional unfolder (dihedral-weighted spanning tree, overlap detection and automatic recut, glue tabs with edge labels, multi-page layout). v2's session-level plan is in `docs/roadmap.md`; session 0012 (OBJ parser) is complete, and session 0013 (sourced model test corpus) is next.
+**v1 — Walking Skeleton is complete.** The end-to-end pipeline loads a platonic solid and produces a printable SVG net rendered alongside the 3D viewport. The current phase is v2 — functional unfolder (dihedral-weighted spanning tree, overlap detection and automatic recut, glue tabs with edge labels, multi-page layout). v2's session-level plan is in `docs/roadmap.md`; session 0013 (sourced model test corpus) is complete, and session 0014 (dihedral-weighted spanning tree) is next.
 
 Detailed v1-v6 phase definitions are in `README.md`.
 
@@ -28,6 +28,7 @@ Detailed v1-v6 phase definitions are in `README.md`.
 - **Session 0010 — Flatten.** Rigid unfolding in `src/core/flatten.ts` — `getThirdPoint` primitive and `buildLayout` walking the spanning tree, with an explicit geometric side test for apex placement. Log: `docs/sessions/0010-flatten.md`.
 - **Session 0011 — SVG export.** `emitSvg` in `src/core/emit-svg.ts`; full pipeline wired into the browser app with a split 3D/net layout. v1 walking skeleton complete. Log: `docs/sessions/0011-svg-export.md`.
 - **Session 0012 — OBJ parser.** Wavefront OBJ parser in `src/core/parse-obj.ts` producing the v1 `Mesh3D` — geometry-only, with shared-vertex indexing (1-based, negative indices), the four face-reference forms, and fan-triangulation of quad/n-gon faces. Vertex dedup mirrors the STL parser. First v2 implementation session. Log: `docs/sessions/0012-obj-parser.md`.
+- **Session 0013 — Sourced model test corpus.** Seven v2 corpus models in `test/corpus/` (four CC0 Kenney Food Kit models, a low-poly deer, two procedural convex baselines), all verified closed two-manifold; `PROVENANCE.md` records source/license per model; `scripts/prepare-corpus.py` is the reproducible record of how the sourced and generated models were produced. `scripts/baseline-pipeline.ts` and `docs/baseline-v1-pipeline.md` capture the v1 baseline: 5 of 11 models produce overlap-free nets under v1's plain DFS. Log: `docs/sessions/0013-sourced-model-test-corpus.md`.
 
 ## Sessions planned
 
@@ -36,11 +37,9 @@ full arc. Per the planning decision, the first three sessions are
 specified in detail; sessions 0015–0019 are a deliberate sketch,
 refined as the early sessions land.
 
-- **0013 — Sourced model test corpus.** CC-licensed low-poly OBJ
-  models in `test/corpus/`, plus the v1-pipeline overlap baseline.
-  The next session.
 - **0014 — Dihedral-weighted spanning tree.** Weighted MST over the
-  dual graph; ADR 0004 commits the weighting heuristic.
+  dual graph; ADR 0004 commits the weighting heuristic. The next
+  session.
 
 Sketched beyond that: 0015 overlap detection, 0016 automatic recut,
 0017 glue tabs with edge labels, 0018 multi-page layout, 0019 v2

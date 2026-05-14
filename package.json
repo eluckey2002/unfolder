@@ -10,7 +10,8 @@
     "test": "vitest",
     "test:run": "vitest run",
     "type-check": "tsc --noEmit",
-    "generate-corpus": "vite-node scripts/generate-corpus.ts"
+    "generate-corpus": "vite-node scripts/generate-corpus.ts",
+    "baseline": "vite-node scripts/baseline-pipeline.ts"
   },
   "devDependencies": {
     "@types/node": "^25.7.0",
