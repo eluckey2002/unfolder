@@ -10,7 +10,7 @@ The full vision and phase plan (v1 through v6) lives in `README.md`. Read it.
 
 ## Current phase
 
-**v1 — Walking Skeleton is complete.** The end-to-end pipeline loads a platonic solid and produces a printable SVG net rendered alongside the 3D viewport. The current phase is v2 — functional unfolder (dihedral-weighted spanning tree, overlap detection and automatic recut, glue tabs with edge labels, multi-page layout). v2's session-level plan is in `docs/roadmap.md`; session 0014 (dihedral-weighted spanning tree) is complete, and session 0015 (overlap detection) is next.
+**v1 — Walking Skeleton is complete.** The end-to-end pipeline loads a platonic solid and produces a printable SVG net rendered alongside the 3D viewport. The current phase is v2 — functional unfolder (dihedral-weighted spanning tree, overlap detection and automatic recut, glue tabs with edge labels, multi-page layout). v2's session-level plan is in `docs/roadmap.md`; session 0015 (overlap detection) is complete, and session 0016 (automatic recut) is next.
 
 Detailed v1-v6 phase definitions are in `README.md`.
 
@@ -30,22 +30,24 @@ Detailed v1-v6 phase definitions are in `README.md`.
 - **Session 0012 — OBJ parser.** Wavefront OBJ parser in `src/core/parse-obj.ts` producing the v1 `Mesh3D` — geometry-only, with shared-vertex indexing (1-based, negative indices), the four face-reference forms, and fan-triangulation of quad/n-gon faces. Vertex dedup mirrors the STL parser. First v2 implementation session. Log: `docs/sessions/0012-obj-parser.md`.
 - **Session 0013 — Sourced model test corpus.** Seven v2 corpus models in `test/corpus/` (four CC0 Kenney Food Kit models, a low-poly deer, two procedural convex baselines), all verified closed two-manifold; `PROVENANCE.md` records source/license per model; `scripts/prepare-corpus.py` is the reproducible record of how the sourced and generated models were produced. `scripts/baseline-pipeline.ts` and `docs/baseline-v1-pipeline.md` capture the v1 baseline: 5 of 11 models produce overlap-free nets under v1's plain DFS. Log: `docs/sessions/0013-sourced-model-test-corpus.md`.
 - **Session 0014 — Dihedral-weighted spanning tree.** Replaced v1's plain DFS with a Kruskal-based dihedral-weighted MST (ADR 0004). `src/core/dihedral.ts` computes per-adjacency fold weights from outward face-normal angles; `buildSpanningTree` now takes a `weights` parameter. The 0013 baseline was re-run (renamed `docs/baseline-pipeline.md`): 5 → 7 overlap-free models, with mixed effects on the concave shapes — improvements on cylinder, egg, ginger-bread; regressions on croissant, deer, meat-sausage. First v2 algorithm session. Log: `docs/sessions/0014-dihedral-weighted-spanning-tree.md`.
+- **Session 0015 — Overlap detection.** Added `src/core/overlap.ts` — `detectOverlaps(layout)`, a pure predicate built on `polygon-clipping` that finds every face pair with positive 2D triangle-triangle intersection. `scripts/baseline-pipeline.ts` now uses it in place of the hand-rolled Sutherland–Hodgman check from session 0013. The 7-of-11 overlap-free summary is unchanged; the four concave models shift slightly upward (+3 to +16 pairs) as the new detector catches sliver overlaps `AREA_EPS=1e-10` was missing. `docs/references/unfolding-algorithm-survey.md` committed alongside. No ADR — `polygon-clipping` was already the committed stack decision. Log: `docs/sessions/0015-overlap-detection.md`.
 
 ## Sessions planned
 
 v2's session-level plan is drafted — see `docs/roadmap.md` for the
 full arc. Per the planning decision, the first three sessions are
-specified in detail; sessions 0015–0019 are a deliberate sketch,
+specified in detail; sessions 0016–0019 are a deliberate sketch,
 refined as the early sessions land.
 
-- **0015 — Overlap detection.** A `polygon-clipping`-based overlap
-  predicate over the 2D layout — replaces the baseline script's
-  naive measurement check with a proper `src/core/` stage. The next
-  session.
+- **0016 — Automatic recut.** The first consumer of
+  `detectOverlaps`: for each overlapping pair, find the path
+  between the two faces in the spanning tree and promote a fold
+  edge on it to a cut, splitting the net into multiple
+  non-overlapping pieces. Likely ADR 0005 on recut strategy. The
+  next session.
 
-Sketched beyond that: 0016 automatic recut, 0017 glue tabs with
-edge labels, 0018 multi-page layout, 0019 v2 integration and
-retrospective.
+Sketched beyond that: 0017 glue tabs with edge labels, 0018
+multi-page layout, 0019 v2 integration and retrospective.
 
 ## Key decisions made so far
 

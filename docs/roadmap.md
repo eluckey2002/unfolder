@@ -13,8 +13,8 @@ agreements and open questions, and the individual session logs in
 ## Where we are now
 
 **Phase:** v2 — Functional Unfolder. Implementation underway.
-**Last completed session:** 0014 — Dihedral-weighted spanning tree.
-**Next planned session:** 0015 — Overlap detection.
+**Last completed session:** 0015 — Overlap detection.
+**Next planned session:** 0016 — Automatic recut.
 
 Run `git log` for exact repo state — this document tracks phase and
 session status, not commit hashes.
@@ -134,10 +134,14 @@ sessions land. Sessions continue the global numbering.
 Refined as the early sessions land; session count and bundling stay
 open until 0014 lands and informs the granularity.
 
-- **0015 — Overlap detection.** ⏭ `polygon-clipping` integration; a
-  pure predicate over the 2D layout that finds face-pair overlaps.
-  Detection only, no fixing.
-- **0016 — Automatic recut.** The control loop: on detected
+- **0015 — Overlap detection.** ✅ `src/core/overlap.ts` —
+  `detectOverlaps(layout)`, a pure predicate built on
+  `polygon-clipping` that finds every overlapping face pair in the 2D
+  layout. The baseline harness now uses it in place of the hand-rolled
+  Sutherland–Hodgman check; the 7-of-11 overlap-free summary is
+  unchanged, with small upward drift on the four concave models
+  (+3 to +16 pairs).
+- **0016 — Automatic recut.** ⏭ The control loop: on detected
   overlap, promote a fold edge to a cut, re-flatten, repeat. The
   net becomes multi-piece here. Likely ADR 0005 on recut strategy.
 - **0017 — Glue tabs with edge labels.** Tab geometry on cut edges

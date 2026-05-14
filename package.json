@@ -23,6 +23,7 @@
     "vitest": "^4.1.6"
   },
   "dependencies": {
+    "polygon-clipping": "^0.15.7",
     "three": "^0.184.0"
   }
 }
