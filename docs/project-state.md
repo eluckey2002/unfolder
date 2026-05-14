@@ -10,7 +10,7 @@ The full vision and phase plan (v1 through v6) lives in `README.md`. Read it.
 
 ## Current phase
 
-**v1 — Walking Skeleton is complete.** The end-to-end pipeline loads a platonic solid and produces a printable SVG net rendered alongside the 3D viewport. Next phase is v2 — functional unfolder (dihedral-weighted spanning tree, overlap detection and automatic recut, glue tabs with edge labels, multi-page layout). v2's session-level plan is the next strategist task.
+**v1 — Walking Skeleton is complete.** The end-to-end pipeline loads a platonic solid and produces a printable SVG net rendered alongside the 3D viewport. The current phase is v2 — functional unfolder (dihedral-weighted spanning tree, overlap detection and automatic recut, glue tabs with edge labels, multi-page layout). v2's session-level plan is drafted in `docs/roadmap.md`; session 0012 (OBJ parser) is next. v2 implementation has not started.
 
 Detailed v1-v6 phase definitions are in `README.md`.
 
@@ -30,7 +30,21 @@ Detailed v1-v6 phase definitions are in `README.md`.
 
 ## Sessions planned
 
-v1 is complete. The next strategist task is drafting v2's session-level plan; until then there are no specific sessions queued.
+v2's session-level plan is drafted — see `docs/roadmap.md` for the
+full arc. Per the planning decision, the first three sessions are
+specified in detail; sessions 0015–0019 are a deliberate sketch,
+refined as the early sessions land.
+
+- **0012 — OBJ parser.** `src/core/parse-obj.ts` producing the v1
+  `Mesh3D`. The next session.
+- **0013 — Sourced model test corpus.** CC-licensed low-poly OBJ
+  models in `test/corpus/`, plus the v1-pipeline overlap baseline.
+- **0014 — Dihedral-weighted spanning tree.** Weighted MST over the
+  dual graph; ADR 0004 commits the weighting heuristic.
+
+Sketched beyond that: 0015 overlap detection, 0016 automatic recut,
+0017 glue tabs with edge labels, 0018 multi-page layout, 0019 v2
+integration and retrospective.
 
 ## Key decisions made so far
 
