@@ -12,31 +12,59 @@ import { buildSpanningTree } from "../../src/core/spanning-tree.js";
 
 const corpusDir = join(dirname(fileURLToPath(import.meta.url)), "../corpus");
 
-const svgFromCorpus = (name: string): string => {
+interface SvgPipeline {
+  svg: string;
+  faceCount: number;
+  foldCount: number;
+}
+
+const pipelineFromCorpus = (name: string): SvgPipeline => {
   const stl = readFileSync(join(corpusDir, `${name}.stl`), "utf-8");
   const mesh = parseStl(stl);
   const tree = buildSpanningTree(buildAdjacency(mesh));
   const layout = buildLayout(mesh, tree);
-  return emitSvg(layout, tree);
+  return {
+    svg: emitSvg(layout, tree),
+    faceCount: mesh.faces.length,
+    foldCount: tree.folds.length,
+  };
 };
 
 const countLines = (svg: string): number =>
   (svg.match(/<line/g) ?? []).length;
 
+const countDashed = (svg: string): number =>
+  (svg.match(/stroke-dasharray="/g) ?? []).length;
+
 describe("emitSvg", () => {
   it("produces a well-formed SVG document", () => {
-    const svg = svgFromCorpus("tetrahedron");
+    const { svg } = pipelineFromCorpus("tetrahedron");
     expect(svg.startsWith("<svg")).toBe(true);
     expect(svg.endsWith("</svg>")).toBe(true);
     expect(svg).toContain("viewBox=");
   });
 
   it("tetrahedron: one line per face-edge (12 total)", () => {
-    expect(countLines(svgFromCorpus("tetrahedron"))).toBe(12);
+    expect(countLines(pipelineFromCorpus("tetrahedron").svg)).toBe(12);
   });
 
   it("cube and octahedron: line counts match face-edge totals", () => {
-    expect(countLines(svgFromCorpus("cube"))).toBe(36);
-    expect(countLines(svgFromCorpus("octahedron"))).toBe(24);
+    expect(countLines(pipelineFromCorpus("cube").svg)).toBe(36);
+    expect(countLines(pipelineFromCorpus("octahedron").svg)).toBe(24);
+  });
+
+  // Fold edges render dashed, cut edges solid. Each fold and each cut is
+  // shared by two faces and drawn once from each, so dashed = 2 * folds
+  // and the remainder (= 3*F - 2*folds) is solid.
+  it.each([
+    ["tetrahedron"],
+    ["cube"],
+    ["octahedron"],
+  ])("%s: dashed lines == 2 * folds, solid lines == 3*F - 2*folds", (name) => {
+    const { svg, faceCount, foldCount } = pipelineFromCorpus(name);
+    const dashed = countDashed(svg);
+    const total = countLines(svg);
+    expect(dashed).toBe(2 * foldCount);
+    expect(total - dashed).toBe(3 * faceCount - 2 * foldCount);
   });
 });

@@ -61,6 +61,44 @@ const assertCongruent = (pipeline: Pipeline): void => {
   }
 };
 
+const assertApexesOpposite = (pipeline: Pipeline): void => {
+  const { tree, layout } = pipeline;
+  const apexOf = (
+    faceIdx: number,
+    s0: number,
+    s1: number,
+  ): { s0Pos: Vec2; s1Pos: Vec2; apex: Vec2 } => {
+    const face = layout.faces[faceIdx];
+    let s0Pos: Vec2 | null = null;
+    let s1Pos: Vec2 | null = null;
+    let apex: Vec2 | null = null;
+    for (let i = 0; i < 3; i++) {
+      const v = face.vertices[i];
+      if (v === s0) s0Pos = face.positions[i];
+      else if (v === s1) s1Pos = face.positions[i];
+      else apex = face.positions[i];
+    }
+    if (!s0Pos || !s1Pos || !apex) {
+      throw new Error(`apex extraction failed for face ${faceIdx}`);
+    }
+    return { s0Pos, s1Pos, apex };
+  };
+
+  for (const fold of tree.folds) {
+    const [s0, s1] = fold.edge;
+    const parent =
+      tree.parent[fold.faceA] === fold.faceB ? fold.faceB : fold.faceA;
+    const child = parent === fold.faceA ? fold.faceB : fold.faceA;
+    const p = apexOf(parent, s0, s1);
+    const c = apexOf(child, s0, s1);
+    const sideParent = sideOf(p.s0Pos, p.s1Pos, p.apex);
+    const sideChild = sideOf(p.s0Pos, p.s1Pos, c.apex);
+    expect(Math.sign(sideParent)).not.toBe(0);
+    expect(Math.sign(sideChild)).not.toBe(0);
+    expect(Math.sign(sideParent)).not.toBe(Math.sign(sideChild));
+  }
+};
+
 describe("flatten", () => {
   it("getThirdPoint: known 3-4-5 triangle", () => {
     const [c1, c2] = getThirdPoint([0, 0], [4, 0], 5, 3);
@@ -82,41 +120,10 @@ describe("flatten", () => {
     assertCongruent(layoutFromCorpus("tetrahedron"));
   });
 
-  it("tetrahedron: child apexes land opposite their parent apexes across the fold edge", () => {
-    const { mesh, tree, layout } = layoutFromCorpus("tetrahedron");
-    for (const fold of tree.folds) {
-      const [s0, s1] = fold.edge;
-      const parent =
-        tree.parent[fold.faceA] === fold.faceB ? fold.faceB : fold.faceA;
-      const child = parent === fold.faceA ? fold.faceB : fold.faceA;
-
-      const pFace = layout.faces[parent];
-      const cFace = layout.faces[child];
-
-      let P_s0: Vec2 | null = null;
-      let P_s1: Vec2 | null = null;
-      let P_parentApex: Vec2 | null = null;
-      for (let i = 0; i < 3; i++) {
-        const v = pFace.vertices[i];
-        if (v === s0) P_s0 = pFace.positions[i];
-        else if (v === s1) P_s1 = pFace.positions[i];
-        else P_parentApex = pFace.positions[i];
-      }
-      let P_childApex: Vec2 | null = null;
-      for (let i = 0; i < 3; i++) {
-        const v = cFace.vertices[i];
-        if (v !== s0 && v !== s1) P_childApex = cFace.positions[i];
-      }
-      expect(P_s0 && P_s1 && P_parentApex && P_childApex).toBeTruthy();
-
-      const sideParent = sideOf(P_s0!, P_s1!, P_parentApex!);
-      const sideChild = sideOf(P_s0!, P_s1!, P_childApex!);
-      expect(Math.sign(sideParent)).not.toBe(0);
-      expect(Math.sign(sideChild)).not.toBe(0);
-      expect(Math.sign(sideParent)).not.toBe(Math.sign(sideChild));
-
-      void mesh;
-    }
+  it("child apexes land opposite their parent apexes across each fold edge (tetra, cube, octa)", () => {
+    assertApexesOpposite(layoutFromCorpus("tetrahedron"));
+    assertApexesOpposite(layoutFromCorpus("cube"));
+    assertApexesOpposite(layoutFromCorpus("octahedron"));
   });
 
   it("cube and octahedron: congruence holds", () => {

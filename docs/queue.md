@@ -37,4 +37,8 @@ Category tags are free-form (current ones: `convention`, `docs`,
 
 ## Open items
 
-(none currently)
+- [cleanup] Add two `parseStl` negative-path tests: non-finite coordinate
+  (e.g. `vertex NaN 0 0`) and mid-triangle truncation (file ends after 1
+  or 2 vertex lines). Both error paths are documented in
+  `src/core/parse-stl.ts:11-13` but currently uncovered by tests.
+  Surfaced during test-suite review.
