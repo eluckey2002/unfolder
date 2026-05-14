@@ -195,12 +195,16 @@ in `docs/retrospectives/v1-complete.md`.
   this re-orientation message:
   > Continue the unfolder project — a browser-based papercraft
   > unfolding tool. Read, in order: `docs/project-state.md`,
-  > `docs/project-rationale.md`, `docs/project-history.md`, the
-  > latest retrospective in `docs/retrospectives/`,
-  > `docs/queue.md`, `docs/roadmap.md`, and the two or three most
-  > recent session logs in `docs/sessions/`. Then run
-  > `git log --oneline -20` to catch anything that landed outside
-  > a chat. Then we'll plan the next session.
+  > `docs/strategist-protocol.md`, `docs/project-rationale.md`,
+  > `docs/project-history.md`, the latest retrospective in
+  > `docs/retrospectives/`, `docs/queue.md`, `docs/roadmap.md`,
+  > and the two or three most recent session logs in
+  > `docs/sessions/`. Then run `git log --oneline -20` to catch
+  > anything that landed outside a chat. Then we'll plan the next
+  > session.
+- **Session logs end with a handoff status block.** Defined in
+  `docs/strategist-protocol.md`; this is what the strategist reads
+  instead of having Evan paraphrase the session in chat.
 
 ## Open questions / things in flight
 
