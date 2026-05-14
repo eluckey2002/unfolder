@@ -100,6 +100,13 @@ in `docs/retrospectives/v1-complete.md`.
 - **Recommendations, not options.** Lead with the recommended
   choice and why; don't offload synthesis onto Evan. He overrides
   when needed.
+- **Forks are for genuine either/or decisions.** An
+  AskUserQuestion-style fork is right when the options are mutually
+  exclusive and Evan's input genuinely changes the outcome (page
+  size, public vs. private). A "which-approach" question where the
+  strategist has a clear pick comes as a recommendation Evan can
+  veto — not a fork. Surfacing a fork when a recommendation was
+  possible is offloading synthesis onto Evan.
 - **Confidence gets marked.** When a recommendation is uncertain,
   say so.
 - **Strategist autonomy is calibrated by stakes.** High-confidence
@@ -151,9 +158,25 @@ in `docs/retrospectives/v1-complete.md`.
   (`diff -q`) and removing the main copy before the FF.
 - **Fresh worktrees lack `node_modules`.** Numbered-session
   prompts include `pnpm install` as the first verification step.
+- **Spike sessions for genuinely uncertain work.** A spike is an
+  explicitly exploratory session — time-boxed, throwaway code
+  permitted, producing a findings doc rather than a shippable stage.
+  It is distinct from a numbered session (which ships functionality)
+  and a maintenance commit (which does mechanical cleanup). Work
+  where the approach itself is in question runs as a spike first.
 
 ### How the strategist works
 
+- **Strategist effort goes to judgment, not bookkeeping.** The
+  strategist's highest-value work is research, triage, and catching
+  the forks that matter — not mechanical doc maintenance. Bookkeeping
+  gets compressed or automated; it does not expand to fill the time.
+  v2's lesson: immaculate roadmap flags are legible but low-leverage.
+- **Fresh-eyes review and prompt red-teaming.** At phase milestones
+  the strategist dispatches a no-priming subagent to review the work
+  and triages the result — the mid-phase audit's value, made
+  routine. Before a session prompt reaches Evan, a subagent
+  red-teams it for ambiguity and gaps.
 - **Mechanical work goes to Claude Code, not Evan.** Inspections,
   file creation, commits, reading file contents — if it's
   mechanical, Claude Code does it.
@@ -189,11 +212,13 @@ in `docs/retrospectives/v1-complete.md`.
   HEAD).
 - **Handoff docs stay current at phase boundaries.**
   `project-state.md` is kept current continuously;
-  `project-history.md` and `project-rationale.md` are updated at
-  each phase boundary rather than left to drift. Each completed
-  phase produces a retrospective in `docs/retrospectives/` — the
-  durable capture of working-method lessons that would otherwise
-  live only in a Cowork chat.
+  `project-history.md` and `project-rationale.md` are updated at each
+  phase boundary rather than left to drift. Each completed phase
+  produces two retrospectives in `docs/retrospectives/`: a
+  `-complete.md` (what shipped) and a `-retrospective.md` (how we
+  worked). The phase-boundary retrospective is a joint exercise Evan
+  and the strategist run together — not a strategist draft. Each
+  phase also gets one lightweight mid-phase checkpoint.
 
 ### Repo and orientation
 
@@ -214,6 +239,13 @@ in `docs/retrospectives/v1-complete.md`.
 - **Session logs end with a handoff status block.** Defined in
   `docs/strategist-protocol.md`; this is what the strategist reads
   instead of having Evan paraphrase the session in chat.
+- **Non-ADR decisions are logged.** The strategist records every
+  non-ADR call with cross-session consequence — a convention, a
+  scoping call, a process choice — as a one-line entry in
+  `docs/decisions-log.md`, so decisions that flow as recommendations
+  rather than forks stay visible and reviewable. Outside-chat work is
+  legitimate; the strategist surfaces anything that landed outside a
+  chat at session start. Visibility, not gatekeeping.
 
 ## Open questions / things in flight
 

@@ -50,3 +50,15 @@ Category tags are free-form (current ones: `convention`, `docs`,
   `recut` try-block, so a `paginate` throw is mislabelled "failed at
   recut". Give `paginate` its own try-block or relabel. Surfaced by
   session 0018.
+- [cleanup] v2 retrospective Decision 3 — machinery prune: remove the
+  unused observer-mode section from `docs/strategist-protocol.md`
+  (it went unused for all of v2), and resolve the `<short-sha>`
+  handoff-block field (drop it, or fill it via a follow-up step).
+  Surfaced by the v2 retrospective.
+- [pilot] v3 experiment — a live state artifact that maintains itself
+  from git, queue, and test state instead of a hand-synced roadmap
+  doc. Try once in v3. Surfaced by the v2 retrospective.
+- [pilot] v3 experiment — a one-off role inversion: Evan drafts a
+  session prompt and the strategist reviews it, to calibrate whether
+  the strategist's prompt-craft adds value or just a layer. Try once
+  in v3. Surfaced by the v2 retrospective.
