@@ -14,7 +14,10 @@ import { computeDihedralWeights } from "../../src/core/dihedral.js";
 import { buildLayout } from "../../src/core/flatten.js";
 import type { Mesh3D, Vec3 } from "../../src/core/mesh.js";
 import { emitSvg } from "../../src/core/emit-svg.js";
+import { detectOverlaps } from "../../src/core/overlap.js";
+import { recut } from "../../src/core/recut.js";
 import { buildSpanningTree } from "../../src/core/spanning-tree.js";
+import { buildRenderablePieces } from "../../src/core/tabs.js";
 import { closedMeshArb } from "./arbitraries.js";
 import {
   nonManifoldFixture,
@@ -203,15 +206,21 @@ describe("Layout connectivity (property)", () => {
 });
 
 describe("SVG output (property)", () => {
-  it("has 3 line elements per face and a well-formed viewBox", () => {
+  it("has 3 line elements per face across all pieces and well-formed viewBoxes", () => {
     fc.assert(
       fc.property(closedMeshArb, (mesh) => {
         const { tree, layout } = pipeline(mesh);
-        const svg = emitSvg(layout, tree);
-        expect(svg.startsWith("<svg")).toBe(true);
-        expect(svg.includes('viewBox="')).toBe(true);
-        const lineCount = (svg.match(/<line /g) ?? []).length;
-        expect(lineCount).toBe(3 * mesh.faces.length);
+        const overlaps = detectOverlaps(layout);
+        const result = recut(tree, layout, overlaps);
+        const renderable = buildRenderablePieces(result);
+        let totalLines = 0;
+        for (const piece of renderable) {
+          const svg = emitSvg(piece);
+          expect(svg.startsWith("<svg")).toBe(true);
+          expect(svg.includes('viewBox="')).toBe(true);
+          totalLines += (svg.match(/<line /g) ?? []).length;
+        }
+        expect(totalLines).toBe(3 * mesh.faces.length);
       }),
     );
   });

@@ -26,12 +26,25 @@ import type { SpanningTree } from "./spanning-tree.js";
  *
  * `layout.faces` is a dense array of the piece's faces in
  * ascending mesh-face-index order. It is NOT face-index-aligned
- * like `buildLayout`'s output. `folds` carries original mesh
- * face indices.
+ * like `buildLayout`'s output. `faces[k]` is the mesh face index
+ * of `layout.faces[k]`. `folds` carries original mesh face
+ * indices.
  */
 export interface Piece {
   layout: Layout2D;
+  faces: number[];
   folds: Adjacency[];
+}
+
+/**
+ * The recut output: the connected pieces plus every cut edge in
+ * the final unfolding — both the spanning tree's original cuts
+ * and the fold edges promoted to cuts by the set-cover step.
+ * These are the edges a builder glues together.
+ */
+export interface RecutResult {
+  pieces: Piece[];
+  cuts: Adjacency[];
 }
 
 /**
@@ -227,7 +240,7 @@ export function recut(
   tree: SpanningTree,
   layout: Layout2D,
   overlaps: FaceOverlap[],
-): Piece[] {
+): RecutResult {
   const faceCount = layout.faces.length;
   const parentFold = buildParentFoldMap(tree);
   const depth = computeDepths(tree.parent, tree.root);
@@ -252,8 +265,20 @@ export function recut(
     }
   }
 
-  return components.map((faces, ci) => ({
+  const promoted: Adjacency[] = [];
+  for (const childFace of cuts) {
+    const fold = parentFold.get(childFace);
+    if (fold) promoted.push(fold);
+  }
+
+  const pieces: Piece[] = components.map((faces, ci) => ({
     layout: { faces: faces.map((i) => layout.faces[i]) },
+    faces,
     folds: pieceFolds[ci],
   }));
+
+  return {
+    pieces,
+    cuts: [...tree.cuts, ...promoted],
+  };
 }

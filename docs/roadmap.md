@@ -13,8 +13,8 @@ agreements and open questions, and the individual session logs in
 ## Where we are now
 
 **Phase:** v2 — Functional Unfolder. Implementation underway.
-**Last completed session:** 0016 — Automatic recut.
-**Next planned session:** 0017 — Glue tabs with edge labels.
+**Last completed session:** 0017 — Glue tabs with edge labels.
+**Next planned session:** 0018 — Multi-page layout.
 
 Run `git log` for exact repo state — this document tracks phase and
 session status, not commit hashes.
@@ -152,11 +152,15 @@ open until 0014 lands and informs the granularity.
   overlap-free. Concave models split (croissant 15, deer 28,
   ginger-bread 5, meat-sausage 3); convex models stay at 1 piece.
   Multi-piece rendering deferred to 0017.
-- **0017 — Glue tabs with edge labels.** ⏭ Tab geometry on cut
-  edges plus matching edge labels — the first consumer of
-  `Piece[]` for rendering. Likely forces a refactor of v1's naive
-  per-face-per-edge SVG emit, which does not carry edge identity.
-- **0018 — Multi-page layout.** Pack the multi-piece net across
+- **0017 — Glue tabs with edge labels.** ✅ `src/core/tabs.ts` —
+  `buildRenderablePieces` turns the `RecutResult` (extended to
+  surface per-piece mesh face indices and the full cut-edge set)
+  into a renderable model: every cut edge labelled, with a
+  trapezoidal tab on the lower-face-index side. `emitSvg`
+  refactored to serialize one piece; the app loops over every
+  piece. Baseline numbers unchanged (the algorithm was not
+  touched).
+- **0018 — Multi-page layout.** ⏭ Pack the multi-piece net across
   printable pages; naive bin-packing first.
 - **0019 — v2 integration and retrospective.** Full pipeline run on
   the 0013 corpus, ship-state validation, handoff-doc updates, and

@@ -11,6 +11,7 @@ import { buildLayout } from "../src/core/flatten.js";
 import { emitSvg } from "../src/core/emit-svg.js";
 import { detectOverlaps } from "../src/core/overlap.js";
 import { recut } from "../src/core/recut.js";
+import { buildRenderablePieces } from "../src/core/tabs.js";
 
 /**
  * Run the unfolding pipeline over every mesh in test/corpus/ and
@@ -103,21 +104,17 @@ for (const fname of entries) {
     continue;
   }
 
-  try {
-    emitSvg(layout, tree);
-  } catch {
-    r.pipeline = "failed at emitSvg";
-    results.push(r);
-    continue;
-  }
-
   const overlaps = detectOverlaps(layout);
   r.overlaps = String(overlaps.length);
 
   try {
-    const pieces = recut(tree, layout, overlaps);
-    r.pieces = String(pieces.length);
-    r.piecesClean = pieces.every((p) => detectOverlaps(p.layout).length === 0);
+    const result = recut(tree, layout, overlaps);
+    r.pieces = String(result.pieces.length);
+    r.piecesClean = result.pieces.every(
+      (p) => detectOverlaps(p.layout).length === 0,
+    );
+    const renderable = buildRenderablePieces(result);
+    for (const piece of renderable) emitSvg(piece);
   } catch {
     r.pipeline = "failed at recut";
     results.push(r);

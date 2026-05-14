@@ -51,11 +51,13 @@ describe("recut", () => {
       ],
     };
 
-    const pieces = recut(tree, layout, []);
+    const { pieces, cuts } = recut(tree, layout, []);
 
     expect(pieces.length).toBe(1);
     expect(pieces[0].layout.faces.length).toBe(3);
+    expect(pieces[0].faces).toEqual([0, 1, 2]);
     expect(pieces[0].folds.length).toBe(2);
+    expect(cuts.length).toBe(0);
   });
 
   it("cuts the overlap path into two pieces when there is a single overlap", () => {
@@ -74,15 +76,18 @@ describe("recut", () => {
     };
     const overlaps: FaceOverlap[] = [{ faceA: 0, faceB: 2 }];
 
-    const pieces = recut(tree, layout, overlaps);
+    const { pieces, cuts } = recut(tree, layout, overlaps);
 
     expect(pieces.length).toBe(2);
     expect(pieces[0].layout.faces.length).toBe(1);
     expect(pieces[1].layout.faces.length).toBe(2);
+    expect(pieces[0].faces).toEqual([0]);
+    expect(pieces[1].faces).toEqual([1, 2]);
     expect(pieces[0].folds.length).toBe(0);
     expect(pieces[1].folds.length).toBe(1);
     expect(pieces[0].layout.faces).toContainEqual(layout.faces[0]);
     expect(pieces[1].layout.faces).toContainEqual(layout.faces[2]);
+    expect(cuts.length).toBe(1);
   });
 
   it("covers multiple overlap paths with a single shared edge", () => {
@@ -107,13 +112,16 @@ describe("recut", () => {
       { faceA: 1, faceB: 4 },
     ];
 
-    const pieces = recut(tree, layout, overlaps);
+    const { pieces, cuts } = recut(tree, layout, overlaps);
 
     expect(pieces.length).toBe(2);
     expect(pieces[0].layout.faces.length).toBe(4);
     expect(pieces[1].layout.faces.length).toBe(1);
+    expect(pieces[0].faces).toEqual([0, 2, 3, 4]);
+    expect(pieces[1].faces).toEqual([1]);
     expect(pieces[0].folds.length).toBe(3);
     expect(pieces[1].folds.length).toBe(0);
+    expect(cuts.length).toBe(1);
   });
 
   it("produces internally overlap-free pieces for ginger-bread.obj end-to-end", () => {
@@ -127,10 +135,11 @@ describe("recut", () => {
 
     expect(overlaps.length).toBeGreaterThan(0);
 
-    const pieces = recut(tree, layout, overlaps);
+    const { pieces } = recut(tree, layout, overlaps);
 
     expect(pieces.length).toBeGreaterThan(1);
     for (const piece of pieces) {
+      expect(piece.faces.length).toBe(piece.layout.faces.length);
       expect(detectOverlaps(piece.layout)).toEqual([]);
     }
   });

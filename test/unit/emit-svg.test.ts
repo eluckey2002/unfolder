@@ -8,8 +8,11 @@ import { buildAdjacency } from "../../src/core/adjacency.js";
 import { computeDihedralWeights } from "../../src/core/dihedral.js";
 import { emitSvg } from "../../src/core/emit-svg.js";
 import { buildLayout } from "../../src/core/flatten.js";
+import { detectOverlaps } from "../../src/core/overlap.js";
 import { parseStl } from "../../src/core/parse-stl.js";
+import { recut } from "../../src/core/recut.js";
 import { buildSpanningTree } from "../../src/core/spanning-tree.js";
+import { buildRenderablePieces } from "../../src/core/tabs.js";
 
 const corpusDir = join(dirname(fileURLToPath(import.meta.url)), "../corpus");
 
@@ -17,6 +20,8 @@ interface SvgPipeline {
   svg: string;
   faceCount: number;
   foldCount: number;
+  cutCount: number;
+  pieceCount: number;
 }
 
 const pipelineFromCorpus = (name: string): SvgPipeline => {
@@ -26,10 +31,15 @@ const pipelineFromCorpus = (name: string): SvgPipeline => {
   const weights = computeDihedralWeights(mesh, dual);
   const tree = buildSpanningTree(dual, weights);
   const layout = buildLayout(mesh, tree);
+  const overlaps = detectOverlaps(layout);
+  const result = recut(tree, layout, overlaps);
+  const renderable = buildRenderablePieces(result);
   return {
-    svg: emitSvg(layout, tree),
+    svg: emitSvg(renderable[0]),
     faceCount: mesh.faces.length,
     foldCount: tree.folds.length,
+    cutCount: result.cuts.length,
+    pieceCount: renderable.length,
   };
 };
 
@@ -38,6 +48,12 @@ const countLines = (svg: string): number =>
 
 const countDashed = (svg: string): number =>
   (svg.match(/stroke-dasharray="/g) ?? []).length;
+
+const countPolygons = (svg: string): number =>
+  (svg.match(/<polygon/g) ?? []).length;
+
+const countTexts = (svg: string): number =>
+  (svg.match(/<text/g) ?? []).length;
 
 describe("emitSvg", () => {
   it("produces a well-formed SVG document", () => {
@@ -56,18 +72,23 @@ describe("emitSvg", () => {
     expect(countLines(pipelineFromCorpus("octahedron").svg)).toBe(24);
   });
 
-  // Fold edges render dashed, cut edges solid. Each fold and each cut is
-  // shared by two faces and drawn once from each, so dashed = 2 * folds
-  // and the remainder (= 3*F - 2*folds) is solid.
+  // Single-piece (convex) platonic solids: each fold edge is drawn
+  // twice (once per adjacent face) as a dashed line; each cut edge is
+  // drawn twice as a solid line, gets one <polygon> tab on the
+  // lower-face-index side, and one <text> label per side.
   it.each([
     ["tetrahedron"],
     ["cube"],
     ["octahedron"],
-  ])("%s: dashed lines == 2 * folds, solid lines == 3*F - 2*folds", (name) => {
-    const { svg, faceCount, foldCount } = pipelineFromCorpus(name);
+  ])("%s: dashed == 2*folds, solid == 3F - 2*folds, polygons == cuts, texts == 2*cuts", (name) => {
+    const { svg, faceCount, foldCount, cutCount, pieceCount } =
+      pipelineFromCorpus(name);
+    expect(pieceCount).toBe(1);
     const dashed = countDashed(svg);
     const total = countLines(svg);
     expect(dashed).toBe(2 * foldCount);
     expect(total - dashed).toBe(3 * faceCount - 2 * foldCount);
+    expect(countPolygons(svg)).toBe(cutCount);
+    expect(countTexts(svg)).toBe(2 * cutCount);
   });
 });
