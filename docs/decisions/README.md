@@ -18,4 +18,8 @@ Keep them short. A few paragraphs each is enough.
 
 ## Immutability
 
-ADRs are immutable once merged. If a decision is superseded, write a new ADR that references the old one — don't edit the original.
+ADRs are immutable once merged to `main`. Pre-merge drafts — for example,
+commits sitting in a worktree branch that hasn't been fast-forwarded into
+`main` yet — can be amended freely. The strict rule applies only after the
+ADR has landed on `main`. If a decision is superseded after that point,
+write a new ADR that references the old one; don't edit the original.

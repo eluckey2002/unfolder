@@ -16,28 +16,22 @@ Detailed v1-v6 phase definitions are in `README.md`.
 
 ## Sessions completed
 
-- **Session 0001 — Project skeleton.** Directory structure, three commits, gitignore (with an anchor-bug fix Claude Code caught). Log: `docs/sessions/0001-project-skeleton.md`.
-- **Session 0002 — Read `paperfoldmodels`.** Cloned the reference implementation, produced a writeup at `docs/references/paperfoldmodels.md`. (Verify this exists; if not, this session may still be in progress.)
+- **Session 0001 — Project skeleton.** Directory structure, gitignore, three commits. Log: `docs/sessions/0001-project-skeleton.md`.
+- **Session 0002 — Read `paperfoldmodels`.** Reference-implementation writeup at `docs/references/paperfoldmodels.md`. Log: `docs/sessions/0002-read-paperfoldmodels.md` (backfilled).
+- **Session 0003 — First ADR.** ADR 0001 — v1 pipeline architecture (staged pure functions). Log: `docs/sessions/0003-first-adr.md`.
+- **Session 0004 — Queue and working agreements.** `docs/queue.md` established; first working-agreement consolidation. Log: `docs/sessions/0004-queue-and-working-agreements.md`.
+- **Session 0005 — Bootstrap the build.** Vite + TypeScript + pnpm + Vitest toolchain. Log: `docs/sessions/0005-bootstrap-the-build.md`.
+- **Session 0006 — Generate the test corpus.** Three.js-generated ASCII STL files for tetrahedron, cube, octahedron. Log: `docs/sessions/0006-generate-test-corpus.md`.
+- **Session 0007 — Mesh loading.** ASCII STL parser in `src/core/` with vertex dedup; three.js viewport in `src/app/` with OrbitControls. First `src/core/` and `src/app/` code. Log: `docs/sessions/0007-mesh-loading.md`.
 
 ## Sessions planned
 
-Sessions 4 through 11 complete v1. Detailed plan:
+Sessions 0008 through 0011 complete v1. Detailed plan in `docs/roadmap.md`.
 
-- **Session 4** — Establish queue and working-agreement updates. (This
-  session.)
-- **Session 5** — Bootstrap the build (Vite + TypeScript + pnpm). Dev
-  server, hello world.
-- **Session 6** — Mesh generation script. Generate STL files for the
-  test corpus (tetrahedron, cube, octahedron) programmatically.
-- **Session 7** — Mesh loading. Parse STL, render triangles on a canvas
-  via three.js.
-- **Session 8** — Face adjacency graph (dual graph).
-- **Session 9** — Depth-first spanning tree (cut/fold edge
-  classification).
-- **Session 10** — Unfolding rotation math (2D coordinates for every
-  triangle).
-- **Session 11** — SVG export. v1 complete: end-to-end pipeline on
-  platonic solids.
+- **Session 0008** — Face adjacency graph (dual graph).
+- **Session 0009** — Spanning tree (cut/fold edge classification).
+- **Session 0010** — Flatten — 2D coordinates for every triangle by walking the spanning tree.
+- **Session 0011** — SVG export. v1 complete: end-to-end pipeline on platonic solids.
 
 ## Key decisions made so far
 
@@ -93,8 +87,9 @@ How Evan and the strategist Claude work together. These have evolved during the 
   re-orientation message: "Continue the unfolder project. Read
   `docs/project-state.md`, `docs/project-rationale.md`, and
   `docs/project-history.md` in that order, then `docs/queue.md` and the
-  two most recent session logs in `docs/sessions/`. Then we'll plan
-  Session NNNN."
+  two most recent session logs in `docs/sessions/`. Then run
+  `git log --oneline -20` to catch any work that landed outside this
+  chat. Then we'll plan Session NNNN."
 - **The strategist maintains `docs/roadmap.md`.** Status flags
   flip from planned to completed when a session commits; phase
   descriptions only change when a phase's ship-state commitment
@@ -103,12 +98,38 @@ How Evan and the strategist Claude work together. These have evolved during the 
   at each session-end.** Same trigger as the roadmap.md status
   flip — both happen together. The artifact carries a baked
   snapshot of session statuses, queue, and recent commits.
+- **Before writing a prompt that involves new tools, libraries, or
+  restructuring**, the strategist does three things: (a) fetches current
+  documentation for any external library used, (b) probes the actual
+  response shape with a sample call rather than assuming, and (c) scans
+  related files for cross-references that could go stale after the
+  change. All three, not any one in isolation.
+- **Worktree by default for numbered sessions; direct-`main` OK for
+  maintenance commits.** The pre-merge amendment freedom that worktrees
+  enable is the actual reason for the rule — bugs caught between commit
+  and merge can be folded in without violating immutability. Maintenance
+  commits don't carry that risk surface and can land directly.
+- **Work gets a numbered session if it matches an entry in the v1 (or
+  later) session plan, or produces new functionality, code, or
+  substantive structural changes.** Otherwise it lands as a plain
+  maintenance commit — no session log, no number, descriptive prompt
+  filename without numeric prefix, clear conventional-commit message.
+- **Prompt files commit with the session log (or commit) they describe**,
+  in the same commit. Amendment/merge sub-prompts get swept in by the
+  next session's commit if they weren't part of the original.
+- **Prompts specify behavior, not code, for implementation work.**
+  Algorithm code, render code, and test bodies are described as
+  specifications; Claude Code writes the implementation using current
+  library API knowledge. Verbatim content in appendices is reserved for
+  type contracts, configuration files, and document content where the
+  wording IS the deliverable. Claude Code produces an implementation
+  report at session-end naming decisions made, deviations from spec,
+  library APIs verified, and concerns worth a strategist eye.
 
 ## Open questions / things in flight
 
 - We have not yet committed to a final project name. `unfolder` is the working name. Worth revisiting before v6.
 - No GitHub remote yet. Worth revisiting once we have a working v1.
-- Test corpus is currently empty. Will be populated in Session 6.
 
 ## Where to look
 

@@ -15,7 +15,7 @@ agreements and open questions, and the individual session logs in
 **Phase:** v1 — Walking Skeleton.
 **Last completed session:** 0007 (mesh loading).
 **Next planned session:** 0008 — Face adjacency graph.
-**Main HEAD:** `1ed6b09`.
+**Main HEAD:** `a69dcf3`.
 
 ## Phase plan (v1–v6)
 
