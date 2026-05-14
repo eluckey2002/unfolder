@@ -6,7 +6,9 @@ All claude-mem tools are deferred MCP. Each section's load step must run before 
 
 | Corpus | Triggers (topic words / path fragments) | Coverage |
 |---|---|---|
-| `paperfoldmodels-algorithm` | `paperfoldmodels`, crease pattern, fold mechanics, unfolding, face overlap, dual graph, `references/paperfoldmodels/` | 8 observations, ~13k tokens |
+| `paperfoldmodels-algorithm` | `paperfoldmodels`, crease pattern, fold mechanics, unfolding, face overlap, dual graph, `references/paperfoldmodels/` | 33 observations, ~18k tokens |
+| `origami-v1-pipeline` | STL parse, mesh, face adjacency, spanning tree, flatten, SVG export, `src/core/`, `src/app/`, `docs/decisions/`, pipeline architecture, three.js renderer | 43 observations, ~19k tokens |
+| `origami-process` | queue, roadmap, project-state, session log, working agreement, ADR discipline, handoff, cowork, `docs/sessions/`, housekeeping | 42 observations, ~18k tokens |
 
 **Workflow on any trigger match:**
 
