@@ -5,11 +5,21 @@
     <title>unfolder</title>
     <style>
       html, body { margin: 0; padding: 0; height: 100%; background: #1a1a1a; }
-      #viewport { width: 100vw; height: 100vh; display: block; }
+      #app { display: flex; height: 100vh; width: 100vw; }
+      #viewport, #net { flex: 1 1 0; min-width: 0; height: 100%; position: relative; }
+      #net { background: #f5f5f0; display: flex; align-items: center; justify-content: center; }
+      #net svg { width: 100%; height: 100%; display: block; }
+      @media (max-aspect-ratio: 1/1) {
+        #app { flex-direction: column; }
+        #viewport, #net { width: 100%; }
+      }
     </style>
   </head>
   <body>
-    <div id="viewport"></div>
+    <div id="app">
+      <div id="viewport"></div>
+      <div id="net"></div>
+    </div>
     <script type="module" src="/src/app/main.ts"></script>
   </body>
 </html>

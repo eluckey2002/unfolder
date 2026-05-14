@@ -12,9 +12,9 @@ agreements and open questions, and the individual session logs in
 
 ## Where we are now
 
-**Phase:** v1 — Walking Skeleton.
-**Last completed session:** 0010 (flatten).
-**Next planned session:** 0011 — SVG export.
+**Phase:** v1 — Walking Skeleton (complete).
+**Last completed session:** 0011 (SVG export).
+**Next planned session:** v2 planning (session plan to be drafted).
 **Main HEAD:** `2745764`.
 
 ## Phase plan (v1–v6)
@@ -56,8 +56,7 @@ anyone.
 
 ## v1 session plan
 
-Sessions 0001–0011 complete v1. Sessions 0001–0010 are committed to
-`main`; 0011 is planned.
+Sessions 0001–0011 are committed to `main`. v1 is complete.
 
 - **0001 — Project skeleton.** ✅ Directory structure, gitignore,
   initial commits.
@@ -79,7 +78,7 @@ Sessions 0001–0011 complete v1. Sessions 0001–0010 are committed to
   each edge as fold or cut.
 - **0010 — Flatten.** ✅ Walk the spanning tree to assign 2D
   coordinates to every face.
-- **0011 — SVG export.** ⏭ Emit the flattened layout as printable SVG.
+- **0011 — SVG export.** ✅ Emit the flattened layout as printable SVG.
   v1 complete.
 
 ## Beyond v1

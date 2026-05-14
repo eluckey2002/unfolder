@@ -10,7 +10,7 @@ The full vision and phase plan (v1 through v6) lives in `README.md`. Read it.
 
 ## Current phase
 
-We're in **v1 — Walking Skeleton.** v1's bar is: load a mesh, run a naive depth-first unfolding, render the result as SVG, work correctly on platonic solids (tetrahedron, cube, octahedron). No tabs, no overlaps, no UI to speak of. The point is getting the geometry math right with simple cases where errors are easy to spot.
+**v1 — Walking Skeleton is complete.** The end-to-end pipeline loads a platonic solid and produces a printable SVG net rendered alongside the 3D viewport. Next phase is v2 — functional unfolder (dihedral-weighted spanning tree, overlap detection and automatic recut, glue tabs with edge labels, multi-page layout). v2's session-level plan is the next strategist task.
 
 Detailed v1-v6 phase definitions are in `README.md`.
 
@@ -26,12 +26,11 @@ Detailed v1-v6 phase definitions are in `README.md`.
 - **Session 0008 — Face adjacency graph.** `DualGraph` output stage in `src/core/adjacency.ts`; ADR 0002 commits the "adjacency as separate stage" decision deferred from ADR 0001. Log: `docs/sessions/0008-face-adjacency-graph.md`.
 - **Session 0009 — Spanning tree.** DFS spanning tree over the dual graph in `src/core/spanning-tree.ts`; ADR 0003 commits "plain DFS for v1, weighted MST deferred to v2." Log: `docs/sessions/0009-spanning-tree.md`.
 - **Session 0010 — Flatten.** Rigid unfolding in `src/core/flatten.ts` — `getThirdPoint` primitive and `buildLayout` walking the spanning tree, with an explicit geometric side test for apex placement. Log: `docs/sessions/0010-flatten.md`.
+- **Session 0011 — SVG export.** `emitSvg` in `src/core/emit-svg.ts`; full pipeline wired into the browser app with a split 3D/net layout. v1 walking skeleton complete. Log: `docs/sessions/0011-svg-export.md`.
 
 ## Sessions planned
 
-Session 0011 completes v1. Detailed plan in `docs/roadmap.md`.
-
-- **Session 0011** — SVG export. v1 complete: end-to-end pipeline on platonic solids.
+v1 is complete. The next strategist task is drafting v2's session-level plan; until then there are no specific sessions queued.
 
 ## Key decisions made so far
 
