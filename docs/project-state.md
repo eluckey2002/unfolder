@@ -25,12 +25,12 @@ Detailed v1-v6 phase definitions are in `README.md`.
 - **Session 0007 — Mesh loading.** ASCII STL parser in `src/core/` with vertex dedup; three.js viewport in `src/app/` with OrbitControls. First `src/core/` and `src/app/` code. Log: `docs/sessions/0007-mesh-loading.md`.
 - **Session 0008 — Face adjacency graph.** `DualGraph` output stage in `src/core/adjacency.ts`; ADR 0002 commits the "adjacency as separate stage" decision deferred from ADR 0001. Log: `docs/sessions/0008-face-adjacency-graph.md`.
 - **Session 0009 — Spanning tree.** DFS spanning tree over the dual graph in `src/core/spanning-tree.ts`; ADR 0003 commits "plain DFS for v1, weighted MST deferred to v2." Log: `docs/sessions/0009-spanning-tree.md`.
+- **Session 0010 — Flatten.** Rigid unfolding in `src/core/flatten.ts` — `getThirdPoint` primitive and `buildLayout` walking the spanning tree, with an explicit geometric side test for apex placement. Log: `docs/sessions/0010-flatten.md`.
 
 ## Sessions planned
 
-Sessions 0010 through 0011 complete v1. Detailed plan in `docs/roadmap.md`.
+Session 0011 completes v1. Detailed plan in `docs/roadmap.md`.
 
-- **Session 0010** — Flatten — 2D coordinates for every triangle by walking the spanning tree.
 - **Session 0011** — SVG export. v1 complete: end-to-end pipeline on platonic solids.
 
 ## Key decisions made so far
