@@ -1,5 +1,7 @@
 # ADR 0003: Plain DFS spanning tree for v1, weighted MST deferred to v2
 
+> **Status:** Superseded by [ADR 0004](0004-dihedral-weighting.md) — the v2 dihedral-weighted MST. The decision recorded below (plain DFS for v1) is preserved as historical record; it is no longer the live algorithm.
+
 ## Context
 
 ADR 0001 deferred the spanning-tree algorithm choice to "Session 8
