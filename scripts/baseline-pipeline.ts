@@ -12,13 +12,13 @@ import { emitSvg } from "../src/core/emit-svg.js";
 import { detectOverlaps } from "../src/core/overlap.js";
 import { LETTER, paginate } from "../src/core/paginate.js";
 import { recut } from "../src/core/recut.js";
-import { buildRenderablePieces } from "../src/core/tabs.js";
+import { buildRenderablePieces, type RenderablePiece } from "../src/core/tabs.js";
 
 /**
  * Run the unfolding pipeline over every mesh in test/corpus/ and
  * record a baseline: pipeline completion, the pre-recut count of
- * overlapping face pairs, and the post-recut piece count. Verifies
- * every piece is internally overlap-free.
+ * overlapping face pairs, the post-recut piece count, and the v3
+ * quality metric set (cut length, tab count, paper efficiency).
  */
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -42,10 +42,39 @@ type Result = {
   overlaps: string;
   pieces: string;
   pages: string;
+  cutLength: string;
+  tabs: string;
+  efficiency: string;
   piecesClean: boolean;
 };
 
 const results: Result[] = [];
+
+const printableW = LETTER.widthMm - 2 * LETTER.marginMm;
+const printableH = LETTER.heightMm - 2 * LETTER.marginMm;
+
+const pieceBboxFit = (piece: RenderablePiece): number => {
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  const bump = (x: number, y: number): void => {
+    if (x < minX) minX = x;
+    if (y < minY) minY = y;
+    if (x > maxX) maxX = x;
+    if (y > maxY) maxY = y;
+  };
+  for (const edge of piece.edges) {
+    bump(edge.from[0], edge.from[1]);
+    bump(edge.to[0], edge.to[1]);
+    if (edge.kind === "cut" && edge.tab) {
+      for (const [tx, ty] of edge.tab) bump(tx, ty);
+    }
+  }
+  const w = maxX - minX;
+  const h = maxY - minY;
+  return Math.min(printableW / w, printableH / h);
+};
 
 for (const fname of entries) {
   const ext = extname(fname).toLowerCase();
@@ -58,6 +87,9 @@ for (const fname of entries) {
     overlaps: "—",
     pieces: "—",
     pages: "—",
+    cutLength: "—",
+    tabs: "—",
+    efficiency: "—",
     piecesClean: true,
   };
 
@@ -119,15 +151,48 @@ for (const fname of entries) {
     continue;
   }
   r.pieces = String(recutResult.pieces.length);
+  r.tabs = String(recutResult.cuts.length);
   r.piecesClean = recutResult.pieces.every(
     (p) => detectOverlaps(p.layout).length === 0,
   );
   const renderable = buildRenderablePieces(recutResult);
 
+  let scale = Infinity;
+  for (const piece of renderable) {
+    const fit = pieceBboxFit(piece);
+    if (fit < scale) scale = fit;
+  }
+
+  let cutLenPre = 0;
+  for (const piece of renderable) {
+    for (const edge of piece.edges) {
+      if (edge.kind !== "cut") continue;
+      const dx = edge.to[0] - edge.from[0];
+      const dy = edge.to[1] - edge.from[1];
+      cutLenPre += Math.sqrt(dx * dx + dy * dy);
+    }
+  }
+  r.cutLength = (cutLenPre * scale).toFixed(1);
+
+  let faceAreaPre = 0;
+  for (const piece of recutResult.pieces) {
+    for (const face of piece.layout.faces) {
+      const [p0, p1, p2] = face.positions;
+      faceAreaPre +=
+        Math.abs(
+          (p1[0] - p0[0]) * (p2[1] - p0[1]) -
+            (p2[0] - p0[0]) * (p1[1] - p0[1]),
+        ) / 2;
+    }
+  }
+  const faceAreaPost = faceAreaPre * scale * scale;
+
   try {
     const pages = paginate(renderable, LETTER);
     r.pages = String(pages.length);
     for (const page of pages) emitSvg(page);
+    const totalPrintable = pages.length * printableW * printableH;
+    r.efficiency = ((faceAreaPost / totalPrintable) * 100).toFixed(1);
   } catch {
     r.pipeline = "failed at paginate";
     results.push(r);
@@ -145,6 +210,9 @@ const headers = [
   "overlaps (pre-recut)",
   "pieces",
   "pages",
+  "cut length (mm)",
+  "tabs",
+  "paper efficiency",
 ];
 const rows = results.map((r) => [
   r.model,
@@ -154,6 +222,9 @@ const rows = results.map((r) => [
   r.overlaps,
   r.pieces,
   r.pages,
+  r.cutLength,
+  r.tabs,
+  r.efficiency === "—" ? "—" : `${r.efficiency}%`,
 ]);
 const widths = headers.map((h, i) =>
   Math.max(h.length, ...rows.map((row) => row[i].length)),
@@ -173,11 +244,26 @@ const pageCounts = completed
   .map((r) => Number.parseInt(r.pages, 10))
   .filter((n) => Number.isFinite(n));
 const totalPages = pageCounts.reduce((s, n) => s + n, 0);
+const cutLengths = completed
+  .map((r) => Number.parseFloat(r.cutLength))
+  .filter((n) => Number.isFinite(n));
+const totalCutLength = cutLengths.reduce((s, n) => s + n, 0);
+const tabCounts = completed
+  .map((r) => Number.parseInt(r.tabs, 10))
+  .filter((n) => Number.isFinite(n));
+const totalTabs = tabCounts.reduce((s, n) => s + n, 0);
+const efficiencies = completed
+  .map((r) => Number.parseFloat(r.efficiency))
+  .filter((n) => Number.isFinite(n));
+const avgEfficiency = efficiencies.length
+  ? efficiencies.reduce((s, n) => s + n, 0) / efficiencies.length
+  : 0;
 const dirty = completed.filter((r) => !r.piecesClean);
 
 const today = new Date().toISOString().slice(0, 10);
 const summaryLines = [
   `**Summary:** ${completed.length} models completed the pipeline; recut produced ${totalPieces} pieces total (per-model range ${minPieces}–${maxPieces}); paginate produced ${totalPages} pages total.`,
+  `Total cut length ${totalCutLength.toFixed(1)} mm; total tabs ${totalTabs}; average paper efficiency ${avgEfficiency.toFixed(1)}%.`,
 ];
 if (dirty.length === 0) {
   summaryLines.push("Every piece is internally overlap-free.");

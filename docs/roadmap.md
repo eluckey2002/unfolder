@@ -13,9 +13,8 @@ agreements and open questions, and the individual session logs in
 ## Where we are now
 
 **Phase:** v3 — Quality Output. In progress.
-**Last completed session:** 0019 — v2 integration and retrospective
-(plus the v3-boundary housekeeping maintenance commit, `3e33524`).
-**Next planned session:** 0020 — development flow setup.
+**Last completed session:** 0021 — v3 quality baseline.
+**Next planned session:** 0022 — Takahashi reference read.
 
 Run `git log` for exact repo state — this document tracks phase and
 session status, not commit hashes.
@@ -196,13 +195,17 @@ as the early ones land.
 
 **Sessions:**
 
-- **0020 — Development flow setup.** ⏭ PR-based merge flow, CI
+- **0020 — Development flow setup.** ✅ PR-based merge flow, CI
   safeguards, the doc-coherence updates (ADR 0006).
-- **0021 — v3 quality baseline.** Define the metric set, instrument
-  the harness, capture `docs/baseline-v3.md`. First session under the
-  PR flow.
-- **0022 — Takahashi reference read.** Study the topological-surgery
-  literature and PolyZamboni; produce a reference writeup.
+- **0021 — v3 quality baseline.** ✅ Defined the v3 quality metric set
+  (cut length, tabs, paper efficiency added alongside pieces and
+  pages), instrumented `scripts/baseline-pipeline.ts`, captured
+  `docs/baseline-v3.md` as the frozen "v3 starts here" snapshot, and
+  extended the CI baseline guard to cover both files. First session
+  under the PR flow.
+- **0022 — Takahashi reference read.** ⏭ Study the
+  topological-surgery literature and PolyZamboni; produce a
+  reference writeup.
 - **0023 — Topological-surgery spike.** Time-boxed, exploratory;
   produces a findings doc, not a shippable stage.
 - **0024+ — sketched:** optimized recut, PDF export, color/texture
