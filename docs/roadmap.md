@@ -12,10 +12,10 @@ agreements and open questions, and the individual session logs in
 
 ## Where we are now
 
-**Phase:** v3 — Quality Output. Not yet started; session plan pending.
-**Last completed session:** 0019 — v2 integration and retrospective.
-**Next planned session:** v3 session-level plan, drafted at the start
-of the next Cowork session.
+**Phase:** v3 — Quality Output. In progress.
+**Last completed session:** 0019 — v2 integration and retrospective
+(plus the v3-boundary housekeeping maintenance commit, `3e33524`).
+**Next planned session:** 0020 — development flow setup.
 
 Run `git log` for exact repo state — this document tracks phase and
 session status, not commit hashes.
@@ -173,6 +173,41 @@ open until 0014 lands and informs the granularity.
   promoted from `it.todo` to a real property test (closes A4); `Piece`
   structurally asserted (closes A6); `docs/retrospectives/v2-complete.md`
   written and handoff docs refreshed. v2 complete.
+
+## v3 session plan
+
+v3 — Quality Output — moves the pipeline from *buildable* to *good*:
+output that's visibly competitive with Pepakura's for non-interactive
+use. Five workstreams; per the planning convention, the first
+sessions are detailed and the rest are a deliberate sketch, refined
+as the early ones land.
+
+**Workstreams:**
+
+1. **Baseline & foundation** — define the v3 quality metric set,
+   instrument the harness, capture the v3 "before" snapshot.
+2. **The cut-quality core** — Takahashi reference read, a
+   topological-surgery spike, optimized recut.
+3. **Output fidelity** — color/texture passthrough, real PDF export.
+4. **Builder-facing quality** — smart tab placement, audit
+   visualization.
+5. **Phase close** — v3 integration test, retrospectives, one
+   mid-phase checkpoint.
+
+**Sessions:**
+
+- **0020 — Development flow setup.** ⏭ PR-based merge flow, CI
+  safeguards, the doc-coherence updates (ADR 0006).
+- **0021 — v3 quality baseline.** Define the metric set, instrument
+  the harness, capture `docs/baseline-v3.md`. First session under the
+  PR flow.
+- **0022 — Takahashi reference read.** Study the topological-surgery
+  literature and PolyZamboni; produce a reference writeup.
+- **0023 — Topological-surgery spike.** Time-boxed, exploratory;
+  produces a findings doc, not a shippable stage.
+- **0024+ — sketched:** optimized recut, PDF export, color/texture
+  passthrough, smart tab placement, audit visualization, v3
+  integration and retrospective. Refined as 0021–0023 land.
 
 ## Maintaining this document
 

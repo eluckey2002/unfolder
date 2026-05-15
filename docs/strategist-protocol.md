@@ -77,3 +77,35 @@ handoff block.
 - ADR style (already documented by example in `docs/decisions/`).
 - The auto-capture pipeline (claude-mem's own behavior — documented in the
   plugin, not here).
+
+## Prompt preflight checklist
+
+Before a session prompt reaches Evan, it is red-teamed against the
+failure classes v1 and v2 actually hit. A subagent runs this; the
+strategist triages the result.
+
+- **No call signatures from memory.** The prompt describes algorithm,
+  render, and test behavior as intent — it does not dictate specific
+  library call signatures. (v1 shipped a wrong three.js call this
+  way.)
+- **No predicted test counts.** The prompt says the new tests should
+  pass and asks Claude Code to report the total; it never predicts a
+  cumulative count.
+- **Formal syntax is exact, not paraphrased.** Where the prompt
+  specifies gitignore patterns, regexes, globs, YAML, or config, the
+  syntax is given exactly — not described. (Session 0001's gitignore
+  bug.)
+- **Verification steps are named.** The prompt names the exact
+  verification commands the session must run.
+- **Files and merge strategy are named.** The prompt lists the files
+  to create or modify and the commit/merge path.
+- **New tooling is probed, not assumed.** For any new library or
+  external tool, the prompt requires doc-fetch-and-probe rather than
+  assuming the API.
+- **Self-contained.** The prompt reads completely to an agent with no
+  chat context — prompts are pasted fresh.
+- **Work type and branch name declared.** The prompt states whether
+  the work is a numbered session, maintenance commit, or spike, and
+  the branch name to use.
+- **Frozen.** This is the final version. A change after handoff is a
+  new prompt or an explicit, flagged amendment — not a silent edit.

@@ -4,12 +4,19 @@ All claude-mem tools are deferred MCP. Each section's load step must run before 
 
 ## 1. Knowledge corpora
 
-| Corpus | Triggers (topic words / path fragments) | Coverage |
-|---|---|---|
-| `paperfoldmodels-algorithm` | `paperfoldmodels`, crease pattern, fold mechanics, unfolding, face overlap, dual graph, `references/paperfoldmodels/` | 33 observations, ~18k tokens |
-| `origami-v1-pipeline` | STL/OBJ parse, mesh, face adjacency, spanning tree (dihedral-weighted MST), flatten, overlap, recut, glue tabs, paginate, SVG export, `src/core/`, `src/app/`, `docs/decisions/`, pipeline architecture, three.js renderer | 59 observations, ~31k tokens |
-| `origami-process` | queue, roadmap, project-state, session log, working agreement, ADR discipline, handoff, cowork, sessions 0012–0018, `docs/sessions/`, housekeeping | 53 observations, ~31k tokens |
-| `origami-decisions` | ADR, decision, design tradeoff, rationale, `docs/decisions/`, "why did we choose", architectural commit | 8 observations, ~5k tokens |
+The corpora are inventoried in
+`~/.claude/projects/-Users-eluckey-Developer-origami/memory/project_corpora.md`
+— **that file is canonical for what exists** (scope, sources, the
+exact subagent paste-blocks). This section carries only the
+*when-to-query triggers*; do not duplicate the inventory here.
+
+| Corpus | Triggers (topic words / path fragments) |
+|---|---|
+| `paperfoldmodels-algorithm` | `paperfoldmodels`, crease pattern, fold mechanics, unfolding, face overlap, dual graph, `references/paperfoldmodels/` |
+| `origami-v1-pipeline` | STL/OBJ parse, mesh, face adjacency, spanning tree, flatten, overlap, recut, glue tabs, paginate, SVG export, `src/core/`, `src/app/`, pipeline architecture, three.js renderer |
+| `origami-process` | queue, roadmap, project-state, session log, working agreement, ADR discipline, handoff, cowork, `docs/sessions/`, housekeeping |
+| `origami-decisions` | ADRs, architectural decisions, design tradeoffs, "why did we do it this way", `docs/decisions/` |
+| `umat-lessons` | retrospectives, lessons learned from earlier project iterations |
 
 **Workflow on any trigger match:**
 
@@ -21,15 +28,11 @@ All claude-mem tools are deferred MCP. Each section's load step must run before 
    ```
    query_corpus(name="<corpus-name>", question="...")
    ```
-3. Spawning a subagent on triggers? Paste this verbatim — subagents do not see CLAUDE.md:
-   ```
-   The corpus "paperfoldmodels-algorithm" is primed in claude-mem.
-   First: ToolSearch(query="select:mcp__plugin_claude-mem_mcp-search__query_corpus", max_results=1)
-   Then: query_corpus(name="paperfoldmodels-algorithm", question="...")
-   Read source files only if the corpus lacks needed detail.
-   ```
+3. Spawning a subagent on triggers? `project_corpora.md` holds the
+   exact paste-block per corpus — subagents do not see CLAUDE.md.
 
-Empty / incoherent / clearly-wrong corpus results → surface to user immediately. Do NOT silently fall back to `Read`.
+Empty / incoherent / clearly-wrong corpus results → surface to user
+immediately. Do NOT silently fall back to `Read`.
 
 ## 2. Smart-explore (use BEFORE Read / find / grep on large or unfamiliar code)
 
@@ -59,7 +62,6 @@ The `/corpus` skill handles the mechanics. These rules tell you *when* to invoke
 
 **Propose `/corpus build "<description>"` when:**
 - A file appears in ≥3 observations across ≥2 sessions and isn't covered by any existing corpus.
-- You just recorded a decision-type observation and ≥5 decisions exist project-wide without a `decisions-corpus`.
 - A subagent reads ≥5 files from the same directory that isn't covered by any corpus.
 - You've read the same large file twice in one session.
 
@@ -84,3 +86,25 @@ Always propose, then wait for user confirmation. Never auto-build.
 - **Verify UI/CSS against real renders.** Screenshot the running app at the target viewport — do not inject CSS to simulate conditions; that produces false-positive bug reports.
 - **Read/Grep/Glob for inspection; Bash for side effects.** Reserve Bash for build, test, git, and other commands that change state. Reuse a verification result already obtained this session rather than re-running. Complements section 2's smart-explore guidance, doesn't replace it.
 - **Parallel Task agents for multi-target exploration.** When the task has independent read-only sub-questions, dispatch parallel sub-agents instead of serial Bash/Read. Use section 1's corpus-priming paste-block for any dispatched agent.
+- **Worktree cleanup.** Run `git worktree prune` at session start.
+  Merged session branches are auto-deleted on the remote; the local
+  worktree admin still needs pruning.
+
+## 6. Development workflow (v3+)
+
+Per ADR 0006. Numbered sessions and spikes land via pull request, not
+direct merge.
+
+- **Worktree branch naming:** `<type>/<descriptor>` — type is
+  `session`, `maint`, or `spike`; for sessions the descriptor leads
+  with the number (`session/0020-dev-flow-setup`). Create the
+  worktree with this name; do not accept an auto-generated one.
+- **Land via PR:** worktree → open a PR → CI must pass → address
+  every CI comment and failure (resolve, or reply with a reasoned
+  dismissal) → squash-merge. Maintenance commits may still go direct
+  to `main`.
+- **Fill the PR template** — it is the structural home of the session
+  handoff block, and it mirrors the in-repo session log
+  (`docs/sessions/NNNN-*.md`), which stays canonical.
+- **Reasoning lives in ADR 0006**; the working agreements are in
+  `docs/project-state.md`. This section is the operative subset only.

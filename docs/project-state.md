@@ -147,6 +147,12 @@ in `docs/retrospectives/v1-complete.md`.
   amendment freedom — bugs caught between commit and merge fold in
   without violating immutability. Maintenance commits don't carry
   that risk surface.
+- **Numbered sessions and spikes land via pull request.** Per ADR
+  0006: worktree → PR → passing CI → review → squash-merge, with
+  branch protection on `main` enforcing it. Maintenance commits may
+  still go direct to `main`. Branches follow `<type>/<descriptor>`
+  (`session/0020-dev-flow-setup`, `maint/...`, `spike/...`); the PR
+  template is the structural home of the handoff block.
 - **Session prompts are saved as files** at
   `docs/sessions/prompts/` before being pasted into Claude Code,
   and commit with the session log (or commit) they describe.
@@ -263,7 +269,7 @@ in `docs/retrospectives/v1-complete.md`.
 - `docs/project-history.md` — narrative arc of how the project evolved
 - `docs/retrospectives/` — per-phase retrospectives: a `-complete.md` (what shipped) and a `-retrospective.md` (how we worked). v1: `v1-complete.md`. v2: `v2-complete.md`, `v2-retrospective.md`.
 - `docs/audits/` — point-in-time codebase assessments (`codebase-assessment-2026-05-14.md` is the first)
-- `docs/decisions/` — ADRs (0001 pipeline architecture, 0002 adjacency-as-stage, 0003 DFS spanning tree, 0004 dihedral-weighted MST, 0005 greedy set-cover recut)
+- `docs/decisions/` — ADRs (0001 pipeline architecture, 0002 adjacency-as-stage, 0003 DFS spanning tree, 0004 dihedral-weighted MST, 0005 greedy set-cover recut, 0006 PR-based development flow and CI safeguards)
 - `docs/references/` — writeups of external implementations we've studied
 - `docs/sessions/` — logs of completed Claude Code sessions
 - `docs/sessions/prompts/` — the saved prompt that produced each session or maintenance commit
