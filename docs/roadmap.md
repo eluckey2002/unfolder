@@ -13,8 +13,8 @@ agreements and open questions, and the individual session logs in
 ## Where we are now
 
 **Phase:** v3 — Quality Output. In progress.
-**Last completed session:** 0021 — v3 quality baseline.
-**Next planned session:** 0022 — Takahashi reference read.
+**Last completed session:** 0022 — Takahashi reference read.
+**Next planned session:** 0023 — Topological-surgery spike.
 
 Run `git log` for exact repo state — this document tracks phase and
 session status, not commit hashes.
@@ -203,10 +203,13 @@ as the early ones land.
   `docs/baseline-v3.md` as the frozen "v3 starts here" snapshot, and
   extended the CI baseline guard to cover both files. First session
   under the PR flow.
-- **0022 — Takahashi reference read.** ⏭ Study the
-  topological-surgery literature and PolyZamboni; produce a
-  reference writeup.
-- **0023 — Topological-surgery spike.** Time-boxed, exploratory;
+- **0022 — Takahashi reference read.** ✅ Reference writeup at
+  `docs/references/takahashi.md` covering Takahashi 2011's
+  topological-surgery + GA, PolyZamboni's greedy cut-removal
+  (correcting the survey), and Export-Paper-Model's blended weights;
+  identifies the vertex-curvature classification as the most
+  portable trick and grounds the 0023 spike's menu.
+- **0023 — Topological-surgery spike.** ⏭ Time-boxed, exploratory;
   produces a findings doc, not a shippable stage.
 - **0024+ — sketched:** optimized recut, PDF export, color/texture
   passthrough, smart tab placement, audit visualization, v3

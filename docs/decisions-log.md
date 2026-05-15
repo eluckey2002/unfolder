@@ -69,3 +69,18 @@ One entry per decision, newest last:
   `scripts/baseline-pipeline.ts`; both files CI-guarded with the
   `baseline-change` label as the intentional-regeneration escape
   hatch.
+- **2026-05-15 — Cut-length metric uses double-count
+  (physical-builder-effort) interpretation.** "Cut length (mm)" in
+  the v3 quality metric set sums the 2D mm-length of every
+  cut-classified edge across every renderable piece, which
+  double-counts each shared cut. This is the physical-builder
+  reading: the scissor cuts along both sides of every cut, so the
+  number reflects real cutting effort. The single-count topological
+  alternative (each cut summed once, comparable to unfolding
+  literature) is a trivial `/2` conversion if needed; the relative
+  v3 trajectory is identical either way. *Companion note:* the
+  paper-efficiency metric is scale-sensitive (cube.stl 41.0% vs
+  cube.obj 23.4% in the 0021 baseline — same shape, different
+  source-corpus dimensions),
+  so the metric set is intended for per-model v3-trajectory
+  tracking, not cross-model comparison.
