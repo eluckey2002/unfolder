@@ -47,3 +47,13 @@ One entry per decision, newest last:
   Rejected: private-until-later, which preserved more optionality but
   forced nothing and matched a more cautious posture than the
   project's own identity.
+- **2026-05-15 — Handoff status blocks drop the `<short-sha>` field
+  and carry the commit subject only.** Short SHAs are redundant once
+  the subject identifies the commit unambiguously, and shaving the
+  field tightens the template the strategist consults at session
+  start. Surfaced by the v2 retrospective's machinery prune.
+- **2026-05-15 — The `test/corpus/OBJ format/` provenance archive is
+  gitignored, not committed.** The folder holds source models for the
+  test corpus and is not imported by any code path; tracking it would
+  add ~megabytes of binary diff with no consumer. The audited corpus
+  files in `test/corpus/` remain committed.

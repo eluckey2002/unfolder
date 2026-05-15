@@ -79,13 +79,12 @@ The `core/` vs `app/` split is structural and important. `core/` is the library;
 
 ## Status
 
-v1 — the walking skeleton — is complete. The full pipeline (parse →
-adjacency → spanning tree → flatten → emit SVG) runs end to end on
-the platonic solids, with a browser app showing the 3D mesh beside
-its unfolded SVG net. v2 — the functional unfolder — is planned; its
-session plan is in `docs/roadmap.md`. v2 implementation has not
-started.
+v2 — the functional unfolder — is complete and merged. The full ten-stage
+pipeline (parse → adjacency → dihedral weights → spanning tree → flatten →
+overlap detect → recut → tabs → paginate → emit SVG) runs end to end across
+the test corpus, with a browser app showing the 3D mesh beside its unfolded
+SVG net. v3 — quality output — is current; its session plan is pending.
 
 ## License
 
-MIT (planned).
+MIT. See `LICENSE`.

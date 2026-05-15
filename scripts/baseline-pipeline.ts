@@ -110,18 +110,26 @@ for (const fname of entries) {
   const overlaps = detectOverlaps(layout);
   r.overlaps = String(overlaps.length);
 
+  let recutResult;
   try {
-    const result = recut(tree, layout, overlaps);
-    r.pieces = String(result.pieces.length);
-    r.piecesClean = result.pieces.every(
-      (p) => detectOverlaps(p.layout).length === 0,
-    );
-    const renderable = buildRenderablePieces(result);
+    recutResult = recut(tree, layout, overlaps);
+  } catch {
+    r.pipeline = "failed at recut";
+    results.push(r);
+    continue;
+  }
+  r.pieces = String(recutResult.pieces.length);
+  r.piecesClean = recutResult.pieces.every(
+    (p) => detectOverlaps(p.layout).length === 0,
+  );
+  const renderable = buildRenderablePieces(recutResult);
+
+  try {
     const pages = paginate(renderable, LETTER);
     r.pages = String(pages.length);
     for (const page of pages) emitSvg(page);
   } catch {
-    r.pipeline = "failed at recut";
+    r.pipeline = "failed at paginate";
     results.push(r);
     continue;
   }

@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 
 import { buildAdjacency } from "../../src/core/adjacency.js";
@@ -9,6 +10,7 @@ import type { DualGraph } from "../../src/core/adjacency.js";
 import { computeDihedralWeights } from "../../src/core/dihedral.js";
 import type { Mesh3D } from "../../src/core/mesh.js";
 import { parseObj } from "../../src/core/parse-obj.js";
+import { closedMeshArb } from "../property/arbitraries.js";
 
 const corpusDir = join(dirname(fileURLToPath(import.meta.url)), "../corpus");
 
@@ -120,5 +122,32 @@ describe("computeDihedralWeights", () => {
   it("throws on a degenerate face, naming the face index", () => {
     const { mesh, dual } = degeneratePair();
     expect(() => computeDihedralWeights(mesh, dual)).toThrow(/Face 1/);
+  });
+});
+
+describe("computeDihedralWeights (property)", () => {
+  it("every weight lands in [0, π]", () => {
+    fc.assert(
+      fc.property(closedMeshArb, (mesh) => {
+        const dual = buildAdjacency(mesh);
+        const weights = computeDihedralWeights(mesh, dual);
+        for (const w of weights) {
+          expect(Number.isFinite(w)).toBe(true);
+          expect(w).toBeGreaterThanOrEqual(0);
+          expect(w).toBeLessThanOrEqual(Math.PI);
+        }
+      }),
+    );
+  });
+
+  it("is deterministic — same input yields identical weights", () => {
+    fc.assert(
+      fc.property(closedMeshArb, (mesh) => {
+        const dual = buildAdjacency(mesh);
+        const a = computeDihedralWeights(mesh, dual);
+        const b = computeDihedralWeights(mesh, dual);
+        expect(b).toEqual(a);
+      }),
+    );
   });
 });

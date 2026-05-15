@@ -1,9 +1,8 @@
-# Strategist / observer protocol
+# Strategist protocol
 
 The conventions that govern how Cowork-side strategist Claude and terminal-side
-Claude Code coordinate, and what observer-mode sessions are expected to do
-without violating their constraints. Evan is the go-between; this doc exists so
-the relay stops being lossy.
+Claude Code coordinate. Evan is the go-between; this doc exists so the relay
+stops being lossy.
 
 ## Roles, briefly
 
@@ -11,9 +10,6 @@ the relay stops being lossy.
   documentation, surfaces decisions. Reads the repo at session start.
 - **Claude Code** — implements. Runs prompts the strategist drafts, edits code,
   commits, reports back via session logs.
-- **Observer-mode Claude Code sessions** — a Claude Code session running in
-  read-only observation mode. Watches and records, doesn't act. Output is the
-  capture, not the side effects.
 - **Evan** — director. Goes between the two as needed. The goal of this doc
   is to make that "going between" as deterministic and lossless as possible.
 
@@ -48,7 +44,7 @@ The strategist consumes it deterministically — no paraphrasing required.
 ## Handoff
 
 - **Branch / worktree:** `claude/<name>` at `.claude/worktrees/<name>/`
-- **Commits:** `<short-sha-1> <subject>` (plus any additional in order)
+- **Commits:** `<subject>` (plus any additional in order)
 - **Verification:** `pnpm test:run` <N passing>; `pnpm type-check` clean.
   (If skipped, say why — e.g. "docs-only change, no verification needed".)
 - **Decisions made or deferred:** Each as a one-line summary, linking to the
@@ -67,62 +63,12 @@ Maintenance commit message body should contain the same fields when applicable
 (branch/worktree usually `main`; commits is the commit being made; decisions
 are usually trivial or absent for maintenance work).
 
-## Observer-mode rules
-
-Observer-mode sessions watch and record — they do not implement. The
-repeat-offender failure modes from the Insights report are below; each has the
-fix.
-
-### No tool calls when no tools are available
-
-If a continuation session lacks Bash (or any tool), do **not** attempt to use
-that tool and then narrate the failure. Report the missing capability once,
-then continue with what is available. A continuation session without Bash can
-still Read; that is enough for almost all observation work.
-
-If a tool *is* available but produces an error, narrate the error and move on
-— do not retry in a loop.
-
-### Don't fabricate facts you can't verify in the current session
-
-If the observation requires running a command that is unavailable, mark the
-observation as "unverified" rather than inferring. The strategist will run the
-command on the next active session.
-
-### Capture format
-
-> **Note — needs Evan to confirm.** The exact `<observation>` / `<summary>`
-> tag schema that observer-mode sessions are expected to emit is not fully
-> documented in this repo or in the claude-mem plugin docs available locally.
-> The taxonomy below is inferred from the `observations` table (types:
-> `bugfix`, `change`, `decision`, `discovery`, `feature`). The auto-capture
-> path (Read / Edit / Bash hooks → SQLite) is separate from observer-mode's
-> explicit tag emission, and the two should not be conflated. Confirm the
-> precise schema before treating any of this as authoritative.
-
-What is reasonably safe to assume from the table schema and existing data:
-
-- An observation has a **type** drawn from `{bugfix, change, decision,
-  discovery, feature}`. Pick the most specific match. When uncertain between
-  two, prefer `discovery` over `change`.
-- An observation has a **title** — one sentence, present tense, what was
-  observed. Not a question, not a TODO.
-- An observation may have **narrative** (longer-form text) and **facts**
-  (concrete claims worth indexing later).
-- A **summary** is the end-of-session rollup — what the session accomplished
-  taken as a whole, distinct from per-event observations. Use one summary per
-  observer-mode session.
-
-When in doubt about whether something is an observation or a summary: if it
-narrates a single event, it's an observation. If it abstracts across the
-whole session, it's a summary.
-
 ## When this doc is consulted
 
 The Cowork re-orientation prompt in `docs/project-state.md` points to this
 file as part of the session-start reading order. The strategist reads it once
-per chat (it's short); Claude Code reads it when starting an observer-mode
-session or when writing a session log's handoff block.
+per chat (it's short); Claude Code reads it when writing a session log's
+handoff block.
 
 ## What this doc does NOT cover
 
