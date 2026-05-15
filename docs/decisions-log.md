@@ -57,3 +57,15 @@ One entry per decision, newest last:
   test corpus and is not imported by any code path; tracking it would
   add ~megabytes of binary diff with no consumer. The audited corpus
   files in `test/corpus/` remain committed.
+- **2026-05-15 — v3 quality metric set.** The v3 baseline tracks
+  five measures, each tied to a v3 improvement vector: **piece
+  count** (fragmentation — targeted by optimized recut), **total
+  cut length in mm** (assembly effort — smarter cuts), **tab
+  count** (assembly effort — smart tab placement), **paper-area
+  efficiency** (paper waste — packing and scale), and **page
+  count** (output size). Foldability proxy is deferred until a
+  clean measurable definition emerges. Captured frozen in
+  `docs/baseline-v3.md`; instrumented in
+  `scripts/baseline-pipeline.ts`; both files CI-guarded with the
+  `baseline-change` label as the intentional-regeneration escape
+  hatch.
