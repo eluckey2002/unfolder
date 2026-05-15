@@ -33,4 +33,30 @@ describe("parseStl — platonic solids", () => {
   it("rejects non-STL input", () => {
     expect(() => parseStl("this is not an STL file")).toThrow();
   });
+
+  it("rejects a non-finite vertex coordinate", () => {
+    const stl = [
+      "solid bad",
+      "facet normal 0 0 1",
+      "  outer loop",
+      "    vertex NaN 0 0",
+      "    vertex 1 0 0",
+      "    vertex 0 1 0",
+      "  endloop",
+      "endfacet",
+      "endsolid bad",
+    ].join("\n");
+    expect(() => parseStl(stl)).toThrow(/non-finite/);
+  });
+
+  it("rejects a file that ends mid-triangle", () => {
+    const stl = [
+      "solid truncated",
+      "facet normal 0 0 1",
+      "  outer loop",
+      "    vertex 0 0 0",
+      "    vertex 1 0 0",
+    ].join("\n");
+    expect(() => parseStl(stl)).toThrow(/mid-triangle/);
+  });
 });

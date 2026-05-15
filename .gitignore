@@ -14,5 +14,8 @@ coverage/
 !/.claude/settings.json
 !/.claude/skills/
 
+# OBJ provenance archive — source files for the test corpus; not imported by anything
+test/corpus/OBJ format/
+
 # macOS
 .DS_Store
