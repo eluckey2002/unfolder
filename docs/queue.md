@@ -44,3 +44,20 @@ Category tags are free-form (current ones: `convention`, `docs`,
   session prompt and the strategist reviews it, to calibrate whether
   the strategist's prompt-craft adds value or just a layer. Try once
   in v3. Surfaced by the v2 retrospective.
+- [cleanup] U1 — extract the duplicated canonical pair-key helper
+  (`adjacency.ts`, `flatten.ts`, `tabs.ts`) to `src/core/pair-key.ts`.
+  No behavior change; triplication verified. Intended as the first
+  PR-flow dogfood after session 0020. Surfaced by the Pathfinder
+  2026-05-15 consolidation analysis.
+- [cleanup] U2 — extract the union-find factory (duplicated in
+  `spanning-tree.ts` and `recut.ts`'s `connectedComponents`) to
+  `src/core/union-find.ts`; relieves a recut.ts complexity hotspot
+  the 2026-05-14 audit flagged. Surfaced by Pathfinder 2026-05-15.
+- [cleanup] U3 — extract the shared vertex-interner closure
+  (`parse-stl.ts`, `parse-obj.ts`) to `src/core/intern-vertex.ts`;
+  the two parsers stay separate. Surfaced by Pathfinder 2026-05-15.
+- [decision] U4 — Pathfinder proposes a single `runPipeline()`
+  orchestrator, reversing the inline-pipeline-per-call-site the
+  2026-05-14 audit called intentional per ADR 0001. Needs a
+  decisions-log entry or ADR before it can become a prompt — not
+  maintenance-eligible. Surfaced by Pathfinder 2026-05-15.
