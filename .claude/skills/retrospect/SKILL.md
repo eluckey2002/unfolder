@@ -7,9 +7,18 @@ description: Run the 4-pass phase-boundary retrospective. Produces -complete.md 
 
 Run the 4-pass retrospective ritual for a completed phase. Each pass pauses for the user's direction — this is the joint exercise pattern, not a strategist draft.
 
-## Step 1 — Validate phase
+## Step 1 — Validate phase and prior state
 
-The first argument is the phase (e.g., `v3`). If `docs/retrospectives/<phase>-complete.md` already exists, ask the user whether to overwrite. Otherwise proceed.
+The first argument is the phase (e.g., `v3`).
+
+**Phase completion check:** Read `docs/roadmap.md` to verify all sessions in the phase range are marked done. If not, stop and surface — do not start a retrospective on an in-flight phase.
+
+**Prior-state check:** Look for three files that may exist from a prior run:
+- `docs/retrospectives/<phase>-complete-draft.md` (Pass 1 draft, session died mid-pass) → offer to resume from Pass 2 or restart from Pass 1
+- `docs/retrospectives/<phase>-complete.md` (Pass 4 completed for the what-shipped doc) → warn before overwriting
+- `docs/retrospectives/<phase>-retrospective.md` (Pass 4 completed for the how-we-worked doc) → warn before overwriting
+
+If both final files exist, confirm with the user before proceeding. If only the draft exists, offer the resume choice. If none exist, proceed normally.
 
 ## Step 2 — Gather phase artifacts
 
@@ -19,6 +28,7 @@ Read these in parallel (use parallel Read/Grep calls):
 - ADRs created during the phase (`docs/decisions/`)
 - Queue items added/closed in the phase (`docs/queue.md` history via `git log -p docs/queue.md`)
 - Audit findings in the phase (`docs/audits/`)
+- Prior phase retrospectives (`docs/retrospectives/*.md` for phases before this one) — used for trend comparison and scoring carried lessons
 - `git log --oneline` for the phase range
 
 Hold the artifacts in working memory. The user will not paraphrase — the read is from the repo directly.
@@ -41,11 +51,11 @@ Prompt:
 
 > Pass 2 — for each observation from Pass 1, I'll propose a decision with viewpoints. Accept, redirect, or skip each.
 
-Walk the observations one by one with the user. Record accepted decisions and pilots; mark rejected ones.
+Walk the observations one by one. For each: present the proposed decision with viewpoints, wait for the user's "accept", "redirect <how>", or "skip", and only then move to the next. Record accepted decisions and pilots; mark rejected ones.
 
 ## Step 5 — Pass 3: Self-lens
 
-Produce an honest assessment of the strategist's (this skill's, or the Cowork strategist's if applicable) performance in the phase. Where it over-weighted bookkeeping, where it offloaded synthesis, what habits showed.
+Produce an honest assessment of the Claude Code agent acting as strategist (and the Cowork strategist if any was in use) during the phase. Where it over-weighted bookkeeping, where it offloaded synthesis, what habits showed.
 
 Prompt:
 
@@ -80,4 +90,4 @@ Do not apply automatically. The user decides which to act on.
 - Producing a strategist-draft retrospective unilaterally. The 4-pass pause-and-direct between passes is the point — that's the v2 lesson.
 - Compressing the 4 passes into one.
 - Auto-applying follow-ups. The user decides.
-- Starting before the phase is actually done. Verify phase completion against `docs/roadmap.md` before beginning.
+- Starting before the phase is actually done. Step 1 enforces this — do not bypass.
