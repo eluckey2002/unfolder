@@ -18,6 +18,7 @@ import type { Adjacency } from "./adjacency.js";
 import type { Layout2D } from "./flatten.js";
 import type { FaceOverlap } from "./overlap.js";
 import type { SpanningTree } from "./spanning-tree.js";
+import { makeUnionFind } from "./union-find.js";
 
 /**
  * One connected piece: a layout of the piece's faces (selected
@@ -180,41 +181,16 @@ const connectedComponents = (
   cuts: ReadonlySet<number>,
   parentFold: ReadonlyMap<number, Adjacency>,
 ): number[][] => {
-  const ufParent = new Array<number>(faceCount);
-  for (let i = 0; i < faceCount; i++) ufParent[i] = i;
-  const rank = new Array<number>(faceCount).fill(0);
-
-  const find = (x: number): number => {
-    let r = x;
-    while (ufParent[r] !== r) r = ufParent[r];
-    let cur = x;
-    while (ufParent[cur] !== r) {
-      const next = ufParent[cur];
-      ufParent[cur] = r;
-      cur = next;
-    }
-    return r;
-  };
-  const union = (a: number, b: number): void => {
-    const ra = find(a);
-    const rb = find(b);
-    if (ra === rb) return;
-    if (rank[ra] < rank[rb]) ufParent[ra] = rb;
-    else if (rank[ra] > rank[rb]) ufParent[rb] = ra;
-    else {
-      ufParent[rb] = ra;
-      rank[ra]++;
-    }
-  };
+  const uf = makeUnionFind(faceCount);
 
   for (const [childFace, fold] of parentFold) {
     if (cuts.has(childFace)) continue;
-    union(fold.faceA, fold.faceB);
+    uf.union(fold.faceA, fold.faceB);
   }
 
   const byRoot = new Map<number, number[]>();
   for (let i = 0; i < faceCount; i++) {
-    const r = find(i);
+    const r = uf.find(i);
     let list = byRoot.get(r);
     if (!list) {
       list = [];
