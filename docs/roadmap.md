@@ -13,8 +13,8 @@ agreements and open questions, and the individual session logs in
 ## Where we are now
 
 **Phase:** v3 — Quality Output. In progress.
-**Last completed session:** 0023 — Topological-surgery spike.
-**Next planned session:** 0024 — Optimized recut (informed by the 0023 spike).
+**Last completed session:** 0025 — Optimized recut.
+**Next planned session:** 0026 — Smart tab placement.
 
 Run `git log` for exact repo state — this document tracks phase and
 session status, not commit hashes.
@@ -35,9 +35,10 @@ layout. Ship state: buildable papercraft output for low-poly meshes
 
 **v3 — Quality output.** Takahashi's topological surgery for optimized
 cuts, audit visualization (color-coded regions by foldability), smart
-tab placement, color/texture passthrough, real PDF export. Ship
-state: output that's visibly competitive with Pepakura's for
-non-interactive use cases.
+tab placement, color/texture passthrough. Ship state: output that's
+visibly competitive with Pepakura's for non-interactive use cases.
+(Real PDF export was originally in scope but cut 2026-05-16 per
+strategist call — SVG output was deemed sufficient; revisit in v5.)
 
 **v4 — Interactive editor.** Project changes character — from batch
 tool to application. Real UI with 3D viewport and 2D layout panel.
@@ -218,17 +219,27 @@ as the early ones land.
   piece-count wins on every concave model, Variant B as opt-in,
   Variant A as a post-condition assertion. Establishes
   `spikes/<date>-<slug>/` and `docs/spikes/` conventions.
-- **0024 — Optimized recut (informed by the 0023 spike).** ⏭
-  Promote Variant C from `spikes/` to `src/core/` as the v3
-  default unfolder; promote Variant B's blended weights as an
-  alternate weight function; wire Variant A's check as a
-  post-condition assertion.
-- **0025+ — sketched:** PDF export, color/texture passthrough,
-  smart tab placement, audit visualization, v3 integration and
-  retrospective. Refined as 0024 lands.
+- **0024 — Strategist skills.** ✅ Six skills codifying protocol
+  ceremony (worktree bootstrap, prompt red-teaming, orientation,
+  retrospectives, ledger management, session wrap). Detoured from
+  the optimized-recut plan; that work landed in 0025.
+- **0025 — Optimized recut.** ✅ Cut-removal (Variant C) is the
+  v3 default via `runPipeline`. Blended weights (Variant B)
+  shipped as opt-in alternate weight function; curvature
+  (Variant A) wired as post-condition assertion. ADR 0007
+  supersedes ADR 0005. P1 audit finding (precision contract)
+  closed via shared `src/core/eps.ts`. U4 Pathfinder
+  `runPipeline()` orchestrator queue item resolved.
+- **0026 — Smart tab placement.** ⏭ Replace lower-face-index tab
+  rule with quality-driven placement (edge length, side clearance,
+  concave-side preference).
+- **0027+ — sketched:** audit visualization, color/texture
+  passthrough, file-loader UI (v4-precursor), v3 integration and
+  retrospective. Refined as 0026 lands. PDF export removed from
+  scope 2026-05-16.
 - **0029 — File-loader UI (v4-precursor).** A thin, strictly-scoped
   UI: load any STL/OBJ from disk, run the pipeline with default
-  settings, render the unfolded output, and download SVG/PDF. No
+  settings, render the unfolded output, and download SVG. No
   editing, no parameter controls, no interactivity beyond load and
   download — editing waits for v4. Lands after the algorithm and
   output-fidelity work so the UI exposes v3-quality output, not the

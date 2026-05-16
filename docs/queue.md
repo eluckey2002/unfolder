@@ -40,11 +40,6 @@ Category tags are free-form (current ones: `convention`, `docs`,
 - [pilot] v3 experiment — a live state artifact that maintains itself
   from git, queue, and test state instead of a hand-synced roadmap
   doc. Try once in v3. Surfaced by the v2 retrospective.
-- [decision] U4 — Pathfinder proposes a single `runPipeline()`
-  orchestrator, reversing the inline-pipeline-per-call-site the
-  2026-05-14 audit called intentional per ADR 0001. Needs a
-  decisions-log entry or ADR before it can become a prompt — not
-  maintenance-eligible. Surfaced by Pathfinder 2026-05-15.
 - [research] Force-directed unfolding spike — simulate faces as
   2D rigid bodies connected by hinges, with repulsive force
   between non-adjacent faces; cuts emerge where hinges over-strain.
