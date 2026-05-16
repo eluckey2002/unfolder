@@ -7,7 +7,9 @@
  * numbers across pieces. Pure function.
  */
 
+import type { Vec2 } from "./flatten.js";
 import type { Page } from "./paginate.js";
+import type { RenderEdge } from "./tabs.js";
 
 const CUT_STROKE_MM = 0.3;
 const FOLD_STROKE_MM = 0.3;
@@ -18,6 +20,46 @@ const LABEL_FONT_MM = 3;
 const LABEL_OFFSET_MM = LABEL_FONT_MM * 0.6;
 const PAGE_BORDER_STROKE_MM = 0.15;
 const PAGE_BORDER_COLOR = "#ccc";
+
+/**
+ * Walk a piece's cut edges (boundary) into an ordered outline polygon.
+ * Folds are ignored — they're interior. Exported for direct unit
+ * testing; the only production caller is emitSvg's tint emission.
+ */
+export function reconstructOutline(edges: RenderEdge[]): Vec2[] {
+  const cuts: RenderEdge[] = edges.filter((e) => e.kind === "cut");
+  if (cuts.length === 0) return [];
+
+  const key = (v: Vec2): string => `${v[0]},${v[1]}`;
+  const adj = new Map<string, Array<{ idx: number; other: Vec2 }>>();
+  const push = (k: string, entry: { idx: number; other: Vec2 }): void => {
+    const list = adj.get(k);
+    if (list) list.push(entry);
+    else adj.set(k, [entry]);
+  };
+  for (let i = 0; i < cuts.length; i++) {
+    const e = cuts[i];
+    push(key(e.from), { idx: i, other: e.to });
+    push(key(e.to), { idx: i, other: e.from });
+  }
+
+  const used = new Set<number>();
+  const start = cuts[0].from;
+  const outline: Vec2[] = [start];
+  used.add(0);
+  let current = cuts[0].to;
+  while (true) {
+    if (key(current) === key(start)) break;
+    outline.push(current);
+    const choices = adj.get(key(current));
+    if (!choices) break;
+    const next = choices.find((c) => !used.has(c.idx));
+    if (!next) break;
+    used.add(next.idx);
+    current = next.other;
+  }
+  return outline;
+}
 
 export function emitSvg(page: Page): string {
   const elems: string[] = [];
