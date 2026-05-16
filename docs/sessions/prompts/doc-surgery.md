@@ -1,4 +1,4 @@
-# Session 0026 — Doc surgery
+# Doc surgery (maint)
 
 ## Goal
 
@@ -78,7 +78,7 @@ User decisions locked: full surgery in one PR; `strategist-protocol.md` kept but
    - `pnpm build` — clean.
    - No `pnpm baseline` regeneration expected (no algorithm changes).
 
-10. **Session log + handoff block** at `docs/sessions/0026-doc-surgery.md`, then `/wrap-session` → PR → CI → squash-merge.
+10. **Wrap as maint commit** — maintenance commits don't get a numbered session log; the commit message body carries the handoff fields (verification, decisions, queue/roadmap deltas) per `docs/strategist-protocol.md`. Then `/wrap-session` → PR (branch protection requires it even for maint) → CI → squash-merge.
 
 ## Specs
 
@@ -155,9 +155,9 @@ See `CLAUDE.md` for the operative subset and working agreements.
 ### Verification commands (Task 9)
 
 ```bash
-pnpm --dir .claude/worktrees/session+0026-doc-surgery type-check
-pnpm --dir .claude/worktrees/session+0026-doc-surgery test:run
-pnpm --dir .claude/worktrees/session+0026-doc-surgery build
+pnpm --dir .claude/worktrees/maint+doc-surgery type-check
+pnpm --dir .claude/worktrees/maint+doc-surgery test:run
+pnpm --dir .claude/worktrees/maint+doc-surgery build
 ```
 
 All three must pass clean.
