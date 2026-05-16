@@ -11,7 +11,7 @@ Run the 4-pass retrospective ritual for a completed phase. Each pass pauses for 
 
 The first argument is the phase (e.g., `v3`).
 
-**Phase completion check:** Read `docs/roadmap.md` to verify all sessions in the phase range are marked done. If not, stop and surface — do not start a retrospective on an in-flight phase.
+**Phase completion check:** Read `README.md`'s phase plan and the most recent session log to determine which sessions fall in the phase. If session numbers per phase aren't explicit in README, infer from session log filenames (e.g., v3 sessions = those numbered 0020+ until the v3 retrospective lands). Verify all sessions in the phase range are complete before proceeding — do not start a retrospective on an in-flight phase.
 
 **Prior-state check:** Look for three files that may exist from a prior run:
 - `docs/retrospectives/<phase>-complete-draft.md` (Pass 1 draft, session died mid-pass) → offer to resume from Pass 2 or restart from Pass 1
@@ -24,7 +24,7 @@ If both final files exist, confirm with the user before proceeding. If only the 
 
 Read these in parallel (use parallel Read/Grep calls):
 
-- Session logs whose number falls in the phase range (read `docs/roadmap.md` to determine the range — each phase has explicit session number boundaries)
+- Session logs whose number falls in the phase range (determined in Step 1 from `README.md` phase plan + session log filenames)
 - ADRs created during the phase (`docs/decisions/`)
 - Queue items added/closed in the phase (`docs/queue.md` history via `git log -p docs/queue.md`)
 - Audit findings in the phase (`docs/audits/`)
@@ -77,9 +77,9 @@ Delete the Pass 1 draft (`docs/retrospectives/<phase>-complete-draft.md`).
 ## Step 7 — Suggest follow-ups
 
 Print a list of follow-up actions the retrospective implies:
-- Handoff doc updates (`project-state.md`, `project-history.md`, `project-rationale.md`)
 - Queue additions
 - Working agreement changes (`CLAUDE.md`, `strategist-protocol.md`)
+- README phase plan updates if phase boundaries changed
 
 Do not apply automatically. The user decides which to act on.
 
