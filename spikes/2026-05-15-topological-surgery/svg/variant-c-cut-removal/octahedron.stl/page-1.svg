@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="215.9mm" height="279.4mm" viewBox="0 0 215.9 279.4">
+<rect x="0" y="0" width="215.9" height="279.4" fill="none" stroke="#ccc" stroke-width="0.15" />
+<line x1="101.46203867465765" y1="204.54999999999995" x2="26.579708760763197" y2="204.54999999999995" stroke="#000" stroke-width="0.3" stroke-dasharray="2 1.5" />
+<line x1="26.579708760763197" y1="204.54999999999995" x2="64.02087371771043" y2="139.69999999999996" stroke="#000" stroke-width="0.3" />
+<polygon points="26.579708760763197,204.54999999999995 64.02087371771043,139.69999999999996 28.720582478473627,140.93603401722106 10.000000000000012,173.36103401722104" fill="none" stroke="#666" stroke-width="0.2" />
+<text x="46.8591369660488" y="173.02499999999995" font-size="3" text-anchor="middle" dominant-baseline="central" fill="#000">1</text>
+<line x1="64.02087371771043" y1="139.69999999999996" x2="101.46203867465765" y2="204.54999999999995" stroke="#000" stroke-width="0.3" stroke-dasharray="2 1.5" />
+<line x1="26.579708760763197" y1="74.85" x2="101.46203867465765" y2="74.85" stroke="#000" stroke-width="0.3" stroke-dasharray="2 1.5" />
+<line x1="101.46203867465765" y1="74.85" x2="64.02087371771043" y2="139.7" stroke="#000" stroke-width="0.3" stroke-dasharray="2 1.5" />
+<line x1="64.02087371771043" y1="139.7" x2="26.579708760763197" y2="74.85" stroke="#000" stroke-width="0.3" />
+<text x="45.30029123923681" y="107.27499999999999" font-size="3" text-anchor="middle" dominant-baseline="central" fill="#000">1</text>
+<line x1="101.46203867465766" y1="74.85000000000001" x2="138.90320363160487" y2="139.7" stroke="#000" stroke-width="0.3" stroke-dasharray="2 1.5" />
+<line x1="138.90320363160487" y1="139.7" x2="64.02087371771043" y2="139.7" stroke="#000" stroke-width="0.3" stroke-dasharray="2 1.5" />
+<line x1="64.02087371771043" y1="139.7" x2="101.46203867465766" y2="74.85000000000001" stroke="#000" stroke-width="0.3" stroke-dasharray="2 1.5" />
+<line x1="138.90320363160487" y1="139.7" x2="101.46203867465765" y2="204.54999999999995" stroke="#000" stroke-width="0.3" stroke-dasharray="2 1.5" />
+<line x1="101.46203867465765" y1="204.54999999999995" x2="64.02087371771043" y2="139.7" stroke="#000" stroke-width="0.3" stroke-dasharray="2 1.5" />
+<line x1="64.02087371771043" y1="139.7" x2="138.90320363160487" y2="139.7" stroke="#000" stroke-width="0.3" stroke-dasharray="2 1.5" />
+<line x1="101.46203867465765" y1="204.54999999999995" x2="138.90320363160487" y2="139.7" stroke="#000" stroke-width="0.3" stroke-dasharray="2 1.5" />
+<line x1="138.90320363160487" y1="139.7" x2="176.34436858855213" y2="204.54999999999995" stroke="#000" stroke-width="0.3" />
+<polygon points="138.90320363160487,139.7 176.34436858855213,204.54999999999995 192.9240773493153,173.3610340172211 174.20349487084167,140.9360340172211" fill="none" stroke="#666" stroke-width="0.2" />
+<text x="156.0649403832665" y="173.02499999999998" font-size="3" text-anchor="middle" dominant-baseline="central" fill="#000">2</text>
+<line x1="176.34436858855213" y1="204.54999999999995" x2="101.46203867465765" y2="204.54999999999995" stroke="#000" stroke-width="0.3" />
+<polygon points="176.34436858855213,204.54999999999995 101.46203867465765,204.54999999999995 120.18262115313125,234.50293196555776 157.6237861100785,234.50293196555776" fill="none" stroke="#666" stroke-width="0.2" />
+<text x="138.9032036316049" y="202.74999999999994" font-size="3" text-anchor="middle" dominant-baseline="central" fill="#000">3</text>
+<line x1="138.90320363160487" y1="139.70000000000002" x2="101.46203867465766" y2="74.85000000000001" stroke="#000" stroke-width="0.3" stroke-dasharray="2 1.5" />
+<line x1="101.46203867465766" y1="74.85000000000001" x2="176.34436858855213" y2="74.85000000000001" stroke="#000" stroke-width="0.3" />
+<polygon points="101.46203867465766,74.85000000000001 176.34436858855213,74.85000000000001 157.6237861100785,44.89706803444221 120.18262115313128,44.89706803444222" fill="none" stroke="#666" stroke-width="0.2" />
+<text x="138.9032036316049" y="76.65" font-size="3" text-anchor="middle" dominant-baseline="central" fill="#000">4</text>
+<line x1="176.34436858855213" y1="74.85000000000001" x2="138.90320363160487" y2="139.70000000000002" stroke="#000" stroke-width="0.3" />
+<text x="157.6237861100785" y="107.275" font-size="3" text-anchor="middle" dominant-baseline="central" fill="#000">2</text>
+<line x1="101.46203867465765" y1="74.85" x2="26.579708760763197" y2="74.85" stroke="#000" stroke-width="0.3" stroke-dasharray="2 1.5" />
+<line x1="26.579708760763197" y1="74.85" x2="64.02087371771042" y2="10" stroke="#000" stroke-width="0.3" />
+<polygon points="26.579708760763197,74.85 64.02087371771042,10 28.72058247847361,11.236034017221106 10,43.661034017221105" fill="none" stroke="#666" stroke-width="0.2" />
+<text x="46.859136966048794" y="43.324999999999996" font-size="3" text-anchor="middle" dominant-baseline="central" fill="#000">5</text>
+<line x1="64.02087371771042" y1="10" x2="101.46203867465765" y2="74.85" stroke="#000" stroke-width="0.3" />
+<text x="82.74145619618403" y="42.425" font-size="3" text-anchor="middle" dominant-baseline="central" fill="#000">4</text>
+<line x1="26.579708760763197" y1="204.54999999999995" x2="101.46203867465765" y2="204.54999999999995" stroke="#000" stroke-width="0.3" stroke-dasharray="2 1.5" />
+<line x1="101.46203867465765" y1="204.54999999999995" x2="64.02087371771042" y2="269.4" stroke="#000" stroke-width="0.3" />
+<text x="82.74145619618403" y="236.97499999999997" font-size="3" text-anchor="middle" dominant-baseline="central" fill="#000">3</text>
+<line x1="64.02087371771042" y1="269.4" x2="26.579708760763197" y2="204.54999999999995" stroke="#000" stroke-width="0.3" />
+<text x="45.300291239236806" y="236.97499999999997" font-size="3" text-anchor="middle" dominant-baseline="central" fill="#000">5</text>
+</svg>

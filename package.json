@@ -11,7 +11,8 @@
     "test:run": "vitest run",
     "type-check": "tsc --noEmit",
     "generate-corpus": "vite-node scripts/generate-corpus.ts",
-    "baseline": "vite-node scripts/baseline-pipeline.ts"
+    "baseline": "vite-node scripts/baseline-pipeline.ts",
+    "spike": "vite-node spikes/2026-05-15-topological-surgery/run.ts"
   },
   "devDependencies": {
     "@types/node": "^25.7.0",
