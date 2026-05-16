@@ -154,3 +154,21 @@ One entry per decision, newest last:
   the boolean with intersection area) would discriminate
   "less crowded" from "more crowded" and likely reduce the 133
   figure; queued as a follow-up.
+- **2026-05-16 — v4 headline UX locked: "feedback-driven
+  iterative unfolding" (B+C hybrid from the v4 user-research
+  spike).** Spike inputs (competitive scan, five synthetic
+  persona interviews, synthesis) initially recommended
+  Hypothesis B alone (buildability-first preview); the director's
+  reframe in brainstorming was that B alone is *defensive* —
+  retreating from a model the user chose — and the v4 user-goal is
+  reaching an excellent unfold of the model they wanted. The
+  hybrid resolves it: buildability badges become entry points for
+  region re-unfold rather than warnings against the chosen model;
+  default user posture is accept-suggestion, not author-constraint.
+  Power users keep manual pin/constrain. Region re-unfold is the
+  load-bearing algorithm risk and will need a dedicated spike
+  before v4 commits. Findings live at
+  `docs/spikes/2026-05-16-v4-user-research/findings.md`; the v4
+  design spec proper is the next strategist deliverable
+  (currently dangling — drafted in the in-flight brainstorm,
+  never written to disk).

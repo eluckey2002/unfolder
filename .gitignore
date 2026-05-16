@@ -20,5 +20,8 @@ test/corpus/OBJ format/
 # Editor history (VS Code Local History extension)
 .history/
 
+# Brainstorm skill runtime state (HTML scratchpads, server PIDs)
+.superpowers/
+
 # macOS
 .DS_Store
