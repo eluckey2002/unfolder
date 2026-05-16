@@ -22,6 +22,42 @@ The five metrics, each tied to a v3 improvement vector:
 
 ---
 
+## v3 trajectory — after session 0025 (cut-removal as default)
+
+Session 0025 promoted Variant C (greedy cut-removal) from
+`spikes/2026-05-15-topological-surgery/` to `src/core/` as the v3
+default unfolder. ADR 0007 commits this change; ADR 0005 is
+superseded. Concave model fragmentation drops dramatically; convex
+models tie with v2 on piece count (cut-length jitter reflects
+post-paginate scale shift, not topology change).
+
+Per-model deltas (frozen v3 baseline → after 0025):
+
+| Model            | Pieces (0021 → 0025) | Cut length (mm) | Paper efficiency |
+| ---------------- | -------------------- | --------------- | ---------------- |
+| croissant.obj    | 15 → **3**           | 2889.0 → 2092.9 | 15.3% → 20.3%    |
+| cube.obj         | 1 → 1                | 623.3 → 623.3   | 23.4% → 23.4%    |
+| cube.stl         | 1 → 1                | 825.4 → 825.4   | 41.0% → 41.0%    |
+| cylinder.obj     | 1 → 1                | 641.1 → 711.2   | 22.4% → 27.6%    |
+| deer.obj         | 28 → **17**          | 6038.6 → 5074.0 | 9.8% → 22.2%     |
+| egg.obj          | 1 → 1                | 1153.7 → 987.9  | 35.5% → 26.0%    |
+| ginger-bread.obj | 5 → **2**            | 2214.9 → 1295.9 | 23.0% → 26.7%    |
+| meat-sausage.obj | 3 → **1**            | 2333.8 → 1747.6 | 11.3% → 20.0%    |
+| octahedron.stl   | 1 → 1                | 569.0 → 748.8   | 22.1% → 38.2%    |
+| tetrahedron.stl  | 1 → 1                | 529.1 → 529.1   | 26.5% → 26.5%    |
+| uv-sphere.obj    | 1 → 1                | 1022.0 → 991.1  | 22.1% → 20.2%    |
+
+Aggregate: total pieces **58 → 30**; total pages **18 → 14**; total
+cut length **18839.9 mm → 15627.2 mm**; total tabs **777 → 749**;
+average paper efficiency **22.9% → 26.6%**.
+
+Every per-model number matches the 0023 spike findings within
+tolerance.
+
+---
+
+## Frozen snapshot — v3 starts here (session 0021)
+
 | model            | format | faces | pipeline  | overlaps (pre-recut) | pieces | pages | cut length (mm) | tabs | paper efficiency |
 | ---------------- | ------ | ----- | --------- | -------------------- | ------ | ----- | --------------- | ---- | ---------------- |
 | croissant.obj    | obj    | 162   | completed | 388                  | 15     | 2     | 2889.0          | 96   | 15.3%            |
