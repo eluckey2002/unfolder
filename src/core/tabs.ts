@@ -11,6 +11,7 @@ import type { Polygon } from "polygon-clipping";
 
 import type { Adjacency } from "./adjacency.js";
 import type { FlatFace, Vec2 } from "./flatten.js";
+import type { FoldabilityClass } from "./foldability.js";
 import { canonicalPairKey } from "./pair-key.js";
 import type { RecutResult } from "./recut.js";
 
@@ -25,7 +26,11 @@ export type RenderEdge =
     };
 
 export interface RenderablePiece {
+  // Invariant: edges are emitted in face-triplet order (3 per face,
+  // in vertex-walk order). classifyFoldability + outline reconstruction
+  // both depend on this; see buildRenderablePieces below.
   edges: RenderEdge[];
+  foldability?: FoldabilityClass;
 }
 
 const TAB_HEIGHT_RATIO = 0.4;
