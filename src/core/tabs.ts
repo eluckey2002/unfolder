@@ -6,8 +6,11 @@
  * `emit-svg.ts`.
  */
 
+import polygonClipping from "polygon-clipping";
+import type { Polygon } from "polygon-clipping";
+
 import type { Adjacency } from "./adjacency.js";
-import type { Vec2 } from "./flatten.js";
+import type { FlatFace, Vec2 } from "./flatten.js";
 import { canonicalPairKey } from "./pair-key.js";
 import type { RecutResult } from "./recut.js";
 
@@ -43,11 +46,45 @@ export function scoreTabPlacement(s: PlacementSignal): number {
   );
 }
 
+const faceToGeom = (positions: readonly [Vec2, Vec2, Vec2]): Polygon => [
+  [positions[0], positions[1], positions[2]],
+];
+
+const tabToGeom = (tab: Vec2[]): Polygon => [tab];
+
+/**
+ * True iff the candidate tab polygon shares positive interior area with
+ * any face in `pieceFaces` other than `originatingFaceIdx`. Mirrors
+ * `detectOverlaps`'s try/catch — `polygon-clipping.intersection` throws
+ * on near-coincident shared edges; treat as non-overlap for the same
+ * shared-edge reasons documented in `overlap.ts`.
+ */
+export function tabOverlapsOwnPieceInterior(
+  tab: Vec2[],
+  pieceFaces: readonly FlatFace[],
+  originatingFaceIdx: number,
+): boolean {
+  const tabGeom = tabToGeom(tab);
+  for (let i = 0; i < pieceFaces.length; i++) {
+    if (i === originatingFaceIdx) continue;
+    try {
+      const result = polygonClipping.intersection(
+        tabGeom,
+        faceToGeom(pieceFaces[i].positions),
+      );
+      if (result.length > 0) return true;
+    } catch {
+      continue;
+    }
+  }
+  return false;
+}
+
 /**
  * Trapezoidal flap on the outside of edge `(p0, p1)` — opposite
  * side from `pApex`. Height and inset scale with edge length.
  */
-const buildTab = (p0: Vec2, p1: Vec2, pApex: Vec2): Vec2[] => {
+export const buildTab = (p0: Vec2, p1: Vec2, pApex: Vec2): Vec2[] => {
   const dx = p1[0] - p0[0];
   const dy = p1[1] - p0[1];
   const L = Math.sqrt(dx * dx + dy * dy);

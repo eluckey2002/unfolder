@@ -16,7 +16,9 @@ import { recut } from "../../src/core/recut.js";
 import { buildSpanningTree } from "../../src/core/spanning-tree.js";
 import {
   buildRenderablePieces,
+  buildTab,
   scoreTabPlacement,
+  tabOverlapsOwnPieceInterior,
 } from "../../src/core/tabs.js";
 
 const corpusDir = join(dirname(fileURLToPath(import.meta.url)), "../corpus");
@@ -190,6 +192,22 @@ describe("buildRenderablePieces", () => {
     });
     expect(clean).toBeGreaterThan(dirty);
     expect(dirty).toBeLessThan(0);
+  });
+
+  it("tabOverlapsOwnPieceInterior: true when tab clips another face in the piece", () => {
+    const f0 = face([0, 1, 2], [[0, 0], [1, 0], [0, 1]]);
+    // face1 sits in the tab's y-range [-0.4, 0]: tab extends down to y=-0.4
+    // (TAB_HEIGHT_RATIO=0.4 on a unit edge). Triangle here spans y=[-1, -0.1].
+    const f1 = face([3, 4, 5], [[0, -0.1], [1, -0.1], [0.5, -1]]);
+    const tab = buildTab(f0.positions[0], f0.positions[1], f0.positions[2]);
+    expect(tabOverlapsOwnPieceInterior(tab, [f0, f1], 0)).toBe(true);
+  });
+
+  it("tabOverlapsOwnPieceInterior: false when other faces are out of the tab's path", () => {
+    const f0 = face([0, 1, 2], [[0, 0], [1, 0], [0, 1]]);
+    const f1 = face([3, 4, 5], [[5, 0], [6, 0], [5.5, 1]]);
+    const tab = buildTab(f0.positions[0], f0.positions[1], f0.positions[2]);
+    expect(tabOverlapsOwnPieceInterior(tab, [f0, f1], 0)).toBe(false);
   });
 
   it("ginger-bread.obj: every cut label appears exactly twice across all pieces", () => {
