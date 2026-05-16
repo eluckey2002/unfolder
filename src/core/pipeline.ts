@@ -17,6 +17,7 @@ import {
   type CutRemovalResult,
   runCutRemoval,
 } from "./cut-removal.js";
+import { classifyFoldability } from "./foldability.js";
 import type { Mesh3D } from "./mesh.js";
 import {
   LETTER,
@@ -45,6 +46,11 @@ export function runPipeline(
   const recut = runCutRemoval(mesh, dual);
   const renderable = buildRenderablePieces(recut);
   const pages = paginate(renderable, page);
+  for (const p of pages) {
+    for (const placed of p.pieces) {
+      placed.piece.foldability = classifyFoldability(placed.piece);
+    }
+  }
   const curvature = reportCurvature(mesh, recut.cuts);
 
   if (curvature.violations.length > 0) {
