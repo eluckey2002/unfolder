@@ -1,4 +1,5 @@
-import type { Mesh3D, Triangle, Vec3 } from "./mesh.js";
+import { makeVertexInterner } from "./intern-vertex.js";
+import type { Mesh3D, Triangle } from "./mesh.js";
 
 /**
  * Parse the contents of a Wavefront OBJ file into a Mesh3D.
@@ -15,20 +16,9 @@ import type { Mesh3D, Triangle, Vec3 } from "./mesh.js";
  * vertices, and files that yield no faces.
  */
 export function parseObj(contents: string): Mesh3D {
-  const vertices: Vec3[] = [];
+  const v = makeVertexInterner();
   const faces: Triangle[] = [];
-  const vertexIndex = new Map<string, number>();
   const ordinalToCanonical: number[] = [];
-
-  const internVertex = (x: number, y: number, z: number): number => {
-    const key = `${x.toFixed(6)},${y.toFixed(6)},${z.toFixed(6)}`;
-    const existing = vertexIndex.get(key);
-    if (existing !== undefined) return existing;
-    const idx = vertices.length;
-    vertexIndex.set(key, idx);
-    vertices.push([x, y, z]);
-    return idx;
-  };
 
   const resolveFaceRef = (ref: string, line: string): number => {
     const slash = ref.indexOf("/");
@@ -61,12 +51,7 @@ export function parseObj(contents: string): Mesh3D {
       const x = Number(parts[1]);
       const y = Number(parts[2]);
       const z = Number(parts[3]);
-      if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z)) {
-        throw new Error(
-          `parseObj: non-finite vertex coordinate in line: ${line}`,
-        );
-      }
-      ordinalToCanonical.push(internVertex(x, y, z));
+      ordinalToCanonical.push(v.intern(x, y, z));
       continue;
     }
 
@@ -89,5 +74,5 @@ export function parseObj(contents: string): Mesh3D {
     throw new Error("parseObj: no faces (no 'f' lines) found in file.");
   }
 
-  return { vertices, faces };
+  return { vertices: v.vertices, faces };
 }

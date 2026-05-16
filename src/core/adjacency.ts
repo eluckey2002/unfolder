@@ -7,6 +7,7 @@
  */
 
 import type { Mesh3D } from "./mesh.js";
+import { canonicalPairKey } from "./pair-key.js";
 
 /**
  * One adjacency relationship: two faces meeting at a shared edge.
@@ -36,9 +37,6 @@ export interface DualGraph {
   byFace: number[][];
 }
 
-const canonicalEdgeKey = (a: number, b: number): string =>
-  a < b ? `${a},${b}` : `${b},${a}`;
-
 export function buildAdjacency(mesh: Mesh3D): DualGraph {
   const edgeToFaces = new Map<string, number[]>();
 
@@ -50,7 +48,7 @@ export function buildAdjacency(mesh: Mesh3D): DualGraph {
       [v2, v0],
     ];
     for (const [a, b] of edges) {
-      const key = canonicalEdgeKey(a, b);
+      const key = canonicalPairKey(a, b);
       const list = edgeToFaces.get(key);
       if (list) {
         list.push(faceIndex);

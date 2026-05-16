@@ -1,4 +1,5 @@
-import type { Mesh3D, Triangle, Vec3 } from "./mesh.js";
+import { makeVertexInterner } from "./intern-vertex.js";
+import type { Mesh3D, Triangle } from "./mesh.js";
 
 /**
  * Parse the contents of an ASCII STL file into a Mesh3D.
@@ -17,19 +18,8 @@ export function parseStl(contents: string): Mesh3D {
     throw new Error("parseStl: expected ASCII STL file (must begin with 'solid').");
   }
 
-  const vertices: Vec3[] = [];
+  const v = makeVertexInterner();
   const faces: Triangle[] = [];
-  const vertexIndex = new Map<string, number>();
-
-  const internVertex = (x: number, y: number, z: number): number => {
-    const key = `${x.toFixed(6)},${y.toFixed(6)},${z.toFixed(6)}`;
-    const existing = vertexIndex.get(key);
-    if (existing !== undefined) return existing;
-    const idx = vertices.length;
-    vertexIndex.set(key, idx);
-    vertices.push([x, y, z]);
-    return idx;
-  };
 
   const pending: number[] = [];
 
@@ -41,11 +31,8 @@ export function parseStl(contents: string): Mesh3D {
     const x = Number(parts[1]);
     const y = Number(parts[2]);
     const z = Number(parts[3]);
-    if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z)) {
-      throw new Error(`parseStl: non-finite vertex coordinate in line: ${line}`);
-    }
 
-    pending.push(internVertex(x, y, z));
+    pending.push(v.intern(x, y, z));
     if (pending.length === 3) {
       faces.push([pending[0], pending[1], pending[2]]);
       pending.length = 0;
@@ -58,5 +45,5 @@ export function parseStl(contents: string): Mesh3D {
     );
   }
 
-  return { vertices, faces };
+  return { vertices: v.vertices, faces };
 }
