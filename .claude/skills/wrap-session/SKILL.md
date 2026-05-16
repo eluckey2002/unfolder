@@ -17,9 +17,9 @@ pwd && git branch --show-current && git worktree list
 
 Confirm cwd matches expectations. Two valid paths:
 
-**Worktree path (default for session/spike):** cwd is a worktree, branch matches `^(session|maint|spike)/[a-z0-9-]+$`. Proceed through all steps.
+**Worktree path:** cwd is a worktree, branch matches `^(session|maint|spike)/[a-z0-9-]+$`. Proceed through all steps. This is the default for `session/` and `spike/`, and also valid for `maint/` worktrees.
 
-**Direct-to-main path (legal for maint per protocol, though branch protection may require a PR — owner can bypass):** cwd is main, branch is `main`. Skip steps 6, 7, and 8 (no PR, no fast-forward, no worktree cleanup); commit goes straight to main.
+**Direct-to-main path (maint only):** cwd is main, branch is `main`. Legal per protocol — though branch protection may require a PR even for maint (owner can bypass). Skip steps 6, 7, and 8 (no PR, no fast-forward, no worktree cleanup); commit goes straight to main.
 
 If cwd doesn't match either pattern, stop and surface.
 
@@ -56,36 +56,96 @@ Conventional Commits style. Use a HEREDOC for the message body. Stage files
 explicitly by name (not `git add -A`) to avoid grabbing stray files. Include
 the prompt file and session log in the commit.
 
-## Step 6 — Push the branch (session/spike only)
+## Step 6 — Push the branch (session/spike/maint-worktree only)
+
+For direct-to-main maintenance commits: run `git push origin main` and skip to Step 9 (Steps 7 and 8 are not applicable — no PR to open, no worktree to clean up).
+
+For all worktree branches (including `maint/`):
 
 ```bash
 git push -u origin <branch>
 ```
 
-Maintenance commits direct-to-main: `git push origin main` and skip to Step 9.
+## Step 7 — Open a PR (session/spike/maint-worktree only)
 
-## Step 7 — Open a PR (session/spike only)
+Read `.github/pull_request_template.md` at runtime and fill in each section from session-specific information:
 
-The repository has a `.github/PULL_REQUEST_TEMPLATE.md`; use its structure for the body. If for some reason it's missing, fall back to a minimal Summary / Test plan body.
+- **Summary** — what shipped, 2–4 lines plain declarative
+- **Verification** — check the boxes that apply; fill in the test count
+- **Spec adherence & scope** — requirements met? anything touched outside the plan?
+- **Decisions** — each decision with its autonomy-tier tag; ADR written?
+- **Concerns, uncertainties, questions** — open questions, confidence with reasoning
+- **Doc coherence** — which docs were updated (or "No")
+- **Queue / roadmap deltas** — items added, closed, or moved (or "None")
+- **Links** — prompt file, session log, ADR (if any), closed issues
+- **Squash commit message** — the Conventional Commits message to paste into the squash-merge box
+- **Merge-readiness** — leave unchecked until CI passes and comments are addressed
+
+Pass the filled-in content via `--body`:
 
 ```bash
 gh pr create --title "<conventional-commit-subject>" --body "$(cat <<'EOF'
 ## Summary
-<1-3 bullets>
 
-## Test plan
-<bulleted checklist>
+<what shipped, 2–4 lines>
 
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
+## Verification
+
+- [ ] `pnpm type-check` clean
+- [ ] `pnpm test:run` passing — total: <N>
+- [ ] `pnpm build` clean
+- [ ] `pnpm baseline` — baseline doc unchanged _(or check the next box)_
+- [ ] baseline intentionally regenerated _(add the `baseline-change` label)_
+
+## Spec adherence & scope
+
+<requirements met in full? anything missed or out of scope?>
+
+## Decisions
+
+<each decision with autonomy-tier tag: [flowed-silently] / [surfaced-and-proceeded] / [needs-Evan]. ADR written?>
+
+## Concerns, uncertainties, questions
+
+<open questions, confidence with reasoning, roadblocks>
+
+## Doc coherence
+
+<which docs updated, or "No">
+
+## Queue / roadmap deltas
+
+<items added, closed, or moved, or "None">
+
+## Links
+
+<prompt file, session log, ADR if any, closed issues>
+
+## Squash commit message
+
+\`\`\`
+<type>: <subject>
+
+<body>
+\`\`\`
+
+## Merge-readiness
+
+- [ ] all CI checks green
+- [ ] all CI comments answered (resolved, or replied with a reasoned dismissal)
 EOF
 )"
 ```
+
+If the template file is missing (unlikely), fall back to a minimal Summary / Test plan body rather than leaving the PR body empty.
 
 Watch CI:
 
 ```bash
 gh pr checks --watch
 ```
+
+If any check fails, do NOT merge. Surface the failure output to the user and pause for direction.
 
 When CI is green and any review comments have been addressed:
 
