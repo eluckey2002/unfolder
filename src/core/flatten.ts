@@ -8,6 +8,7 @@
  */
 
 import type { Adjacency } from "./adjacency.js";
+import { COINCIDENT_EPS, SIDE_EPS } from "./eps.js";
 import type { Mesh3D, Vec3 } from "./mesh.js";
 import { canonicalPairKey } from "./pair-key.js";
 import type { SpanningTree } from "./spanning-tree.js";
@@ -23,8 +24,6 @@ export interface Layout2D {
   faces: FlatFace[];
 }
 
-const COINCIDENT_EPS = 1e-12;
-const SIDE_EPS = 1e-9;
 
 const len3D = (vertices: Vec3[], a: number, b: number): number => {
   const [ax, ay, az] = vertices[a];

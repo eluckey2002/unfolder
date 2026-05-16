@@ -19,3 +19,22 @@ describe("eps", () => {
     expect(COINCIDENT_EPS).toBeLessThanOrEqual(SIDE_EPS);
   });
 });
+
+describe("eps consumers", () => {
+  it("flatten.ts imports COINCIDENT_EPS and SIDE_EPS from eps.ts", async () => {
+    const src = await import("node:fs").then((fs) =>
+      fs.readFileSync("src/core/flatten.ts", "utf-8"),
+    );
+    expect(src).toMatch(/from\s+["']\.\/eps\.js["']/);
+    expect(src).not.toMatch(/const\s+COINCIDENT_EPS\s*=/);
+    expect(src).not.toMatch(/const\s+SIDE_EPS\s*=/);
+  });
+
+  it("intern-vertex.ts imports PARSE_DECIMALS from eps.ts", async () => {
+    const src = await import("node:fs").then((fs) =>
+      fs.readFileSync("src/core/intern-vertex.ts", "utf-8"),
+    );
+    expect(src).toMatch(/PARSE_DECIMALS/);
+    expect(src).toMatch(/from\s+["']\.\/eps\.js["']/);
+  });
+});

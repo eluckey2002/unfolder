@@ -1,3 +1,4 @@
+import { PARSE_DECIMALS } from "./eps.js";
 import type { Vec3 } from "./mesh.js";
 
 export interface VertexInterner {
@@ -14,7 +15,7 @@ export function makeVertexInterner(): VertexInterner {
         `intern-vertex: non-finite coordinate (${x}, ${y}, ${z}).`,
       );
     }
-    const key = `${x.toFixed(6)},${y.toFixed(6)},${z.toFixed(6)}`;
+    const key = `${x.toFixed(PARSE_DECIMALS)},${y.toFixed(PARSE_DECIMALS)},${z.toFixed(PARSE_DECIMALS)}`;
     const existing = index.get(key);
     if (existing !== undefined) return existing;
     const idx = vertices.length;
