@@ -8,6 +8,7 @@
 
 import type { Adjacency } from "./adjacency.js";
 import type { Vec2 } from "./flatten.js";
+import { canonicalPairKey } from "./pair-key.js";
 import type { RecutResult } from "./recut.js";
 
 export type RenderEdge =
@@ -26,9 +27,6 @@ export interface RenderablePiece {
 
 const TAB_HEIGHT_RATIO = 0.4;
 const TAB_INSET_RATIO = 0.25;
-
-const canonicalEdgeKey = (a: number, b: number): string =>
-  a < b ? `${a},${b}` : `${b},${a}`;
 
 /**
  * Trapezoidal flap on the outside of edge `(p0, p1)` — opposite
@@ -64,7 +62,7 @@ export function buildRenderablePieces(
   const cutByKey = new Map<string, { label: number; adj: Adjacency }>();
   for (let k = 0; k < recut.cuts.length; k++) {
     const adj = recut.cuts[k];
-    cutByKey.set(canonicalEdgeKey(adj.edge[0], adj.edge[1]), {
+    cutByKey.set(canonicalPairKey(adj.edge[0], adj.edge[1]), {
       label: k + 1,
       adj,
     });
@@ -73,7 +71,7 @@ export function buildRenderablePieces(
   return recut.pieces.map((piece) => {
     const foldKeys = new Set<string>();
     for (const fold of piece.folds) {
-      foldKeys.add(canonicalEdgeKey(fold.edge[0], fold.edge[1]));
+      foldKeys.add(canonicalPairKey(fold.edge[0], fold.edge[1]));
     }
 
     const edges: RenderEdge[] = [];
@@ -87,7 +85,7 @@ export function buildRenderablePieces(
         const vb = face.vertices[j];
         const pa = face.positions[i];
         const pb = face.positions[j];
-        const key = canonicalEdgeKey(va, vb);
+        const key = canonicalPairKey(va, vb);
         if (foldKeys.has(key)) {
           edges.push({ kind: "fold", from: pa, to: pb });
           continue;

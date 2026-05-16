@@ -9,6 +9,7 @@
 
 import type { Adjacency } from "./adjacency.js";
 import type { Mesh3D, Vec3 } from "./mesh.js";
+import { canonicalPairKey } from "./pair-key.js";
 import type { SpanningTree } from "./spanning-tree.js";
 
 export type Vec2 = [number, number];
@@ -33,9 +34,6 @@ const len3D = (vertices: Vec3[], a: number, b: number): number => {
   const dz = az - bz;
   return Math.sqrt(dx * dx + dy * dy + dz * dz);
 };
-
-const canonicalPairKey = (a: number, b: number): string =>
-  a < b ? `${a},${b}` : `${b},${a}`;
 
 /** Signed area test: which side of the directed line p0->p1 does p sit on? */
 const side = (p0: Vec2, p1: Vec2, p: Vec2): number => {
