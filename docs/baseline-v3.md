@@ -56,6 +56,34 @@ tolerance.
 
 ---
 
+## v3 trajectory — after session 0026 (smart tab placement)
+
+Session 0026 replaced `tabs.ts`'s lower-face-index tab-side rule
+with a score-driven choice (longer-edge bonus, hard penalty for
+candidate tabs that clip the originating piece's own interior).
+Algorithmic counts are stable: piece count, page count, tab count
+all byte-identical. Cut length and paper efficiency shift 1–10 mm
+(≤0.6%) on 7 of 11 models — a bbox→scale coupling, not an
+algorithm change (tab geometry moves, piece bbox grows or shrinks
+slightly, paginate's uniform-scale-to-fit ratio recomputes).
+
+Baseline gained a `tab overlap (own)` quality column: per-model
+count of tabs whose placed polygon overlaps another face in the
+same piece. Across the 11-model corpus, **133 of 749 tabs (17.8%)
+self-clip** — concentrated in dense pieces (deer 91, meat-sausage
+11, croissant/egg/uv-sphere 7 each, ginger-bread 6, cylinder 4).
+These are cases where both candidate sides of the cut overlap;
+the score-driven rule ties (both penalized) and tie-breaks to
+faceA — same placement the old rule produced. The new algorithm
+is monotonically no-worse than the old; it can't manufacture
+clean sides where geometry doesn't offer one.
+
+A finer signal (intersection area instead of a boolean overlap
+flag) is documented as a follow-up; would discriminate
+"less crowded" from "more crowded" and likely reduce the 133 figure.
+
+---
+
 ## Frozen snapshot — v3 starts here (session 0021)
 
 | model            | format | faces | pipeline  | overlaps (pre-recut) | pieces | pages | cut length (mm) | tabs | paper efficiency |
