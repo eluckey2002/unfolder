@@ -1,5 +1,7 @@
 # ADR 0005: Greedy set-cover recut
 
+> **Status:** Superseded by ADR 0007 (cut-removal as v3 default), 2026-05-16. The recut module remains in the codebase for the opt-in MST+recut path; only the default pipeline changed.
+
 ## Context
 
 ADR 0004's dihedral-weighted MST decides which spanning tree gets

@@ -97,3 +97,30 @@ One entry per decision, newest last:
   v4-precursor — interactive editing (click-to-edit cuts, drag
   pieces, undo/redo, parameter controls) remains v4 territory per
   the phase plan.
+- **2026-05-16 — PDF export removed from v3 scope.** SVG output
+  was deemed sufficient for v3's quality bar; PDF carried to v5
+  if/when needed. Removes one v3 session and the pdf-lib
+  dependency probe from the v3 arc. Updates the file-loader UI
+  scope from "download SVG/PDF" to "download SVG" only. Strategist
+  call; cited "to speed v3 up."
+- **2026-05-16 — U4 Pathfinder `runPipeline()` orchestrator landed
+  alongside cut-removal in session 0025.** Cut-removal collapsed
+  two stages anyway (buildSpanningTree + recut → runCutRemoval),
+  making the call-site refactor unavoidable. Doing it as one
+  `runPipeline` is cleaner and surfaces every intermediate stage
+  for callers that want a slice. No new ADR — the orchestrator is
+  a structural seam, not an algorithmic decision; ADR 0001's
+  pipeline contract is unchanged in spirit (pure stages, no I/O),
+  just wired through a single entry point.
+- **2026-05-16 — Hardened `detectOverlaps` with try/catch
+  defensive against `polygon-clipping` exceptions.** Cut-removal
+  output produces near-coincident shared edges (rigid-transform
+  FP imprecision) that throw "Unable to complete output ring" in
+  `polygon-clipping.intersection`. Variant C's internal anyOverlap
+  already catches these as conservative overlap rejections;
+  `detectOverlaps` now catches them as non-overlap (treat as
+  shared-edge, not overlap). Asymmetric semantics by design: for
+  merge admission, conservative-reject prevents bad merges; for
+  post-hoc verification, optimistic-skip avoids false alarms.
+  Real overlaps with interior intersection still take the normal
+  path.
