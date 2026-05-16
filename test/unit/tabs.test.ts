@@ -14,7 +14,10 @@ import { parseObj } from "../../src/core/parse-obj.js";
 import type { RecutResult } from "../../src/core/recut.js";
 import { recut } from "../../src/core/recut.js";
 import { buildSpanningTree } from "../../src/core/spanning-tree.js";
-import { buildRenderablePieces } from "../../src/core/tabs.js";
+import {
+  buildRenderablePieces,
+  scoreTabPlacement,
+} from "../../src/core/tabs.js";
 
 const corpusDir = join(dirname(fileURLToPath(import.meta.url)), "../corpus");
 
@@ -162,6 +165,31 @@ describe("buildRenderablePieces", () => {
       expect(e.kind).toBe("cut");
       if (e.kind === "cut") expect(typeof e.label).toBe("number");
     }
+  });
+
+  it("scoreTabPlacement: returns higher score for longer shared edges (clean candidates)", () => {
+    const short = scoreTabPlacement({
+      edgeLengthMm: 5,
+      tabOverlapsOwnPieceInterior: false,
+    });
+    const long = scoreTabPlacement({
+      edgeLengthMm: 50,
+      tabOverlapsOwnPieceInterior: false,
+    });
+    expect(long).toBeGreaterThan(short);
+  });
+
+  it("scoreTabPlacement: overlap penalty swamps edge-length bonus", () => {
+    const clean = scoreTabPlacement({
+      edgeLengthMm: 100,
+      tabOverlapsOwnPieceInterior: false,
+    });
+    const dirty = scoreTabPlacement({
+      edgeLengthMm: 100,
+      tabOverlapsOwnPieceInterior: true,
+    });
+    expect(clean).toBeGreaterThan(dirty);
+    expect(dirty).toBeLessThan(0);
   });
 
   it("ginger-bread.obj: every cut label appears exactly twice across all pieces", () => {

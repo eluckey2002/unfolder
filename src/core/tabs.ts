@@ -28,6 +28,21 @@ export interface RenderablePiece {
 const TAB_HEIGHT_RATIO = 0.4;
 const TAB_INSET_RATIO = 0.25;
 
+export interface PlacementSignal {
+  edgeLengthMm: number;
+  tabOverlapsOwnPieceInterior: boolean;
+}
+
+const W_LENGTH = 1.0;
+const W_OVERLAP = 1000;
+
+export function scoreTabPlacement(s: PlacementSignal): number {
+  return (
+    W_LENGTH * s.edgeLengthMm -
+    (s.tabOverlapsOwnPieceInterior ? W_OVERLAP : 0)
+  );
+}
+
 /**
  * Trapezoidal flap on the outside of edge `(p0, p1)` — opposite
  * side from `pApex`. Height and inset scale with edge length.
