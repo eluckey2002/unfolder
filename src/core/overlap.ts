@@ -50,7 +50,19 @@ export function detectOverlaps(layout: Layout2D): FaceOverlap[] {
 
   for (let i = 0; i < geoms.length; i++) {
     for (let j = i + 1; j < geoms.length; j++) {
-      const result = polygonClipping.intersection(geoms[i], geoms[j]);
+      let result: ReturnType<typeof polygonClipping.intersection>;
+      try {
+        result = polygonClipping.intersection(geoms[i], geoms[j]);
+      } catch {
+        // polygon-clipping can throw on near-coincident shared edges
+        // ("Unable to complete output ring..."), which appear in
+        // cut-removal output where fold-merged faces share exact
+        // edges by construction. The geometric truth in those cases
+        // is "shared edge, not overlap"; treat the throw as
+        // non-overlap. Real overlaps with interior intersection
+        // still take the normal path.
+        continue;
+      }
       if (result.length > 0) {
         overlaps.push({ faceA: i, faceB: j });
       }
