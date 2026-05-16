@@ -8,6 +8,7 @@ Tracks unresolved questions from session handoffs. Every entry has an explicit d
 
 ## Resolved
 
+- [Q-0026-2] Raised 0026 — Visual inspection coverage for v3's "visibly competitive with Pepakura" quality bar; should a corpus-wide visual sweep be its own session or fold into another? Resolved 2026-05-16: fold into 0031 (v3-close retrospective) — the v3-close session already exists to verify the phase shipped its quality bar, and the visual sweep IS that verification.
 - [Q-0025-1] Raised 0025 — `detectOverlapsTolerant(layout, areaEps)` helper for tolerance-aware verification of Variant C cut-removal output (polygon-clipping throws on near-coincident shared edges). Resolved 2026-05-16: queued to `docs/queue.md` as `[research]`.
 - [Q-0025-2] Raised 0025 — Orphan locked subagent worktree at `.claude/worktrees/agent-a2e7d08ff17975096`. Resolved 2026-05-16: PID 35444 died on its own; worktree unlocked then removed via `git worktree remove`; auto-generated `worktree-agent-a2e7d08ff17975096` branch deleted.
 - [Q-0025-3] Raised 0025 — `.history/` VS Code Local History directory cleanup. Resolved 2026-05-16: queued to `docs/queue.md` as `[cleanup]`.
