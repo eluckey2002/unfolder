@@ -12,13 +12,12 @@ Switch into strategist mode. Load orientation docs, then either draft an artifac
 Read these in parallel (one Agent or batched Read calls — not sequential):
 
 1. `CLAUDE.md` (project-root)
-2. `docs/project-state.md`
+2. `README.md` (phase plan + project pitch)
 3. `docs/strategist-protocol.md`
 4. `docs/queue.md`
-5. `docs/roadmap.md`
-6. The most recent file in `docs/retrospectives/` (sort by filename — the latest phase's retrospective files)
-7. The last 2-3 session logs in `docs/sessions/` (sort by filename — the highest-numbered logs)
-8. `docs/open-questions.md` (the ledger — may not exist if no scan has been done yet)
+5. The most recent file in `docs/retrospectives/` (sort by filename — the latest phase's retrospective files)
+6. The last 2-3 session logs in `docs/sessions/` (sort by filename — the highest-numbered logs)
+7. `docs/open-questions.md` (the ledger — may not exist if no scan has been done yet)
 
 ## Step 2 — Check for outside-chat drift
 
@@ -36,7 +35,7 @@ If commits landed since the most recent session log's recorded HEAD, note them �
 Print one short paragraph:
 
 ```
-Loaded. Current phase: <X>. Last session: <NNNN>. Open queue items: <N>. Open-questions ledger: <N open / <M> resolved, or "absent — run /open-questions scan">. Drift since last session log: <yes/no, brief>. Most recent retrospective: <filename>.
+Loaded. Current phase: <X> (from README.md phase plan). Last session: <NNNN>. Open queue items: <N>. Open-questions ledger: <N open / <M> resolved, or "absent — run /open-questions scan">. Drift since last session log: <yes/no, brief>. Most recent retrospective: <filename>.
 ```
 
 ## Step 4 — Branch on input
@@ -67,7 +66,7 @@ Use the lean template below. `/begin-session` and `/wrap-session` handle ceremon
 
 ## Context
 
-<Only what is NOT in project-state.md or the prior session log. Link, do not recap. Cite filenames.>
+<Only what is NOT in the prior session log or README. Link, do not recap. Cite filenames.>
 
 ## Tasks
 
@@ -88,9 +87,9 @@ Save to `docs/sessions/prompts/<NNNN>-<descriptor>.md` (e.g., `0025-foo-bar.md`)
 
 ## Step 6 — Common forks: apply working agreements
 
-When making a call, apply CLAUDE.md and project-state.md guidance. Specifically:
+When making a call, apply CLAUDE.md guidance. Specifically:
 
-- **Naive before optimized** during the current naive-first stage (see `docs/roadmap.md` for the active phase's stance — v1 and v2 were strictly naive-first; v3 begins quality work but still defaults naive unless the phase explicitly says otherwise).
+- **Naive before optimized** during the current naive-first stage (see `README.md` phase plan for the active phase's stance — v1 and v2 were strictly naive-first; v3 begins quality work but still defaults naive unless the phase explicitly says otherwise).
 - **ADR for decisions with real alternatives and consequences**; session-log note for naive-first within-stage choices.
 - **No predicted test counts.** Ever.
 - **Specs describe intent, not call signatures.**
@@ -100,7 +99,7 @@ When making a call, apply CLAUDE.md and project-state.md guidance. Specifically:
 
 **Anti-patterns to avoid:**
 
-- Restating context from `project-state.md` verbatim in the drafted prompt. Link instead.
+- Restating context from prior session logs verbatim in the drafted prompt. Link instead.
 - Offering forks where a recommendation was possible (v2 lesson).
 - Predicting test counts (v1 lesson, repeated in v2).
 - Dictating library call signatures (v1 lesson).
