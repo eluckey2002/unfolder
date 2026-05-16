@@ -17,5 +17,8 @@ coverage/
 # OBJ provenance archive — source files for the test corpus; not imported by anything
 test/corpus/OBJ format/
 
+# Editor history (VS Code Local History extension)
+.history/
+
 # macOS
 .DS_Store
