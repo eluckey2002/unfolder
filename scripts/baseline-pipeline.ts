@@ -7,6 +7,7 @@ import { parseStl } from "../src/core/parse-stl.js";
 import { parseObj } from "../src/core/parse-obj.js";
 import { runPipeline } from "../src/core/pipeline.js";
 import type { RenderablePiece } from "../src/core/tabs.js";
+import { tabOverlapsOwnPieceInterior } from "../src/core/tabs.js";
 
 /**
  * Run the unfolding pipeline over every mesh in test/corpus/ and
@@ -38,6 +39,7 @@ type Result = {
   pages: string;
   cutLength: string;
   tabs: string;
+  tabOverlapsOwn: string;
   efficiency: string;
   piecesClean: boolean;
 };
@@ -83,6 +85,7 @@ for (const fname of entries) {
     pages: "—",
     cutLength: "—",
     tabs: "—",
+    tabOverlapsOwn: "—",
     efficiency: "—",
     piecesClean: true,
   };
@@ -110,6 +113,40 @@ for (const fname of entries) {
   r.overlaps = "0";
   r.pieces = String(result.recut.pieces.length);
   r.tabs = String(result.recut.cuts.length);
+
+  // Per-tab predicate: count tabs that clip into the originating piece's
+  // own interior. After Task 26.3's score-driven placement, this should
+  // be 0 on every model.
+  let tabOverlapsOwnCount = 0;
+  for (let pi = 0; pi < result.renderable.length; pi++) {
+    const piece = result.renderable[pi];
+    const pieceFaces = result.recut.pieces[pi].layout.faces;
+    for (const edge of piece.edges) {
+      if (edge.kind !== "cut" || edge.tab === null) continue;
+      // Find the originating face by matching the cut edge endpoints.
+      let origIdx = -1;
+      for (let fi = 0; fi < pieceFaces.length; fi++) {
+        const positions = pieceFaces[fi].positions;
+        let hits = 0;
+        for (const p of positions) {
+          if (
+            (p[0] === edge.from[0] && p[1] === edge.from[1]) ||
+            (p[0] === edge.to[0] && p[1] === edge.to[1])
+          ) {
+            hits++;
+          }
+        }
+        if (hits === 2) {
+          origIdx = fi;
+          break;
+        }
+      }
+      if (tabOverlapsOwnPieceInterior(edge.tab, pieceFaces, origIdx)) {
+        tabOverlapsOwnCount++;
+      }
+    }
+  }
+  r.tabOverlapsOwn = String(tabOverlapsOwnCount);
   // Cut-removal guarantees overlap-free pieces by construction
   // (anyOverlap rejects merges that would overlap). detectOverlaps
   // has known sliver false-positives on Variant C output (rigid-
@@ -164,6 +201,7 @@ const headers = [
   "pages",
   "cut length (mm)",
   "tabs",
+  "tab overlap (own)",
   "paper efficiency",
 ];
 const rows = results.map((r) => [
@@ -176,6 +214,7 @@ const rows = results.map((r) => [
   r.pages,
   r.cutLength,
   r.tabs,
+  r.tabOverlapsOwn,
   r.efficiency === "—" ? "—" : `${r.efficiency}%`,
 ]);
 const widths = headers.map((h, i) =>
@@ -222,6 +261,21 @@ if (dirty.length === 0) {
 } else {
   summaryLines.push(
     `WARNING: piece(s) with internal overlap in: ${dirty.map((r) => r.model).join(", ")}.`,
+  );
+}
+
+const tabOverlapDirty = completed.filter(
+  (r) => Number.parseInt(r.tabOverlapsOwn, 10) > 0,
+);
+if (tabOverlapDirty.length === 0) {
+  summaryLines.push("Every tab is clear of own-piece interior.");
+} else {
+  const total = tabOverlapDirty.reduce(
+    (s, r) => s + (Number.parseInt(r.tabOverlapsOwn, 10) || 0),
+    0,
+  );
+  summaryLines.push(
+    `WARNING: ${total} self-clipping tab(s) in: ${tabOverlapDirty.map((r) => r.model).join(", ")}.`,
   );
 }
 
