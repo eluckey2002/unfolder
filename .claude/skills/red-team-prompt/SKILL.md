@@ -15,6 +15,8 @@ The first argument is a path to a `.md` file. Verify it exists with the Read too
 
 Read the full prompt file. Capture the line count — the subagent will cite by line number.
 
+Hold this content in working memory. In Step 3 you'll substitute it (verbatim, not summarized) into the subagent prompt where `<paste full prompt file content here>` appears. The substitution must NOT carry the blockquote `>` prefixes from the dispatch template — paste raw file content.
+
 ## Step 3 — Dispatch the subagent
 
 Use the Agent tool with `subagent_type: Plan`. Do **NOT** prime the agent with project context, working agreements, or CLAUDE.md content — the fresh-eyes property is the whole point.
@@ -30,6 +32,10 @@ Subagent prompt (literal — paste exactly with the prompt content inlined at th
 > 5. **Cross-file inconsistencies** — referenced files, commits, SHAs that don't match the actual repo state (you can verify these if a repo is mounted)
 > 6. **Missing verification steps** — code-modification tasks without an explicit verification command
 > 7. **Verbatim-vs-spec mismatch** — content marked verbatim that should be a behavior spec, or spec content where wording IS the deliverable
+> 8. **Files and merge strategy declared** — the prompt lists every file to create or modify and names the commit/merge path
+> 9. **New tooling probed, not assumed** — for any new library or external tool, the prompt requires doc-fetch-and-probe rather than assuming the API
+> 10. **Self-contained** — the prompt reads completely to a fresh Claude Code session with no chat context; nothing relies on implied shared knowledge
+> 11. **Work type and branch name declared** — the prompt states whether the work is a numbered session, maintenance commit, or spike, and the branch name to use
 >
 > Format your response in three sections:
 > - **Blocking** — issues that would produce wrong work if left
