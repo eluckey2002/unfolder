@@ -7,9 +7,16 @@
  * numbers across pieces. Pure function.
  */
 
+import type { FoldabilityClass } from "./foldability.js";
 import type { Vec2 } from "./flatten.js";
 import type { Page } from "./paginate.js";
 import type { RenderEdge } from "./tabs.js";
+
+const TINT_BY_CLASS: Record<FoldabilityClass, string> = {
+  clean: "hsla(120, 50%, 70%, 0.18)",
+  caution: "hsla(48, 90%, 65%, 0.22)",
+  warn: "hsla(0, 70%, 65%, 0.25)",
+};
 
 const CUT_STROKE_MM = 0.3;
 const FOLD_STROKE_MM = 0.3;
@@ -67,6 +74,19 @@ export function emitSvg(page: Page): string {
   elems.push(
     `<rect x="0" y="0" width="${page.widthMm}" height="${page.heightMm}" fill="none" stroke="${PAGE_BORDER_COLOR}" stroke-width="${PAGE_BORDER_STROKE_MM}" />`,
   );
+
+  // Foldability tint pass: earlier in document order than the line
+  // work, so each tint sits behind its piece's edges/labels.
+  for (const placed of page.pieces) {
+    const klass = placed.piece.foldability;
+    if (!klass) continue;
+    const outline = reconstructOutline(placed.piece.edges);
+    if (outline.length < 3) continue;
+    const pts = outline.map(([x, y]) => `${x},${y}`).join(" ");
+    elems.push(
+      `<polygon class="foldability-tint" points="${pts}" fill="${TINT_BY_CLASS[klass]}" stroke="none" />`,
+    );
+  }
 
   for (const placed of page.pieces) {
     for (const edge of placed.piece.edges) {

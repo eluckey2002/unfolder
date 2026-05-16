@@ -14,7 +14,8 @@ import { LETTER, paginate } from "../../src/core/paginate.js";
 import { parseStl } from "../../src/core/parse-stl.js";
 import { recut } from "../../src/core/recut.js";
 import { buildSpanningTree } from "../../src/core/spanning-tree.js";
-import type { RenderEdge } from "../../src/core/tabs.js";
+import type { Page } from "../../src/core/paginate.js";
+import type { RenderEdge, RenderablePiece } from "../../src/core/tabs.js";
 import { buildRenderablePieces } from "../../src/core/tabs.js";
 
 const corpusDir = join(dirname(fileURLToPath(import.meta.url)), "../corpus");
@@ -152,5 +153,71 @@ describe("reconstructOutline", () => {
     expect(new Set(keys)).toEqual(
       new Set(["0,0", "1,0", "0.5,1", "0.5,-1"]),
     );
+  });
+});
+
+const trianglePiece = (
+  side: number,
+  foldability: "clean" | "caution" | "warn",
+): RenderablePiece => {
+  const h = (side * Math.sqrt(3)) / 2;
+  const a: Vec2 = [0, 0];
+  const b: Vec2 = [side, 0];
+  const c: Vec2 = [side / 2, h];
+  return {
+    foldability,
+    edges: [
+      cutEdge(a, b, 1),
+      cutEdge(b, c, 2),
+      cutEdge(c, a, 3),
+    ],
+  };
+};
+
+const pageWith = (pieces: RenderablePiece[]): Page => ({
+  widthMm: 100,
+  heightMm: 100,
+  pieces: pieces.map((piece, sourceIndex) => ({ sourceIndex, piece })),
+});
+
+describe("emitSvg — foldability tint", () => {
+  it("emits one tinted polygon per piece, each before any <line> element", () => {
+    const svg = emitSvg(
+      pageWith([
+        trianglePiece(10, "clean"),
+        trianglePiece(10, "warn"),
+      ]),
+    );
+    const tintMatches = svg.match(/<polygon[^>]*fill="hsla\(/g) ?? [];
+    expect(tintMatches.length).toBe(2);
+    const firstLine = svg.indexOf("<line");
+    const lastTint = svg.lastIndexOf('<polygon class="foldability-tint"');
+    expect(lastTint).toBeGreaterThanOrEqual(0);
+    expect(lastTint).toBeLessThan(firstLine);
+  });
+
+  it("colors tints by class: clean=green, caution=amber, warn=red", () => {
+    const svg = emitSvg(
+      pageWith([
+        trianglePiece(10, "clean"),
+        trianglePiece(10, "caution"),
+        trianglePiece(10, "warn"),
+      ]),
+    );
+    expect(svg).toContain('fill="hsla(120, 50%, 70%, 0.18)"');
+    expect(svg).toContain('fill="hsla(48, 90%, 65%, 0.22)"');
+    expect(svg).toContain('fill="hsla(0, 70%, 65%, 0.25)"');
+  });
+
+  it("skips the tint for a piece with no foldability set (defensive)", () => {
+    const piece: RenderablePiece = {
+      edges: [
+        cutEdge([0, 0], [10, 0], 1),
+        cutEdge([10, 0], [5, 8], 2),
+        cutEdge([5, 8], [0, 0], 3),
+      ],
+    };
+    const svg = emitSvg(pageWith([piece]));
+    expect(svg).not.toContain("foldability-tint");
   });
 });
