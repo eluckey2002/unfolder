@@ -1,6 +1,6 @@
 ---
 name: open-questions
-description: Manage the docs/open-questions.md ledger. Force explicit disposition (close/carry/queue/drop) on each open question from session handoffs — no silent carry. Use when the user types /open-questions, "scan open questions", or starts a new session.
+description: Manage the docs/open-questions.md ledger. Force explicit disposition (close/carry/queue/drop) on each open question from session handoffs — no silent carry. Use when the user types /open-questions, "scan open questions", or "review session handoff questions".
 ---
 
 # Open questions
@@ -38,7 +38,7 @@ Tracks unresolved questions from session handoffs. Every entry has an explicit d
 1. Find the most recent session log in `docs/sessions/` (sorted by filename — works because numbers are zero-padded).
 2. Extract the "Open questions for the strategist" block. If missing, print `No open questions in <filename>. Ledger unchanged.` and stop.
 3. For each item, prompt the user with the question text and these options: **close** / **carry** / **queue** / **drop** / **skip-for-now**.
-4. Apply chosen disposition by editing `docs/open-questions.md`:
+4. Each item gets an ID using the scheme `[Q-<session>-<n>]` where `<session>` is the session number parsed from the log filename (e.g., `0024` from `0024-strategist-skills.md`) and `<n>` increments from 1 for each item in that log. Apply chosen disposition by editing `docs/open-questions.md` (entries always carry their ID):
    - close → add entry to `## Resolved` with resolution + today's date
    - carry → add to `## Open` with reason + target session
    - queue → add a line to `docs/queue.md` with appropriate category tag AND add to `## Resolved` noting "queued <date>"
@@ -51,7 +51,7 @@ Print the contents of `docs/open-questions.md`. If empty (only headers), print `
 
 ### add <text>
 
-Add a new entry to `## Open` with ID `[Q-<session>-<n>]` where `<session>` is the current session number from the most recent log and `<n>` is the next available number for that session.
+Add a new entry to `## Open` with ID `[Q-<session>-<n>]` where `<session>` is the current session number from the most recent log, and `<n>` is one greater than the highest existing `<n>` for that session prefix across both `## Open` and `## Resolved` sections (scan the ledger to determine).
 
 ### close <id> <resolution>
 
@@ -59,11 +59,11 @@ Move the entry from `## Open` to `## Resolved` with resolution text and today's 
 
 ### carry <id> <reason> <target-session>
 
-Update the entry in `## Open` with new reason and target.
+Update the entry in `## Open` with new reason and target. Format: `- [Q-<session>-<n>] <text> _(carried → session <target-session>; reason: <reason>)_`
 
 ### queue <id> <reason>
 
-Add a line to `docs/queue.md` with the entry text + an appropriate category tag (`decision`, `cleanup`, `process`, `convention`, etc.). Mark in ledger as resolved with disposition `queued <date>`.
+Two-file update. Do in this order: first add a line to `docs/queue.md` with the entry text + an appropriate category tag (`decision`, `cleanup`, `process`, `convention`, etc.); second, mark the ledger entry resolved with disposition `queued <date>`. If either step fails, surface the partial state to the user before stopping — do not leave one file updated and the other not.
 
 ### drop <id> <reason>
 
