@@ -82,7 +82,11 @@ Always propose, then wait for user confirmation. Never auto-build.
 ## 5. Session conduct
 
 - **Worktree discipline.** When in a worktree, confirm `pwd` before any Edit/Write — never edit the main repo from a worktree session. The SessionStart hook prints cwd, branch, and `git worktree list` at session start; trust that, not memory.
-- **Plan first for multi-file sessions.** Any session touching >2 files or producing new functionality enters plan mode and produces a written plan before implementing. **Implementation plans break down to atomic 5-step TDD per task** (write failing test → run/fail → implement → run/pass → commit), with concrete code blocks and exact commands per the `superpowers:writing-plans` skill format — phase-level or task-level summaries are not enough. For doc/config-only plans (no testable behavior), substitute read → edit → verify-by-reread → commit, with exact `old_string`/`new_string` shown. Full agreement in `docs/project-state.md` → "Session and commit mechanics".
+- **Plan first for multi-file sessions.** Any session touching >2 files or producing new functionality enters plan mode and produces a written plan before implementing. **Implementation plans break down to atomic 5-step TDD per task** (write failing test → run/fail → implement → run/pass → commit), with concrete code blocks and exact commands per the `superpowers:writing-plans` skill format — phase-level or task-level summaries are not enough. For doc/config-only plans (no testable behavior), substitute read → edit → verify-by-reread → commit, with exact `old_string`/`new_string` shown.
+- **Three kinds of work:** numbered session / maintenance commit / spike. Spike = explicitly exploratory, time-boxed, throwaway code allowed, produces findings doc rather than shippable stage.
+- **Session prompts saved at** `docs/sessions/prompts/<NNNN>-<descriptor>.md` (sessions/spikes) or `docs/sessions/prompts/<descriptor>.md` (maint); commit with the work.
+- **Doc-fetch and probe before writing prompts** that involve new tools/libraries — fetch current docs, probe with a sample call.
+- **Non-ADR decisions logged in** `docs/decisions-log.md`.
 - **Verify UI/CSS against real renders.** Screenshot the running app at the target viewport — do not inject CSS to simulate conditions; that produces false-positive bug reports.
 - **Read/Grep/Glob for inspection; Bash for side effects.** Reserve Bash for build, test, git, and other commands that change state. Reuse a verification result already obtained this session rather than re-running. Complements section 2's smart-explore guidance, doesn't replace it.
 - **`pnpm install` on Windows needs `NODE_OPTIONS="--use-system-ca"`.** Plain `pnpm install` fails with `UNABLE_TO_VERIFY_LEAF_SIGNATURE` against npmjs.org (the Windows cert store / Node bundled-CA mismatch). Prefix with `NODE_OPTIONS="--use-system-ca"` (PowerShell: `$env:NODE_OPTIONS="--use-system-ca"; pnpm install`). Other pnpm commands (`pnpm test:run`, `pnpm baseline`, `pnpm build`) don't hit the registry and don't need the flag.
@@ -137,3 +141,13 @@ hand.
 The lean prompt template (Goal / Context / Tasks / Specs / Appendix)
 replaces the old worktree-boilerplate prompt format. `/strategist` uses
 the lean template by default.
+
+## Preferences specific to Evan
+
+- Goes by **Evan**.
+- Background: PM at Firebrand, maker hobbies, generative-art interests, an existing Ver_dep methodology for agentic repo work. The unfolder project is shaped by his maker practice; v4 onward may eventually integrate with his generative-art generators (e.g. String Theory).
+- Prefers **strategic language over technical jargon** in high-level discussion; details when warranted.
+- Prefers **paraphrasing over quotation**; cites sources when claims warrant it.
+- Strong preference for **fact-based, candid, forward-thinking** collaboration.
+- When revising existing content, returns **only the revised section**, not the full document.
+- Calls out **when memory is being used or new memory is being saved**.
