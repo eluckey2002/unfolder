@@ -116,3 +116,57 @@ describe("v3 ship-state — runPipeline orchestrator smoke", () => {
     },
   );
 });
+
+describe("v3 ship-state — runPipeline invariants", () => {
+  it.each(models)(
+    "%s: runPipeline produces a valid pages output with no curvature violations",
+    async (model) => {
+      const ext = extname(model).toLowerCase();
+      const contents = readFileSync(join(corpusDir, model), "utf-8");
+      const mesh = ext === ".stl" ? parseStl(contents) : parseObj(contents);
+
+      const { runPipeline } = await import("../../src/core/pipeline.js");
+      const result = runPipeline(mesh);
+
+      expect(result.pages.length).toBeGreaterThan(0);
+      expect(result.recut.pieces.length).toBeGreaterThan(0);
+
+      // Overlap-free is an algorithmic guarantee of cut-removal
+      // (anyOverlap rejects merges that would overlap). The strict
+      // detectOverlaps check has known sliver false-positives on
+      // Variant C output from rigid-transform FP drift, so it isn't
+      // asserted here. The curvature post-condition below is the
+      // tolerance-free invariant that catches real regressions.
+
+      expect(result.curvature.violations).toEqual([]);
+    },
+  );
+
+  const v3Bounds: Record<string, number> = {
+    "tetrahedron.stl": 1,
+    "octahedron.stl": 1,
+    "cube.obj": 1,
+    "cube.stl": 1,
+    "cylinder.obj": 1,
+    "egg.obj": 1,
+    "uv-sphere.obj": 1,
+    "ginger-bread.obj": 5,
+    "croissant.obj": 15,
+    "meat-sausage.obj": 3,
+    "deer.obj": 28,
+  };
+
+  it.each(Object.entries(v3Bounds))(
+    "%s: cut-removal does not regress past v2's piece count (≤ %s)",
+    async (model, bound) => {
+      const ext = extname(model).toLowerCase();
+      const contents = readFileSync(join(corpusDir, model), "utf-8");
+      const mesh = ext === ".stl" ? parseStl(contents) : parseObj(contents);
+
+      const { runPipeline } = await import("../../src/core/pipeline.js");
+      const result = runPipeline(mesh);
+
+      expect(result.recut.pieces.length).toBeLessThanOrEqual(bound);
+    },
+  );
+});
