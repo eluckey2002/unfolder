@@ -108,6 +108,43 @@ export const buildTab = (p0: Vec2, p1: Vec2, pApex: Vec2): Vec2[] => {
   ];
 };
 
+/**
+ * For a cut on `meshFace` along `edge`, locate the face within its piece
+ * and build the candidate tab + edge length. Returns null if the face
+ * isn't in this piece, or if `edge`'s vertices don't both appear on the
+ * face (defensive — shouldn't happen on valid input).
+ */
+const candidateTabForFace = (
+  piece: RecutResult["pieces"][number],
+  meshFace: number,
+  edge: readonly [number, number],
+): { tab: Vec2[]; faceIdxInPiece: number; edgeLenMm: number } | null => {
+  const faceIdxInPiece = piece.faces.indexOf(meshFace);
+  if (faceIdxInPiece === -1) return null;
+  const flatFace = piece.layout.faces[faceIdxInPiece];
+
+  let i = -1;
+  let j = -1;
+  let apexIdx = -1;
+  for (let k = 0; k < 3; k++) {
+    const v = flatFace.vertices[k];
+    if (v === edge[0] || v === edge[1]) {
+      if (i === -1) i = k;
+      else j = k;
+    } else {
+      apexIdx = k;
+    }
+  }
+  if (i === -1 || j === -1 || apexIdx === -1) return null;
+
+  const pa = flatFace.positions[i];
+  const pb = flatFace.positions[j];
+  const tab = buildTab(pa, pb, flatFace.positions[apexIdx]);
+  const dx = pb[0] - pa[0];
+  const dy = pb[1] - pa[1];
+  return { tab, faceIdxInPiece, edgeLenMm: Math.sqrt(dx * dx + dy * dy) };
+};
+
 export function buildRenderablePieces(
   recut: RecutResult,
 ): RenderablePiece[] {
@@ -118,6 +155,70 @@ export function buildRenderablePieces(
       label: k + 1,
       adj,
     });
+  }
+
+  const faceToPieceIdx = new Map<number, number>();
+  for (let p = 0; p < recut.pieces.length; p++) {
+    for (const f of recut.pieces[p].faces) faceToPieceIdx.set(f, p);
+  }
+
+  // Pre-pass: per cut, score each candidate side and record the winner.
+  // Tie-break to adj.faceA — preserves symmetric-fixture behavior.
+  const winningSideMap = new Map<string, number>();
+  for (const adj of recut.cuts) {
+    const key = canonicalPairKey(adj.edge[0], adj.edge[1]);
+    const pieceIdxA = faceToPieceIdx.get(adj.faceA);
+    const pieceIdxB = faceToPieceIdx.get(adj.faceB);
+
+    // Boundary cuts in test fixtures (faceB = phantom) have only one
+    // real side; that side gets the tab.
+    if (pieceIdxA === undefined && pieceIdxB === undefined) continue;
+    if (pieceIdxA === undefined) {
+      winningSideMap.set(key, adj.faceB);
+      continue;
+    }
+    if (pieceIdxB === undefined) {
+      winningSideMap.set(key, adj.faceA);
+      continue;
+    }
+
+    const candA = candidateTabForFace(
+      recut.pieces[pieceIdxA],
+      adj.faceA,
+      adj.edge,
+    );
+    const candB = candidateTabForFace(
+      recut.pieces[pieceIdxB],
+      adj.faceB,
+      adj.edge,
+    );
+    if (candA === null && candB === null) continue;
+    if (candA === null) {
+      winningSideMap.set(key, adj.faceB);
+      continue;
+    }
+    if (candB === null) {
+      winningSideMap.set(key, adj.faceA);
+      continue;
+    }
+
+    const scoreA = scoreTabPlacement({
+      edgeLengthMm: candA.edgeLenMm,
+      tabOverlapsOwnPieceInterior: tabOverlapsOwnPieceInterior(
+        candA.tab,
+        recut.pieces[pieceIdxA].layout.faces,
+        candA.faceIdxInPiece,
+      ),
+    });
+    const scoreB = scoreTabPlacement({
+      edgeLengthMm: candB.edgeLenMm,
+      tabOverlapsOwnPieceInterior: tabOverlapsOwnPieceInterior(
+        candB.tab,
+        recut.pieces[pieceIdxB].layout.faces,
+        candB.faceIdxInPiece,
+      ),
+    });
+    winningSideMap.set(key, scoreB > scoreA ? adj.faceB : adj.faceA);
   }
 
   return recut.pieces.map((piece) => {
@@ -149,7 +250,7 @@ export function buildRenderablePieces(
           );
         }
         const tab =
-          meshFace === entry.adj.faceA
+          meshFace === winningSideMap.get(key)
             ? buildTab(pa, pb, face.positions[apexIdx])
             : null;
         edges.push({
