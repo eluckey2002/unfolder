@@ -37,9 +37,6 @@ Category tags are free-form (current ones: `convention`, `docs`,
 
 ## Open items
 
-- [pilot] v3 experiment — a live state artifact that maintains itself
-  from git, queue, and test state instead of a hand-synced roadmap
-  doc. Try once in v3. Surfaced by the v2 retrospective.
 - [research] Force-directed unfolding spike — simulate faces as
   2D rigid bodies connected by hinges, with repulsive force
   between non-adjacent faces; cuts emerge where hinges over-strain.
@@ -66,9 +63,3 @@ Category tags are free-form (current ones: `convention`, `docs`,
   History accumulation. `.history/` is gitignored (added in pre-0025
   housekeeping) but the existing contents weren't cleaned. Trivial
   maint, no behavior change. Surfaced 0025.
-- [docs] Prune `project-state.md` Sessions-completed list (now stale
-  from session 0020 onward — 0025 was the 6th session in a row with
-  "no change" to project-state); merge "Current phase" with roadmap's
-  "Where we are now". The `[pilot]` live-state-artifact above is the
-  proper long-term fix; this is a manual prune to stop the visible
-  drift in the meantime. Surfaced by 0025 review.
