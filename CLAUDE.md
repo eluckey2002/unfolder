@@ -108,3 +108,22 @@ direct merge.
   (`docs/sessions/NNNN-*.md`), which stays canonical.
 - **Reasoning lives in ADR 0006**; the working agreements are in
   `docs/project-state.md`. This section is the operative subset only.
+
+### Strategist skills (the operative subset)
+
+The repo carries a set of skills that codify the strategist's ceremony.
+Use them instead of pasting the ritual into prompts or running it by
+hand.
+
+| Skill | Purpose |
+|---|---|
+| `/begin-session <branch>` | Worktree + prompt-copy + `pnpm install` + queue scan. Replaces Tasks 1-2 of the old prompt template. |
+| `/wrap-session` | Verify → commit → push → PR → CI → squash-merge. ADR 0006's PR flow. |
+| `/strategist [task]` | Load 8-doc orientation, detect drift, draft session prompts in the lean template, or enter planning conversation. |
+| `/red-team-prompt <path>` | Dispatch a no-context subagent to stress-test a drafted prompt before handoff. |
+| `/open-questions [subcmd]` | Manage `docs/open-questions.md`. Force explicit disposition on each handoff open-question; no silent carry. |
+| `/retrospect <phase>` | Run the 4-pass phase-boundary retrospective; produce `-complete.md` + `-retrospective.md`. |
+
+The lean prompt template (Goal / Context / Tasks / Specs / Appendix)
+replaces the old worktree-boilerplate prompt format. `/strategist` uses
+the lean template by default.
