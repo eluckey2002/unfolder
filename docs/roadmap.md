@@ -13,8 +13,8 @@ agreements and open questions, and the individual session logs in
 ## Where we are now
 
 **Phase:** v3 — Quality Output. In progress.
-**Last completed session:** 0022 — Takahashi reference read.
-**Next planned session:** 0023 — Topological-surgery spike.
+**Last completed session:** 0023 — Topological-surgery spike.
+**Next planned session:** 0024 — Optimized recut (informed by the 0023 spike).
 
 Run `git log` for exact repo state — this document tracks phase and
 session status, not commit hashes.
@@ -209,11 +209,31 @@ as the early ones land.
   (correcting the survey), and Export-Paper-Model's blended weights;
   identifies the vertex-curvature classification as the most
   portable trick and grounds the 0023 spike's menu.
-- **0023 — Topological-surgery spike.** ⏭ Time-boxed, exploratory;
-  produces a findings doc, not a shippable stage.
-- **0024+ — sketched:** optimized recut, PDF export, color/texture
-  passthrough, smart tab placement, audit visualization, v3
-  integration and retrospective. Refined as 0021–0023 land.
+- **0023 — Topological-surgery spike.** ✅ Three proof-of-concept
+  variants from `docs/references/takahashi.md` (curvature guard,
+  blended weights, cut-removal) measured against the v3 baseline
+  on the 11-model corpus; findings doc at
+  `docs/spikes/2026-05-15-topological-surgery.md` recommends
+  Variant C (greedy cut-removal) as the v3 default with strong
+  piece-count wins on every concave model, Variant B as opt-in,
+  Variant A as a post-condition assertion. Establishes
+  `spikes/<date>-<slug>/` and `docs/spikes/` conventions.
+- **0024 — Optimized recut (informed by the 0023 spike).** ⏭
+  Promote Variant C from `spikes/` to `src/core/` as the v3
+  default unfolder; promote Variant B's blended weights as an
+  alternate weight function; wire Variant A's check as a
+  post-condition assertion.
+- **0025+ — sketched:** PDF export, color/texture passthrough,
+  smart tab placement, audit visualization, v3 integration and
+  retrospective. Refined as 0024 lands.
+- **0029 — File-loader UI (v4-precursor).** A thin, strictly-scoped
+  UI: load any STL/OBJ from disk, run the pipeline with default
+  settings, render the unfolded output, and download SVG/PDF. No
+  editing, no parameter controls, no interactivity beyond load and
+  download — editing waits for v4. Lands after the algorithm and
+  output-fidelity work so the UI exposes v3-quality output, not the
+  v2 baseline. Numbering is provisional; the actual session number
+  is whatever slot it falls into as v3 lands.
 
 ## Maintaining this document
 

@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Topological-surgery spike — visual comparison</title>
+    <style>
+      :root {
+        --border: #ddd;
+        --muted: #666;
+        --bg-alt: #f8f8f8;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+        margin: 24px;
+        color: #222;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0 0 4px;
+      }
+      .lede {
+        color: var(--muted);
+        margin: 0 0 24px;
+        max-width: 720px;
+      }
+      .model {
+        margin-bottom: 32px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        overflow: hidden;
+      }
+      .model-header {
+        background: var(--bg-alt);
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        gap: 16px;
+        align-items: baseline;
+      }
+      .model-header .name {
+        font-weight: 600;
+        font-size: 16px;
+      }
+      .model-header .meta {
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0;
+      }
+      .cell {
+        padding: 12px;
+        border-right: 1px solid var(--border);
+        min-height: 280px;
+      }
+      .cell:last-child {
+        border-right: none;
+      }
+      .cell h3 {
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin: 0 0 6px;
+        color: var(--muted);
+      }
+      .cell .metrics {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 10px;
+      }
+      .pages {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .pages object {
+        width: 100%;
+        max-width: 240px;
+        height: 320px;
+        border: 1px solid var(--border);
+        background: white;
+      }
+      .missing {
+        color: var(--muted);
+        font-style: italic;
+        padding: 12px 0;
+      }
+      .variant-a-note {
+        font-size: 12px;
+        color: var(--muted);
+        padding: 12px;
+        border-top: 1px solid var(--border);
+        background: var(--bg-alt);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Topological-surgery spike — visual comparison</h1>
+    <p class="lede">
+      Per-model side-by-side of the v2 baseline against Variant B
+      (blended convex/concave/length weights) and Variant C (greedy
+      cut-removal recut). Variant A is diagnostic — it does not
+      change the pipeline output — so it has no SVG of its own; its
+      violation count is shown in each model's metadata. See
+      <code>docs/spikes/2026-05-15-topological-surgery.md</code> for
+      the findings doc.
+    </p>
+
+    <script>
+      const corpus = [
+        { name: "cube.obj", faces: 12, v2: { pieces: 1, pages: 1 }, b: { pieces: 1, pages: 1 }, c: { pieces: 1, pages: 1 }, a: 0 },
+        { name: "cube.stl", faces: 12, v2: { pieces: 1, pages: 1 }, b: { pieces: 1, pages: 1 }, c: { pieces: 1, pages: 1 }, a: 0 },
+        { name: "tetrahedron.stl", faces: 4, v2: { pieces: 1, pages: 1 }, b: { pieces: 1, pages: 1 }, c: { pieces: 1, pages: 1 }, a: 0 },
+        { name: "octahedron.stl", faces: 8, v2: { pieces: 1, pages: 1 }, b: { pieces: 1, pages: 1 }, c: { pieces: 1, pages: 1 }, a: 0 },
+        { name: "cylinder.obj", faces: 28, v2: { pieces: 1, pages: 1 }, b: { pieces: 1, pages: 1 }, c: { pieces: 1, pages: 1 }, a: 0 },
+        { name: "egg.obj", faces: 44, v2: { pieces: 1, pages: 1 }, b: { pieces: 1, pages: 1 }, c: { pieces: 1, pages: 1 }, a: 0 },
+        { name: "uv-sphere.obj", faces: 48, v2: { pieces: 1, pages: 1 }, b: { pieces: 1, pages: 1 }, c: { pieces: 1, pages: 1 }, a: 0 },
+        { name: "ginger-bread.obj", faces: 80, v2: { pieces: 5, pages: 2 }, b: { pieces: 5, pages: 2 }, c: { pieces: 2, pages: 2 }, a: 0 },
+        { name: "croissant.obj", faces: 162, v2: { pieces: 15, pages: 2 }, b: { pieces: 6, pages: 2 }, c: { pieces: 3, pages: 2 }, a: 0 },
+        { name: "meat-sausage.obj", faces: 320, v2: { pieces: 3, pages: 3 }, b: { pieces: 2, pages: 3 }, c: { pieces: 1, pages: 3 }, a: 0 },
+        { name: "deer.obj", faces: 720, v2: { pieces: 28, pages: 4 }, b: { pieces: 36, pages: 4 }, c: { pieces: 17, pages: 4 }, a: 0 },
+      ];
+
+      const root = document.body;
+      const pagesHtml = (variant, model, pageCount) => {
+        if (pageCount === null) return '<div class="missing">no SVG output</div>';
+        let html = '<div class="pages">';
+        for (let i = 1; i <= pageCount; i++) {
+          html += `<object type="image/svg+xml" data="svg/${variant}/${model}/page-${i}.svg"></object>`;
+        }
+        html += "</div>";
+        return html;
+      };
+
+      for (const m of corpus) {
+        const wrap = document.createElement("section");
+        wrap.className = "model";
+        wrap.innerHTML = `
+          <div class="model-header">
+            <span class="name">${m.name}</span>
+            <span class="meta">${m.faces} faces · Variant A violations: ${m.a}</span>
+          </div>
+          <div class="grid">
+            <div class="cell">
+              <h3>v2 baseline</h3>
+              <div class="metrics">${m.v2.pieces} piece${m.v2.pieces === 1 ? "" : "s"} · ${m.v2.pages} page${m.v2.pages === 1 ? "" : "s"}</div>
+              ${pagesHtml("v2-baseline", m.name, m.v2.pages)}
+            </div>
+            <div class="cell">
+              <h3>Variant B — blended weights</h3>
+              <div class="metrics">${m.b.pieces} piece${m.b.pieces === 1 ? "" : "s"} · ${m.b.pages} page${m.b.pages === 1 ? "" : "s"}</div>
+              ${pagesHtml("variant-b-blended", m.name, m.b.pages)}
+            </div>
+            <div class="cell">
+              <h3>Variant C — cut-removal</h3>
+              <div class="metrics">${m.c.pieces} piece${m.c.pieces === 1 ? "" : "s"} · ${m.c.pages} page${m.c.pages === 1 ? "" : "s"}</div>
+              ${pagesHtml("variant-c-cut-removal", m.name, m.c.pages)}
+            </div>
+          </div>
+          <div class="variant-a-note">
+            Variant A — vertex-curvature pre-flatten guard — is diagnostic only and produces no SVG output. <strong>${m.a} violations</strong> on this model: every vertex in v2's final cut set already satisfies the Takahashi necessary condition.
+          </div>
+        `;
+        root.appendChild(wrap);
+      }
+    </script>
+  </body>
+</html>

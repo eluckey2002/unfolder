@@ -61,3 +61,15 @@ Category tags are free-form (current ones: `convention`, `docs`,
   2026-05-14 audit called intentional per ADR 0001. Needs a
   decisions-log entry or ADR before it can become a prompt — not
   maintenance-eligible. Surfaced by Pathfinder 2026-05-15.
+- [research] Force-directed unfolding spike — simulate faces as
+  2D rigid bodies connected by hinges, with repulsive force
+  between non-adjacent faces; cuts emerge where hinges over-strain.
+  Continuous relaxation of the discrete cut-selection problem.
+  Strong v4-UX fit (parameters have direct physical meaning —
+  repulsion strength, hinge stiffness — and a user can watch the
+  simulation think). Not in the standard shipping-tool menu;
+  energy-based methods exist in the broader unfolding literature.
+  Hard parts: rigid unfolding's geometric constraints, local
+  minima, discretization at the end, computational cost. Explore
+  as own spike if 0023's three approaches under-deliver on the
+  hard concave cases. Surfaced 2026-05-15.

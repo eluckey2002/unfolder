@@ -84,3 +84,16 @@ One entry per decision, newest last:
   source-corpus dimensions),
   so the metric set is intended for per-model v3-trajectory
   tracking, not cross-model comparison.
+- **2026-05-15 — Late-v3 file-loader UI scope.** v3 will gain a
+  thin, strictly-scoped file-loader UI as its last functional
+  addition (provisional slot 0029, between audit-visualization and
+  v3-integration): load STL/OBJ → run pipeline with defaults →
+  render → download SVG/PDF. No editing, no parameter sliders, no
+  interactivity beyond load and download. Rationale: v3 already
+  has UI-touching surfaces (audit visualization, PDF export), and
+  without a way to load arbitrary models, v3's quality
+  improvements are visible only as metrics in `docs/baseline-v3.md`
+  rather than as product wins. The file-loader is a deliberate
+  v4-precursor — interactive editing (click-to-edit cuts, drag
+  pieces, undo/redo, parameter controls) remains v4 territory per
+  the phase plan.

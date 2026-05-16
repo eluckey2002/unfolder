@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="215.9mm" height="279.4mm" viewBox="0 0 215.9 279.4">
+<rect x="0" y="0" width="215.9" height="279.4" fill="none" stroke="#ccc" stroke-width="0.15" />
+<line x1="54.09361301077879" y1="86.37237802394894" x2="142.28083903233636" y2="86.37237802394894" stroke="#000" stroke-width="0.3" stroke-dasharray="2 1.5" />
+<line x1="142.28083903233636" y1="86.37237802394894" x2="98.18722602155758" y2="162.74475604789788" stroke="#000" stroke-width="0.3" stroke-dasharray="2 1.5" />
+<line x1="98.18722602155758" y1="162.74475604789788" x2="54.09361301077879" y2="86.37237802394894" stroke="#000" stroke-width="0.3" stroke-dasharray="2 1.5" />
+<line x1="186.37445204311513" y1="162.74475604789788" x2="98.18722602155758" y2="162.74475604789788" stroke="#000" stroke-width="0.3" />
+<polygon points="186.37445204311513,162.74475604789788 98.18722602155758,162.74475604789788 120.23403252694695,198.01964645652092 164.32764553772574,198.01964645652092" fill="none" stroke="#666" stroke-width="0.2" />
+<text x="142.28083903233636" y="160.94475604789787" font-size="3" text-anchor="middle" dominant-baseline="central" fill="#000">1</text>
+<line x1="98.18722602155758" y1="162.74475604789788" x2="142.28083903233636" y2="86.37237802394894" stroke="#000" stroke-width="0.3" stroke-dasharray="2 1.5" />
+<line x1="142.28083903233636" y1="86.37237802394894" x2="186.37445204311513" y2="162.74475604789788" stroke="#000" stroke-width="0.3" />
+<polygon points="142.28083903233636,86.37237802394894 186.37445204311513,162.74475604789788 205.9,126.01421633759914 183.85319349461062,87.82802732562467" fill="none" stroke="#666" stroke-width="0.2" />
+<text x="162.76879981091375" y="125.45856703592341" font-size="3" text-anchor="middle" dominant-baseline="central" fill="#000">2</text>
+<line x1="98.18722602155758" y1="10" x2="142.28083903233636" y2="86.37237802394894" stroke="#000" stroke-width="0.3" />
+<text x="120.23403252694698" y="48.18618901197447" font-size="3" text-anchor="middle" dominant-baseline="central" fill="#000">2</text>
+<line x1="142.28083903233636" y1="86.37237802394894" x2="54.09361301077879" y2="86.37237802394894" stroke="#000" stroke-width="0.3" stroke-dasharray="2 1.5" />
+<line x1="54.09361301077879" y1="86.37237802394894" x2="98.18722602155758" y2="10" stroke="#000" stroke-width="0.3" />
+<polygon points="54.09361301077879,86.37237802394894 98.18722602155758,10 56.61487155928329,11.455649301675733 34.5680650538939,49.6418383136502" fill="none" stroke="#666" stroke-width="0.2" />
+<text x="77.69926524298018" y="49.08618901197447" font-size="3" text-anchor="middle" dominant-baseline="central" fill="#000">3</text>
+<line x1="10" y1="162.74475604789788" x2="54.09361301077879" y2="86.37237802394894" stroke="#000" stroke-width="0.3" />
+<text x="32.0468065053894" y="124.5585670359234" font-size="3" text-anchor="middle" dominant-baseline="central" fill="#000">3</text>
+<line x1="54.09361301077879" y1="86.37237802394894" x2="98.18722602155758" y2="162.74475604789788" stroke="#000" stroke-width="0.3" stroke-dasharray="2 1.5" />
+<line x1="98.18722602155758" y1="162.74475604789788" x2="10" y2="162.74475604789788" stroke="#000" stroke-width="0.3" />
+<text x="54.09361301077879" y="162.74475604789788" font-size="3" text-anchor="middle" dominant-baseline="central" fill="#000">1</text>
+</svg>
