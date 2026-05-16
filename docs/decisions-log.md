@@ -172,3 +172,18 @@ One entry per decision, newest last:
   design spec proper is the next strategist deliverable
   (currently dangling — drafted in the in-flight brainstorm,
   never written to disk).
+- **2026-05-16 — Foldability classifier uses two explainable
+  metrics with per-class aggregation.** Per-piece label `clean` /
+  `caution` / `warn` from (1) smallest face-corner angle and (2)
+  smallest edge length, both measured post-paginate. Aggregation:
+  any single warn → warn; any two caution trips → warn; one
+  caution trip → caution; clean otherwise. Picked for
+  explainability (one-line user fix suggestion possible) and
+  survival into v4's interactive buildability badges per the
+  2026-05-16 v4 user-research findings. Seed thresholds: angle
+  caution <30° / warn <15°; edge caution <5 mm / warn <2 mm; held
+  without tuning — platonic solids + uv-sphere all classify clean,
+  spread across the corpus is meaningful (7/4/19). Diameter /
+  oversized-piece signal considered and dropped: paginate's global
+  rescale already manifests oversized pieces through tiny
+  post-rescale edges, captured by the edge-length signal.
