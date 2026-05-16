@@ -100,3 +100,19 @@ describe("v2 ship-state — end-to-end pipeline", () => {
     },
   );
 });
+
+describe("v3 ship-state — runPipeline orchestrator smoke", () => {
+  it.each(models)(
+    "%s: runPipeline produces a non-empty pages output",
+    async (model) => {
+      const ext = extname(model).toLowerCase();
+      const contents = readFileSync(join(corpusDir, model), "utf-8");
+      const mesh = ext === ".stl" ? parseStl(contents) : parseObj(contents);
+
+      const { runPipeline } = await import("../../src/core/pipeline.js");
+      const result = runPipeline(mesh);
+
+      expect(result.pages.length).toBeGreaterThan(0);
+    },
+  );
+});
