@@ -57,3 +57,23 @@ Category tags are free-form (current ones: `convention`, `docs`,
   minima, discretization at the end, computational cost. Explore
   as own spike if 0023's three approaches under-deliver on the
   hard concave cases. Surfaced 2026-05-15.
+- [research] `detectOverlapsTolerant(layout, areaEps)` —
+  tolerance-aware overlap detector that lets integration tests
+  assert strict overlap-free for Variant C cut-removal output.
+  Current `detectOverlaps` was hardened in 0025 with a try/catch
+  because `polygon-clipping.intersection` throws on near-coincident
+  shared edges in Variant C output; integration verification was
+  routed through the curvature post-condition (tolerance-free)
+  instead. A tolerant variant would let polygon-clipping verification
+  return as a strict assertion. Worth a small spike or maint commit;
+  not blocking v3. Surfaced 0025.
+- [cleanup] Wipe `.history/` directory contents — VS Code Local
+  History accumulation. `.history/` is gitignored (added in pre-0025
+  housekeeping) but the existing contents weren't cleaned. Trivial
+  maint, no behavior change. Surfaced 0025.
+- [docs] Prune `project-state.md` Sessions-completed list (now stale
+  from session 0020 onward — 0025 was the 6th session in a row with
+  "no change" to project-state); merge "Current phase" with roadmap's
+  "Where we are now". The `[pilot]` live-state-artifact above is the
+  proper long-term fix; this is a manual prune to stop the visible
+  drift in the meantime. Surfaced by 0025 review.
