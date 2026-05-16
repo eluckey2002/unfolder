@@ -14,7 +14,12 @@ import { parseObj } from "../../src/core/parse-obj.js";
 import type { RecutResult } from "../../src/core/recut.js";
 import { recut } from "../../src/core/recut.js";
 import { buildSpanningTree } from "../../src/core/spanning-tree.js";
-import { buildRenderablePieces } from "../../src/core/tabs.js";
+import {
+  buildRenderablePieces,
+  buildTab,
+  scoreTabPlacement,
+  tabOverlapsOwnPieceInterior,
+} from "../../src/core/tabs.js";
 
 const corpusDir = join(dirname(fileURLToPath(import.meta.url)), "../corpus");
 
@@ -105,7 +110,7 @@ describe("buildRenderablePieces", () => {
     expect(labelOnPiece(0)).toBe(labelOnPiece(1));
   });
 
-  it("puts exactly one tab on the shared cut edge, on the lower-face-index side", () => {
+  it("puts exactly one tab on the shared cut edge (faceA wins by tie-break on the symmetric fixture)", () => {
     const pieces = buildRenderablePieces(makeTwoPieceFixture());
 
     const sharedOnPiece = (i: number) =>
@@ -162,6 +167,96 @@ describe("buildRenderablePieces", () => {
       expect(e.kind).toBe("cut");
       if (e.kind === "cut") expect(typeof e.label).toBe("number");
     }
+  });
+
+  it("scoreTabPlacement: returns higher score for longer shared edges (clean candidates)", () => {
+    const short = scoreTabPlacement({
+      edgeLengthMm: 5,
+      tabOverlapsOwnPieceInterior: false,
+    });
+    const long = scoreTabPlacement({
+      edgeLengthMm: 50,
+      tabOverlapsOwnPieceInterior: false,
+    });
+    expect(long).toBeGreaterThan(short);
+  });
+
+  it("scoreTabPlacement: overlap penalty swamps edge-length bonus", () => {
+    const clean = scoreTabPlacement({
+      edgeLengthMm: 100,
+      tabOverlapsOwnPieceInterior: false,
+    });
+    const dirty = scoreTabPlacement({
+      edgeLengthMm: 100,
+      tabOverlapsOwnPieceInterior: true,
+    });
+    expect(clean).toBeGreaterThan(dirty);
+    expect(dirty).toBeLessThan(0);
+  });
+
+  it("score-driven placement: tab lands on the side whose candidate is clear of own-piece interior", () => {
+    // P_0 has face 0 + face 2; face 2 sits in face 0's candidate-tab area.
+    // P_1 has face 1 + face 3; face 3 sits AWAY from face 1's tab area.
+    // Cut edge is (0,1) at positions (0,0)→(1,0).
+    // face 0 tab extends into y∈[-0.4, 0]; face 2 (positions span y<0) clips it.
+    // face 1 tab extends into y∈[0, 0.4]; face 3 (positions y<0) is clear.
+    const face0 = face([0, 1, 2], [[0, 0], [1, 0], [0, 1]]);
+    const face2 = face([1, 2, 4], [[1, 0], [0, 1], [0.5, -0.5]]);
+    const face1 = face([0, 1, 3], [[0, 0], [1, 0], [0, -1]]);
+    const face3 = face([1, 3, 5], [[1, 0], [0, -1], [1.5, -1.5]]);
+    const fixture: RecutResult = {
+      pieces: [
+        {
+          layout: { faces: [face0, face2] },
+          faces: [0, 2],
+          folds: [{ faceA: 0, faceB: 2, edge: [1, 2] }],
+        },
+        {
+          layout: { faces: [face1, face3] },
+          faces: [1, 3],
+          folds: [{ faceA: 1, faceB: 3, edge: [1, 3] }],
+        },
+      ],
+      cuts: [
+        cut(0, 1, [0, 1]),
+        cut(0, 99, [0, 2]),
+        cut(2, 99, [2, 4]),
+        cut(2, 99, [1, 4]),
+        cut(1, 99, [0, 3]),
+        cut(3, 99, [3, 5]),
+        cut(3, 99, [1, 5]),
+      ],
+    };
+    const pieces = buildRenderablePieces(fixture);
+    const sharedOnPiece = (i: number) =>
+      pieces[i].edges.find(
+        (e) =>
+          e.kind === "cut" &&
+          ((e.from[0] === 0 && e.from[1] === 0 && e.to[0] === 1 && e.to[1] === 0) ||
+            (e.from[0] === 1 && e.from[1] === 0 && e.to[0] === 0 && e.to[1] === 0)),
+      );
+    const e0 = sharedOnPiece(0);
+    const e1 = sharedOnPiece(1);
+    expect(e0?.kind).toBe("cut");
+    expect(e1?.kind).toBe("cut");
+    if (e0?.kind === "cut") expect(e0.tab).toBeNull();
+    if (e1?.kind === "cut") expect(e1.tab).not.toBeNull();
+  });
+
+  it("tabOverlapsOwnPieceInterior: true when tab clips another face in the piece", () => {
+    const f0 = face([0, 1, 2], [[0, 0], [1, 0], [0, 1]]);
+    // face1 sits in the tab's y-range [-0.4, 0]: tab extends down to y=-0.4
+    // (TAB_HEIGHT_RATIO=0.4 on a unit edge). Triangle here spans y=[-1, -0.1].
+    const f1 = face([3, 4, 5], [[0, -0.1], [1, -0.1], [0.5, -1]]);
+    const tab = buildTab(f0.positions[0], f0.positions[1], f0.positions[2]);
+    expect(tabOverlapsOwnPieceInterior(tab, [f0, f1], 0)).toBe(true);
+  });
+
+  it("tabOverlapsOwnPieceInterior: false when other faces are out of the tab's path", () => {
+    const f0 = face([0, 1, 2], [[0, 0], [1, 0], [0, 1]]);
+    const f1 = face([3, 4, 5], [[5, 0], [6, 0], [5.5, 1]]);
+    const tab = buildTab(f0.positions[0], f0.positions[1], f0.positions[2]);
+    expect(tabOverlapsOwnPieceInterior(tab, [f0, f1], 0)).toBe(false);
   });
 
   it("ginger-bread.obj: every cut label appears exactly twice across all pieces", () => {

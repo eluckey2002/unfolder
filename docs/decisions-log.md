@@ -124,3 +124,33 @@ One entry per decision, newest last:
   post-hoc verification, optimistic-skip avoids false alarms.
   Real overlaps with interior intersection still take the normal
   path.
+- **2026-05-16 — Smart-tab-placement weights (session 0026):
+  `W_LENGTH=1.0`, `W_OVERLAP=1000`.** Deliberately one-sided —
+  overlap is a hard constraint, edge length is a soft preference.
+  Tie-breaks to `adj.faceA` when both candidate sides have the
+  same score (preserves the symmetric-fixture test's existing
+  expectation). Values are tunable starting points, not an
+  architectural commitment; if a future session finds a better
+  weighting, the constants change in `tabs.ts` and a follow-up
+  entry lands here.
+- **2026-05-16 — Three smart-tab signals deferred (session 0026).**
+  The pre-0025 plan listed `sideClearance` (post-paginate spatial
+  distance to other pieces) and `isConcaveSide` (3D edge concavity
+  preference); both deferred — `sideClearance` requires
+  post-paginate information that tabs.ts doesn't have, and
+  `isConcaveSide` turned out to be muddled (concavity is a 3D edge
+  property, not a side-of-2D-edge property). Replaced by
+  `tabOverlapsOwnPieceInterior` which is pre-paginate-tractable.
+- **2026-05-16 — Plan's "tab overlap (own) reads 0 on every row"
+  verification gate was wrong (session 0026).** Actual measurement
+  after smart placement lands: 133 of 749 tabs self-clip across 7
+  of 11 models (deer 91, meat-sausage 11, ...). These are cases
+  where BOTH candidate sides overlap; the score-driven rule ties
+  and tie-breaks to faceA — same placement the old rule produced.
+  Smart algorithm is monotonically no-worse than old; can't
+  manufacture clean sides where geometry doesn't offer one. The
+  `tab overlap (own)` column is now an informational regression
+  guard, not a 0-or-fail gate. A finer area-based signal (replace
+  the boolean with intersection area) would discriminate
+  "less crowded" from "more crowded" and likely reduce the 133
+  figure; queued as a follow-up.

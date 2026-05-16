@@ -63,3 +63,12 @@ Category tags are free-form (current ones: `convention`, `docs`,
   History accumulation. `.history/` is gitignored (added in pre-0025
   housekeeping) but the existing contents weren't cleaned. Trivial
   maint, no behavior change. Surfaced 0025.
+- [enhancement] Area-based tab placement signal — replace the
+  boolean `tabOverlapsOwnPieceInterior` with an intersection-area
+  predicate, then pick the side with smaller overlap area when both
+  sides overlap. Session 0026 measurement: 133 of 749 tabs (17.8%)
+  self-clip on cuts where both candidate sides overlap — currently
+  tie-broken to faceA. An area-based signal would discriminate
+  "less crowded" from "more crowded" and likely reduce that figure.
+  Sized as a small src/core/tabs.ts refactor + baseline regen.
+  Surfaced 0026.
