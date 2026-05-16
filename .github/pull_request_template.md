@@ -35,8 +35,8 @@ a bare "high". Roadblocks. Anything that felt fragile._
 ## Doc coherence
 
 _Did this change a working agreement, convention, or the pipeline
-contract? If so, which docs were updated (CLAUDE.md /
-project-state.md / roadmap.md / ADRs)? "No" is a valid answer._
+contract? If so, which docs were updated (CLAUDE.md / ADRs /
+strategist-protocol.md)? "No" is a valid answer._
 
 ## Queue / roadmap deltas
 

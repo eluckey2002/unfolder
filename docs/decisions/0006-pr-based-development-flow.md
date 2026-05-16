@@ -9,9 +9,8 @@ gate anything. Numbered sessions merge straight from a worktree into
 on.
 
 Separately, the working method is a large and growing body of
-agreements that live in prose — `project-state.md`,
-`strategist-protocol.md`, `CLAUDE.md` — and depend on being
-remembered. v1 and v2's recurring failures are all the same shape:
+agreements that live in prose — `strategist-protocol.md`,
+`CLAUDE.md` — and depend on being remembered. v1 and v2's recurring failures are all the same shape:
 discipline that decayed because nothing structural held it. Work
 landed on `main` outside a chat. A prompt was edited after handoff.
 A branch-naming rule was discussed and never written, so it "didn't
@@ -83,10 +82,8 @@ What becomes harder / the costs:
 The doc-ownership map — so the same fact stops drifting across docs:
 
 - **ADR 0006** is the decision record — the *why*.
-- **`project-state.md`** holds the working agreements — the
-  canonical *what*.
-- **`CLAUDE.md`** carries the operative subset the implementing
-  agent acts on at session start, and points to the other two. One
+- **`CLAUDE.md`** holds the working agreements and the operative
+  subset the implementing agent acts on at session start. One
   canonical home per fact; the rest point to it.
 
 What this does NOT do — parked future work:

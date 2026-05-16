@@ -6,8 +6,8 @@ natural moment, discovered issues that don't justify their own session
 yet, and follow-up edits queued during work on something else.
 
 This file is for _tactical_ follow-ups. _Strategic_ unknowns (final
-project name, GitHub remote visibility, license commitment) live in
-`project-state.md`'s "Open questions / things in flight" section.
+project name, GitHub remote visibility, license commitment) should be
+tracked in `docs/open-questions.md`.
 
 ## Format
 
