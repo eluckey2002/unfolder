@@ -40,14 +40,21 @@ retrospective was a joint pass after).
 - **Visual sweep** (resolved Q-0026-2 per
   `docs/open-questions.md`): "the v3-close session already exists to
   verify the phase shipped its quality bar, and the visual sweep IS
-  that verification." All 11 corpus models, one observation per
-  model.
-- **Baseline harness** (`scripts/baseline-pipeline.ts`) already runs
-  the pipeline corpus-wide and emits metrics, but does NOT save SVG
-  output. A small transient sweep harness is needed (one SVG per
-  page per model, written to a scratch location). It can be deleted
-  after the gate per the precedent of 0027's `scripts/probe-visual.ts`
-  and 0028's `scripts/probe-svg-invariant.ts`.
+  that verification." Coverage = all 11 corpus files in
+  `test/corpus/` (10 unique shapes — cube ships in both `.obj` and
+  `.stl` to exercise both parser paths, so cube counts twice for
+  sweep purposes). One observation per file.
+- **Baseline harness** (`scripts/baseline-pipeline.ts`, run via
+  `pnpm baseline` which uses `vite-node`) already walks the corpus,
+  routes by extension to `parseObj` / `parseStl`, loads sibling
+  `.mtl` when present, and calls `runPipeline`. It emits metrics
+  but does NOT save SVG output. The transient sweep harness should
+  reuse the same parser-dispatch + MTL-load pattern from
+  `scripts/baseline-pipeline.ts` and add per-page `emitSvg` writes
+  to a scratch dir. Run via `vite-node` directly (mirroring how
+  `pnpm baseline` invokes the baseline script). Delete after the
+  gate — 0027 and 0028 both shipped with transient probe scripts
+  that were deleted post-gate (rationale in those session logs).
 
 ## Files
 
@@ -59,10 +66,19 @@ Modified:
 - `docs/decisions-log.md` — one closure entry on v3-close (the
   visual-sweep verdict in one or two sentences; the v3→v4 phase
   hand-off note).
-- `README.md` — if status text mentions v3 as the current phase,
-  flip it to ✅ / shipped and v4 to the current phase. Check
-  carefully — README may not have explicit per-phase status flags
-  (the deleted `docs/roadmap.md` was the prior status home).
+- `README.md` — **three known-stale spots** the implementer should
+  fix in this session, not defer:
+  - The v3 phase-plan paragraph (~line 32) still names "real PDF
+    export" as a v3 surface; remove (per `decisions-log.md`
+    2026-05-16 entry that pulled PDF from v3).
+  - The Stack list (~line 48) still claims `pdf-lib` was "added in
+    v3"; remove or correct (no `pdf-lib` dependency landed).
+  - The Status section (~line 80-86) currently reads "v2 …
+    complete … v3 — quality output — is current"; flip v3 to
+    complete (with a one-line trajectory summary mirroring v2's)
+    and name v4 as the current phase (linking the v4 design spec
+    at `docs/superpowers/specs/2026-05-16-v4-interactive-editor-design.md`).
+  Confirm by grep after edit that no other PDF mentions remain.
 - `docs/open-questions.md` — no edits expected; ledger is clean.
 
 Created:
@@ -82,20 +98,31 @@ session most "tasks" are inspection / drafting, not TDD — substitute
 read → write → verify-by-reread → commit per CLAUDE.md's doc-only
 plan guidance.
 
-1. **Audit v3 named surfaces.** For each of (cut-removal, smart tabs,
-   audit viz, color), confirm via session-log presence + grep for the
-   key exported function names in `src/core/`. Flag anything the
-   README named for v3 that didn't ship and isn't explicitly deferred
-   in the decisions-log.
+1. **Audit v3 named surfaces.** For each, confirm session-log
+   presence + grep for the named export in `src/core/`:
+   - Cut-removal → `runCutRemoval` in `src/core/cut-removal.ts`
+   - Smart tabs → `scoreTabPlacement` in `src/core/tabs.ts`
+   - Audit viz → `classifyFoldability` in `src/core/foldability.ts`
+   - Color → `parseMtl` in `src/core/parse-mtl.ts`
+   Flag anything the README names for v3 that didn't ship and isn't
+   explicitly deferred in `docs/decisions-log.md`.
 2. **Audit the queue and open-questions ledger.** Confirm zero v3
    blockers remain. The `[enhancement]` area-based tab placement and
    the `[research]` items are not v3 blockers — they're v3-or-later
    improvements. Note them in v3-complete.md as "shipped without."
-3. **Generate the visual sweep.** Write the transient probe harness;
-   render all 11 corpus models' SVGs to a scratch dir (recommend
-   `/tmp/v3-sweep/` or `scripts/.v3-sweep-output/` — anywhere
-   gitignored). Open each in a browser. Capture one
-   observation-per-model in the implementer's notes.
+3. **Generate the visual sweep.** Write the transient probe harness
+   (reusing the parser-dispatch + MTL-load pattern from
+   `scripts/baseline-pipeline.ts`); render all 11 corpus files' SVGs
+   to a scratch dir. Recommend `scripts/.v3-sweep-output/` so the
+   directory is local to the script and easy to delete; ensure the
+   chosen path is gitignored (either via the existing `*.log` /
+   `dist/` lines or by adding a one-line rule for this run). Open
+   each SVG in a browser. **Capture observations inline in the
+   session log** (`docs/sessions/0029-v3-close.md`, under a
+   "Visual sweep" section) — one line per corpus file with the
+   verdict classification (clean / minor-quibble / fail-the-bar)
+   and a short rationale. These notes feed the v3-complete.md
+   verdict paragraph.
 4. **Read `v2-complete.md`** before drafting v3-complete.md. Match
    its structure and tone. Pattern adherence > novelty.
 5. **Draft `docs/retrospectives/v3-complete.md`** — see Specs below
@@ -115,9 +142,11 @@ plan guidance.
   - **Phase pitch** — one paragraph: what v3 was supposed to
     deliver per the README, and the abstract version of "did it."
   - **What shipped, session by session** — one short paragraph per
-    session 0021 through 0028 (skipping the 0024 strategist-skills
-    process session if it doesn't belong to the v3 product arc).
-    Link the session log; do not recap it.
+    session in the v3 product arc: 0021 (baseline), 0022 (Takahashi
+    reference read), 0023 (topo surgery spike), 0025 (cut-removal),
+    0026 (smart tabs), 0027 (audit viz), 0028 (color). Skip 0024
+    (strategist-skills) — that's process, not v3 product. Link
+    each session log; do not recap.
   - **Metric trajectory** — pull from `docs/baseline-v3.md`. One
     table showing the 0021 snapshot vs the post-0028 numbers for
     each frozen metric. Honest assessment — call out where the
@@ -134,7 +163,7 @@ plan guidance.
     the deep retrospective for `/retrospect v3`.
 
 - **Visual sweep verdict criteria** — for each of the 11 corpus
-  models:
+  files:
   - Does the rendered SVG look "obviously right" — pieces present,
     edge labels readable, tabs visible, no glaring rendering
     artifacts?
@@ -170,15 +199,19 @@ Standard gates; **report the test count, do not predict it**:
 1. `pnpm test:run` — all passing (unchanged from post-0028).
 2. `pnpm type-check` — clean.
 3. `pnpm build` — clean.
-4. **Sweep coverage gate:** `v3-complete.md` Visual-sweep verdict
-   paragraph names each of the 11 corpus models — either
-   individually or with explicit grouping (e.g. "all five Platonic
-   / parametric models classify clean and render cleanly; the
-   organic models X, Y, Z…"). No model is silently absent from
-   the verdict.
-5. **No-scratch-artifacts gate:** `git status --short` after Task 7
-   shows no `scripts/probe-*.ts` or scratch SVG paths staged or
-   untracked.
+4. **Sweep coverage gate:** every one of the 11 corpus files is
+   referenced (individually or in an explicitly-named group) in
+   either the session log's Visual sweep section OR the
+   `v3-complete.md` verdict paragraph. No file is silently absent.
+   Cube counts twice (`.obj` + `.stl`); confirm both formats were
+   actually rendered.
+5. **No-scratch-artifacts gate:** after Task 7, BOTH
+   (a) `git status --short` shows no `scripts/probe-*.ts` or
+   `scripts/.v3-sweep-output/` paths staged or untracked, AND
+   (b) `ls scripts/` shows only the pre-0029 contents (verify
+   against `git ls-files scripts/`). If the scratch dir was placed
+   outside the repo (e.g. `/tmp/v3-sweep/`), explicitly `rm -rf`
+   it as part of Task 7.
 
 ## Appendix
 
