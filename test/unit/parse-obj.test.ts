@@ -69,6 +69,36 @@ describe("parseObj", () => {
     }
   });
 
+  it("captures mtllib paths in source order, deduped", () => {
+    const obj = [
+      "mtllib first.mtl",
+      "mtllib second.mtl shared.mtl",
+      "mtllib first.mtl",
+      "v 0 0 0",
+      "v 1 0 0",
+      "v 0 1 0",
+      "f 1 2 3",
+    ].join("\n");
+    expect(parseObj(obj).mtllibs).toEqual([
+      "first.mtl",
+      "second.mtl",
+      "shared.mtl",
+    ]);
+  });
+
+  it("records faceMaterials parallel to faces, undefined before first usemtl", () => {
+    const obj = [
+      "v 0 0 0",
+      "v 1 0 0",
+      "v 0 1 0",
+      "v 1 1 0",
+      "f 1 2 3",
+      "usemtl red",
+      "f 2 3 4",
+    ].join("\n");
+    expect(parseObj(obj).faceMaterials).toEqual([undefined, "red"]);
+  });
+
   it("ignores vn, vt, vp, g, o, usemtl, mtllib, s, and comments", () => {
     const withNoise = [
       "# leading whole-line comment",

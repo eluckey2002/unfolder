@@ -16,4 +16,14 @@ export interface Mesh3D {
   vertices: Vec3[];
   /** Faces, each referencing three vertex indices. */
   faces: Triangle[];
+  /**
+   * Optional per-face material names, parallel-indexed to `faces`.
+   * Set by `parseObj` when `usemtl` directives are present. Faces
+   * before the first `usemtl` (and after a name-less `usemtl` or
+   * `usemtl off`) record `undefined`. Absent on parsers that don't
+   * track materials (e.g. `parseStl`).
+   */
+  faceMaterials?: (string | undefined)[];
+  /** `mtllib`-referenced file paths in source order, deduped. */
+  mtllibs?: string[];
 }
