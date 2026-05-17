@@ -68,3 +68,12 @@ Category tags are free-form (current ones: `convention`, `docs`,
   "less crowded" from "more crowded" and likely reduce that figure.
   Sized as a small src/core/tabs.ts refactor + baseline regen.
   Surfaced 0026.
+- [enhancement] Bundle-tuning for v4.1 — code-split r3f + drei
+  behind a dynamic import. Current v4.0 bundle is 318.86 kB gzipped
+  (1,145 kB raw); the r3f stack is the largest contributor.
+  Decision can wait until v4.1's first user-facing surface is
+  scoped; surface during v4.1 plan-mode. Surfaced 0030.
+- [watch] THREE.Clock deprecation — r3f 9.6 still uses
+  `THREE.Clock`; three 0.184 has deprecated in favor of
+  `THREE.Timer`. Console.warn only, no functional impact. Re-evaluate
+  on next dep upgrade or v4.1 prep. Surfaced 0030.
