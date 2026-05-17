@@ -4,17 +4,27 @@
 
 - **Worktree discipline.** When in a worktree, confirm `pwd` before any Edit/Write — never edit the main repo from a worktree session. The SessionStart hook prints cwd, branch, and `git worktree list` at session start; trust that, not memory.
 - **Plan first for multi-file sessions.** Any session touching >2 files or producing new functionality enters plan mode and produces a written plan before implementing. **Implementation plans break down to atomic 5-step TDD per task** (write failing test → run/fail → implement → run/pass → commit), with concrete code blocks and exact commands per the `superpowers:writing-plans` skill format — phase-level or task-level summaries are not enough. For doc/config-only plans (no testable behavior), substitute read → edit → verify-by-reread → commit, with exact `old_string`/`new_string` shown.
+- **Plan gates report, never predict.** Plan-time gates of the form "X equals N" or "baseline is byte-identical after Task K" are a structural smell — they leak strategist over-confidence about implementation behavior into the plan and produce mid-session reframes when wrong. Use report-form instead: name the measurement and the threshold of concern, not the predicted value. (Per v3-retrospective Decision 3; `/red-team-prompt` flags the smell.)
 - **Three kinds of work:** numbered session / maintenance commit / spike. Spike = explicitly exploratory, time-boxed, throwaway code allowed, produces findings doc rather than shippable stage.
 - **Session prompts saved at** `docs/sessions/prompts/<NNNN>-<descriptor>.md` (sessions/spikes) or `docs/sessions/prompts/<descriptor>.md` (maint); commit with the work.
 - **Doc-fetch and probe before writing prompts** that involve new tools/libraries — fetch current docs, probe with a sample call.
 - **Non-ADR decisions logged in** `docs/decisions-log.md`.
 - **Verify UI/CSS against real renders.** Screenshot the running app at the target viewport — do not inject CSS to simulate conditions; that produces false-positive bug reports.
+- **Visual gates for geometric and rendering output.** Every session whose plan touches `src/core/emit-svg.ts`, `src/core/paginate.ts`, `src/core/foldability.ts`, or any new rendering surface names a visual gate in its plan and runs it before commit. Synthetic unit-test fixtures structurally cannot catch float drift, silent field drops, or visible-but-undetected artifacts; the visual gate can. (Per v3-retrospective Decision 2; `scripts/visual-gate.ts` is the standing harness when Playwright is reachable.)
 - **Read/Grep/Glob for inspection; Bash for side effects.** Reserve Bash for build, test, git, and other commands that change state. Reuse a verification result already obtained this session rather than re-running.
 - **`pnpm install` on Windows needs `NODE_OPTIONS="--use-system-ca"`.** Plain `pnpm install` fails with `UNABLE_TO_VERIFY_LEAF_SIGNATURE` against npmjs.org (the Windows cert store / Node bundled-CA mismatch). Prefix with `NODE_OPTIONS="--use-system-ca"` (PowerShell: `$env:NODE_OPTIONS="--use-system-ca"; pnpm install`). Other pnpm commands (`pnpm test:run`, `pnpm baseline`, `pnpm build`) don't hit the registry and don't need the flag.
 - **Parallel Task agents for multi-target exploration.** When the task has independent read-only sub-questions, dispatch parallel sub-agents instead of serial Bash/Read.
 - **Worktree cleanup.** Run `git worktree prune` at session start.
   Merged session branches are auto-deleted on the remote; the local
   worktree admin still needs pruning.
+- **Phase-artifact authorship is split.** `<phase>-complete.md` is
+  strategist-authored inside a phase-close numbered session
+  (precedent: 0019 → v2-complete.md, 0029 → v3-complete.md), with a
+  mandatory sub-agent code-review pass for factual / tonal /
+  structural issues before commit. `<phase>-retrospective.md` is
+  joint via `/retrospect`. The split is codified per v3-retrospective
+  Decision 5; do not author complete.md unilaterally without the
+  sub-agent review layer.
 
 ## 2. Development workflow (v3+)
 
@@ -56,7 +66,7 @@ hand.
 | `/strategist [task]` | Load orientation docs, detect drift, draft session prompts in the lean template, or enter planning conversation. |
 | `/red-team-prompt <path>` | Dispatch a no-context subagent to stress-test a drafted prompt before handoff. |
 | `/open-questions [subcmd]` | Manage `docs/open-questions.md`. Force explicit disposition on each handoff open-question; no silent carry. |
-| `/retrospect <phase>` | Run the 4-pass phase-boundary retrospective; produce `-complete.md` + `-retrospective.md`. |
+| `/retrospect <phase>` | Run the 4-pass phase-boundary retrospective; produce `-retrospective.md` (the how-we-worked doc). `-complete.md` is strategist-authored in a phase-close numbered session, not by this skill. |
 
 The lean prompt template (Goal / Context / Tasks / Specs / Appendix)
 replaces the old worktree-boilerplate prompt format. `/strategist` uses

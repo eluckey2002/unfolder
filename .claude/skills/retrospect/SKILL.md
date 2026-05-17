@@ -1,6 +1,6 @@
 ---
 name: retrospect
-description: Run the 4-pass phase-boundary retrospective. Produces -complete.md (what shipped) and -retrospective.md (how we worked) per the v2 pattern. Use when the user types /retrospect, "retrospect on v3", or "phase retrospective".
+description: Run the 4-pass phase-boundary retrospective. Produces -retrospective.md (how we worked). The companion -complete.md (what shipped) is strategist-authored in a phase-close numbered session, not by this skill — see CLAUDE.md § 1 phase-artifact authorship split. Use when the user types /retrospect, "retrospect on v3", or "phase retrospective".
 ---
 
 # Retrospect
@@ -13,12 +13,12 @@ The first argument is the phase (e.g., `v3`).
 
 **Phase completion check:** Read `README.md`'s phase plan and the most recent session log to determine which sessions fall in the phase. If session numbers per phase aren't explicit in README, infer from session log filenames (e.g., v3 sessions = those numbered 0020+ until the v3 retrospective lands). Verify all sessions in the phase range are complete before proceeding — do not start a retrospective on an in-flight phase.
 
-**Prior-state check:** Look for three files that may exist from a prior run:
-- `docs/retrospectives/<phase>-complete-draft.md` (Pass 1 draft, session died mid-pass) → offer to resume from Pass 2 or restart from Pass 1
-- `docs/retrospectives/<phase>-complete.md` (Pass 4 completed for the what-shipped doc) → warn before overwriting
-- `docs/retrospectives/<phase>-retrospective.md` (Pass 4 completed for the how-we-worked doc) → warn before overwriting
+**Prior-state check:** Look for three files that may exist:
+- `docs/retrospectives/<phase>-complete-draft.md` (Pass 1 draft from a prior `/retrospect` run that died mid-pass) → offer to resume from Pass 2 or restart from Pass 1
+- `docs/retrospectives/<phase>-complete.md` (the what-shipped doc, authored in a phase-close numbered session — NOT by this skill) → expected to exist before `/retrospect` runs; surface to the user as confirmation that the phase actually closed
+- `docs/retrospectives/<phase>-retrospective.md` (prior `/retrospect` completion) → warn before overwriting
 
-If both final files exist, confirm with the user before proceeding. If only the draft exists, offer the resume choice. If none exist, proceed normally.
+If `<phase>-complete.md` does NOT exist, surface that to the user — the phase-close numbered session may not have run yet, and the retrospective ceremony assumes complete.md is already on disk for grounding. If `<phase>-retrospective.md` already exists, confirm before overwriting. If only the draft exists, offer the resume choice.
 
 ## Step 2 — Gather phase artifacts
 
@@ -67,10 +67,11 @@ Prompt:
 
 ## Step 6 — Pass 4: Converge
 
-Write both files:
+Write the retrospective file:
 
-- `docs/retrospectives/<phase>-complete.md` — what shipped (use `v2-complete.md` as the structural reference)
 - `docs/retrospectives/<phase>-retrospective.md` — how we worked (use `v2-retrospective.md` as the structural reference)
+
+Do NOT write or overwrite `<phase>-complete.md` — that file is authored in a phase-close numbered session per CLAUDE.md § 1 phase-artifact authorship split. The complete.md should already exist on disk from before the retrospective ceremony ran.
 
 Delete the Pass 1 draft (`docs/retrospectives/<phase>-complete-draft.md`).
 
