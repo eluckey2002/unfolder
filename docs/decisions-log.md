@@ -187,3 +187,23 @@ One entry per decision, newest last:
   oversized-piece signal considered and dropped: paginate's global
   rescale already manifests oversized pieces through tiny
   post-rescale edges, captured by the edge-length signal.
+- **2026-05-16 — MTL parser is Kd-only; texture / UV / STL color
+  deferred (session 0028).** Naive-first per `README.md` ("Naive
+  before optimized") and per the v3 commitment to ship color before
+  texture. `parseMtl` recognises `newmtl` and `Kd`; every other
+  directive (`Ka`, `Ks`, `Ke`, `Ns`, `d`, `Tr`, `illum`, `map_*`, …)
+  is silently ignored. Texture (UV + image sampling) is v5 territory
+  per the phase plan. Per-vertex color OBJ extensions and STL color
+  extensions are also deferred — `parseStl` is materials-unaware and
+  `Mesh3D.faceMaterials` is optional, so STL meshes skip the color
+  path without code changes.
+- **2026-05-16 — `paginate`'s `transformPiece` now preserves
+  `faceColors` (session 0028).** Pre-0028 the helper returned only
+  `{ edges }`, silently dropping every other `RenderablePiece`
+  field; 0027's `foldability?` survived only because runPipeline
+  re-assigned it post-paginate. 0028's `faceColors?` doesn't depend
+  on placement, so re-assigning post-paginate would be redundant
+  work; instead `transformPiece` explicitly forwards `faceColors`
+  when set. `foldability?` is still intentionally not forwarded —
+  the post-paginate re-assignment lets it reflect placement-derived
+  geometry.

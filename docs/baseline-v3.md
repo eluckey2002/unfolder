@@ -118,3 +118,22 @@ models**. Platonic solids and uv-sphere all clean; deer.obj is 2/0/15
 values (angle <30°/<15°, edge <5 mm/<2 mm) held without tuning.
 Classifier carries forward as v4's foundation for interactive
 buildability badges per the 2026-05-16 v4 user-research findings.
+
+---
+
+## v3 trajectory — after session 0028 (color passthrough)
+
+Session 0028 adds per-face diffuse color from OBJ `.mtl` materials
+through to SVG output. Pure endpoint extension — parser captures
+`usemtl` + `mtllib`, pipeline resolves names against a merged MTL
+lookup, emit-svg paints fills before the foldability tint and line
+work. Naive-first scope: `Kd` only; texture/UV/STL color deferred to
+v5. The no-color invariant holds — models without a sibling `.mtl`
+produce byte-identical SVG to post-0027 (hard gate verified on
+`cube.obj` and `octahedron.stl`). Authored one fixture MTL:
+`ginger-bread.mtl` (single-material, gingerbread-brown
+`Kd 0.55 0.30 0.10` ≈ `#8c4d1a`). Corpus today: **1 distinct material
+across 1 model with color data**; remaining 10 models render
+unchanged. One paginate refactor along the way: `transformPiece` now
+preserves `faceColors` through placement (it previously returned only
+`{ edges }`, silently dropping all other piece fields).
