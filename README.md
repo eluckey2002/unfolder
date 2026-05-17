@@ -29,7 +29,7 @@ Each phase produces something useful on its own, not scaffolding for the next.
 
 **v2 — Functional unfolder.** Dihedral-weighted spanning tree, overlap detection and automatic recut, glue tabs with edge labels, multi-page layout. Output is buildable for low-poly meshes (faceted animal heads, geometric busts).
 
-**v3 — Quality output.** Takahashi's topological surgery for optimized cuts, audit visualization (color-coded regions by foldability), smart tab placement, color/texture passthrough, real PDF export.
+**v3 — Quality output.** Takahashi-style topological surgery for optimized cuts, smart tab placement, audit visualization (color-coded regions by foldability), and color passthrough from OBJ materials.
 
 **v4 — Interactive editor.** This is where the project changes character — from a batch tool to an application. Real UI with a 3D viewport and 2D layout panel. Click edges to toggle cut/fold. Drag pieces to rearrange. Live feedback on overlaps. Undo/redo. Save/load project state. React + react-three-fiber.
 
@@ -45,7 +45,6 @@ Each phase produces something useful on its own, not scaffolding for the next.
 - Vitest (unit tests)
 - three.js (3D rendering, mesh loading)
 - polygon-clipping (2D overlap detection, added in v2)
-- pdf-lib (PDF export, added in v3)
 - React + react-three-fiber (UI, added in v4)
 
 ## Repository layout
@@ -79,11 +78,14 @@ The `core/` vs `app/` split is structural and important. `core/` is the library;
 
 ## Status
 
-v2 — the functional unfolder — is complete and merged. The full ten-stage
-pipeline (parse → adjacency → dihedral weights → spanning tree → flatten →
-overlap detect → recut → tabs → paginate → emit SVG) runs end to end across
-the test corpus, with a browser app showing the 3D mesh beside its unfolded
-SVG net. v3 — quality output — is current; its session plan is pending.
+v2 — the functional unfolder — is complete and merged. v3 — quality output —
+is complete and merged: Takahashi-style cut-removal as the default unfolder
+(ADR 0007), score-driven smart tab placement, per-piece foldability
+classification with SVG tint overlay, and per-face color passthrough from
+OBJ materials. Aggregate trajectory across the eleven-model corpus:
+58 → 30 pieces, 18 → 14 pages, 18.8 m → 15.6 m total cut length. v4 —
+interactive editor — is current; design spec at
+`docs/superpowers/specs/2026-05-16-v4-interactive-editor-design.md`.
 
 ## License
 

@@ -219,3 +219,21 @@ One entry per decision, newest last:
   file-loader functionality moves to v4.0 alongside the React
   shell. The v3.5 incremental-pipeline spike (per spec §3) blocks
   v4.3 only — v4.0 → v4.2 can ship without it.
+- **2026-05-17 — v3 closes (session 0029).** Corpus-wide visual
+  sweep across the 11 test models (14 SVG pages total) confirms v3
+  hit its "visibly competitive with Pepakura" bar: every page
+  renders structurally complete with the expected piece outlines,
+  edge labels, tab polygons, and foldability tints; `ginger-bread.obj`
+  exemplifies that the two v3 visual surfaces compose cleanly (80
+  colored triangles render underneath both caution and warn tint
+  overlays). Foldability distribution holds at the post-0028
+  baseline (7 clean / 4 caution / 19 warn across 30 pieces). The
+  model closest to the quality-bar edge is `deer.obj` (15 of 17
+  pieces warn) — ships buildable, but the warn signal is the honest
+  "this will be tricky" report from the classifier. v3 surfaces
+  (cut-removal, smart tabs, foldability viz, color passthrough) all
+  shipped per ADR 0007 and the 0025-0028 session arc; PDF and
+  file-loader UI deferred per prior log entries. v4 begins; the
+  design spec at
+  `docs/superpowers/specs/2026-05-16-v4-interactive-editor-design.md`
+  is the entry point. Process retrospective deferred to `/retrospect v3`.
