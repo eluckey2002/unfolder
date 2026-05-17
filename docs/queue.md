@@ -59,10 +59,6 @@ Category tags are free-form (current ones: `convention`, `docs`,
   instead. A tolerant variant would let polygon-clipping verification
   return as a strict assertion. Worth a small spike or maint commit;
   not blocking v3. Surfaced 0025.
-- [cleanup] Wipe `.history/` directory contents — VS Code Local
-  History accumulation. `.history/` is gitignored (added in pre-0025
-  housekeeping) but the existing contents weren't cleaned. Trivial
-  maint, no behavior change. Surfaced 0025.
 - [enhancement] Area-based tab placement signal — replace the
   boolean `tabOverlapsOwnPieceInterior` with an intersection-area
   predicate, then pick the side with smaller overlap area when both

@@ -207,3 +207,15 @@ One entry per decision, newest last:
   when set. `foldability?` is still intentionally not forwarded —
   the post-paginate re-assignment lets it reflect placement-derived
   geometry.
+- **2026-05-17 — v4 design spec landed at
+  `docs/superpowers/specs/2026-05-16-v4-interactive-editor-design.md`.**
+  Closes the "currently dangling" caveat on the 2026-05-16 v4
+  headline-UX entry above. Drafted in the in-flight brainstorming
+  session referenced by that earlier entry; locks the v4.0 → v4.3
+  release sequencing (§3) and re-categorizes the previously-
+  v3-roadmap "0029 file-loader UI" as v4.0 scope ("Absorbs the
+  v3-roadmap session 0029 — file-loader UI" in §3). Net effect on
+  v3: 0029 is now the v3 close session, not the file-loader UI; the
+  file-loader functionality moves to v4.0 alongside the React
+  shell. The v3.5 incremental-pipeline spike (per spec §3) blocks
+  v4.3 only — v4.0 → v4.2 can ship without it.
