@@ -13,6 +13,7 @@ import type { Adjacency } from "./adjacency.js";
 import type { FlatFace, Vec2 } from "./flatten.js";
 import type { FoldabilityClass } from "./foldability.js";
 import { canonicalPairKey } from "./pair-key.js";
+import type { RGB } from "./parse-mtl.js";
 import type { RecutResult } from "./recut.js";
 
 export type RenderEdge =
@@ -31,6 +32,14 @@ export interface RenderablePiece {
   // both depend on this; see buildRenderablePieces below.
   edges: RenderEdge[];
   foldability?: FoldabilityClass;
+  /**
+   * Optional per-face diffuse RGB in [0,1]^3, parallel to face-triplet
+   * order: faceColors[k] is the color for edges[3k..3k+3]. `undefined`
+   * entries (and an absent faceColors field) mean "no fill - render
+   * over white background." Populated by runPipeline's materials
+   * resolution pass when a materials lookup is provided.
+   */
+  faceColors?: (RGB | undefined)[];
 }
 
 const TAB_HEIGHT_RATIO = 0.4;

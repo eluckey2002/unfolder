@@ -1,6 +1,8 @@
+import gingerBreadMtl from "../../test/corpus/ginger-bread.mtl?raw";
 import gingerBreadObj from "../../test/corpus/ginger-bread.obj?raw";
 
 import { emitSvg } from "../core/emit-svg.js";
+import { parseMtl } from "../core/parse-mtl.js";
 import { parseObj } from "../core/parse-obj.js";
 import { runPipeline } from "../core/pipeline.js";
 import { createViewport } from "./render.js";
@@ -21,7 +23,8 @@ console.log(
 
 createViewport(viewportContainer, mesh);
 
-const { recut, pages } = runPipeline(mesh);
+const materials = parseMtl(gingerBreadMtl);
+const { recut, pages } = runPipeline(mesh, undefined, materials);
 
 netContainer.replaceChildren();
 for (let i = 0; i < pages.length; i++) {

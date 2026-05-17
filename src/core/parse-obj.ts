@@ -19,6 +19,10 @@ export function parseObj(contents: string): Mesh3D {
   const v = makeVertexInterner();
   const faces: Triangle[] = [];
   const ordinalToCanonical: number[] = [];
+  const faceMaterials: (string | undefined)[] = [];
+  const mtllibs: string[] = [];
+  const mtllibSeen = new Set<string>();
+  let currentMaterial: string | undefined = undefined;
 
   const resolveFaceRef = (ref: string, line: string): number => {
     const slash = ref.indexOf("/");
@@ -65,14 +69,41 @@ export function parseObj(contents: string): Mesh3D {
       const resolved = refs.map((ref) => resolveFaceRef(ref, line));
       for (let i = 1; i < resolved.length - 1; i++) {
         faces.push([resolved[0], resolved[i], resolved[i + 1]]);
+        faceMaterials.push(currentMaterial);
       }
+      continue;
     }
-    // Everything else (vn, vt, vp, g, o, usemtl, mtllib, s, ...) ignored.
+
+    if (head === "mtllib") {
+      for (const path of parts.slice(1)) {
+        if (!mtllibSeen.has(path)) {
+          mtllibSeen.add(path);
+          mtllibs.push(path);
+        }
+      }
+      continue;
+    }
+
+    if (head === "usemtl") {
+      const name = parts[1];
+      if (!name || name === "off") {
+        currentMaterial = undefined;
+      } else {
+        currentMaterial = name;
+      }
+      continue;
+    }
+    // Everything else (vn, vt, vp, g, o, s, ...) ignored.
   }
 
   if (faces.length === 0) {
     throw new Error("parseObj: no faces (no 'f' lines) found in file.");
   }
 
-  return { vertices: v.vertices, faces };
+  const mesh: Mesh3D = { vertices: v.vertices, faces };
+  if (mtllibs.length > 0) mesh.mtllibs = mtllibs;
+  if (faceMaterials.some((m) => m !== undefined)) {
+    mesh.faceMaterials = faceMaterials;
+  }
+  return mesh;
 }
