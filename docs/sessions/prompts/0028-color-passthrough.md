@@ -16,25 +16,39 @@ deferred (naive-first).
 
 ## Context
 
-- Coexists with 0027's foldability tint. Painter's-algorithm order
-  (top-to-back of the final render): line work → foldability tint →
-  face fills. In SVG document order this reverses: fills emitted
-  earliest, foldability tint next, line work last. The foldability
-  tint shifts colored faces' hues but does not occlude them;
-  classification stays readable through the tint's low alpha.
+- Coexists with 0027's foldability tint. Final-render painter's
+  stack, top to back: line work → foldability tint → face fills →
+  page border. In SVG document order this reverses: page border
+  first (existing), then face fills (new), then foldability tint
+  (existing), then line work (existing). Face fills and the
+  foldability tint use the same `<polygon>` element shape; the
+  fills are opaque, the tint is low-alpha overlay. The tint
+  shifts the fill's hue but does not occlude it; classification
+  stays readable through the tint's low alpha.
 - Mesh-face → color lookup is already a clean keying:
   `Piece.faces: number[]` (`src/core/recut.ts:36`) carries original
   mesh-face indices in `Layout2D.faces`-aligned order. At emit-time
   the k-th `FlatFace` in a piece corresponds to mesh-face
-  `piece.faces[k]`. Same indirection pattern 0027's classifier used.
-  Data-flow seam: implementer picks (a) optional `faceColors?` on
-  `RenderablePiece` parallel to the edge-triplet pattern (one color
-  entry per face, length = `edges.length / 3`) or (b) external
-  lookup threaded via the `emitSvg` signature. The 0027 pattern
-  favors (a); plan picks it explicitly.
-- `src/core/parse-obj.ts:70` currently parses-and-ignores `usemtl`,
-  `mtllib`, `g`, `o`, `s`, `vn`, `vt`. The session extends it to
-  capture `mtllib` and `usemtl` without changing the rest.
+  `piece.faces[k]`. No intermediate-stage plumbing needed
+  (adjacency, dihedral, spanning-tree, cut-removal, flatten,
+  paginate all run unchanged); the color extension lives at the
+  endpoints (parser + emit).
+- **Data-flow seam.** Add an optional
+  `faceColors?: (RGB | undefined)[]` field on `RenderablePiece`,
+  length equal to the piece's face count (which is
+  `edges.length / 3` given the existing face-triplet edge
+  invariant). Populated by a downstream pass in `runPipeline`
+  after `buildRenderablePieces` — same *hook point* 0027 used
+  for its per-piece `foldability?` scalar, but with **per-face
+  cardinality** this time because color is per-face data, not
+  per-piece. `emitSvg` reads `piece.faceColors?.[k]` for the
+  k-th face it emits. This seam is the recommended path;
+  implementer may propose an alternative in plan mode if it
+  has clear advantages.
+- `src/core/parse-obj.ts:70` currently parses-and-ignores
+  everything except `v` and `f` (see the catch-all comment on
+  that line). The session extends it to capture `mtllib` and
+  `usemtl` without changing the existing geometry path.
 - `.mtl` is a sibling file to the `.obj`. Both the dev server
   (browser `fetch` from `/test/corpus/`) and the baseline harness
   (`fs.readFileSync`) need a small sibling-path helper to load it.
@@ -81,7 +95,7 @@ Created:
 
 - `src/core/parse-mtl.ts` — MTL parser (name → diffuse RGB).
 - `test/unit/parse-mtl.test.ts` — unit tests for the MTL parser.
-- `test/unit/parse-obj.test.ts` (if absent — add) — assertions for
+- `test/unit/parse-obj.test.ts` — add assertions for
   `mtllib`/`usemtl` handling. Pre-0028 geometry-only assertions
   remain unchanged.
 - `test/corpus/<model>.mtl` — author one MTL for one demo corpus
@@ -105,8 +119,11 @@ Roughly:
    triangle from one source face shares its source's current
    material.
 4. Author the MTL fixture for one corpus model.
-5. Thread material resolution through `runPipeline`. Pick the seam
-   (`RenderablePiece.faceColors?` vs external lookup) in plan mode.
+5. Thread material resolution through `runPipeline`: add the
+   `faceColors?` field on `RenderablePiece` (per the data-flow
+   seam in Context); populate via a downstream pass after
+   `buildRenderablePieces`. Resolution uses the merged MTL
+   lookup against `mesh.faceMaterials[piece.faces[k]]`.
 6. Extend `emit-svg.ts` to emit per-face fill polygons before the
    foldability-tint and line-work passes.
 7. Wire `src/app/main.ts` to fetch and apply the companion MTL.
@@ -135,6 +152,10 @@ Roughly:
     or out-of-`[0, 1]` channel values. A file with only comments
     / whitespace returns an empty lookup (not an error — an
     empty MTL is valid, just useless).
+  - **Test coverage:** include an assertion that a `.mtl` file
+    containing `map_Kd` (or any other unsupported directive)
+    parses without throwing — the silent-ignore is a real
+    behavior the visual gate depends on.
 
 - **`parseObj` extension** — preserves the existing
   geometry-only contract for callers that don't read the new
@@ -146,10 +167,13 @@ Roughly:
   - Each `usemtl <name>` sets a "current material" cursor;
     subsequent `f` lines record that name in
     `Mesh3D.faceMaterials` (parallel-indexed to `faces`). Faces
-    before the first `usemtl` record `undefined`. `usemtl off`
-    (or a `usemtl` line with no name) clears the cursor —
-    subsequent faces record `undefined` until the next named
-    `usemtl`.
+    before the first `usemtl` record `undefined`. A `usemtl`
+    line with no name (just `usemtl` alone, or only whitespace
+    after) clears the cursor — subsequent faces record
+    `undefined` until the next named `usemtl`. (The `usemtl off`
+    form sometimes seen in the wild is non-standard; treat it
+    the same as the no-name form. The OBJ spec is loose here,
+    so favor the permissive read.)
   - Quad/n-gon fan-triangulation: every triangle from one
     source face inherits the source face's current material.
   - Existing throws (non-finite vertex, zero/out-of-range face
@@ -169,26 +193,30 @@ Roughly:
   uncolored.
 
 - **`emit-svg` extension** — for each piece carrying per-face
-  colors, emit a `<polygon>` fill per colored face *before* the
-  foldability-tint polygon and *before* any line-work elements.
-  Colors render as `fill="#RRGGBB"` (sRGB hex; multiply each
-  `[0, 1]` channel by 255, round, clamp). Faces without color
-  emit no fill polygon (the existing no-fill behavior; the
-  foldability tint composites onto white where no fill exists).
-
-  *(Z-order, top-to-back in the final render: line work →
-  foldability tint → face fills → page border. In SVG document
-  order, the page border emits first (existing), then face fills,
-  then foldability tint, then line work.)*
+  colors, emit one `<polygon>` fill per colored face *after* the
+  page-border rect (which stays first) and *before* the
+  foldability-tint polygon and any line-work elements. Each
+  face's `[0, 1]`-float Kd channels are encoded as a stable
+  six-digit sRGB hex string (`fill="#RRGGBB"`) — emit the
+  hex equivalent of the channel value scaled to the 0–255
+  integer range; rounding mode and edge-case handling (e.g.
+  exact 0.0 → `00`, exact 1.0 → `ff`) are at the implementer's
+  discretion as long as the mapping is deterministic across
+  runs. Faces with no resolved color emit no fill polygon (the
+  foldability tint composites onto white background where no
+  fill exists).
 
 - **`scripts/baseline-pipeline.ts` `materials` column** — count
-  of *distinct material names referenced and resolved* per model
-  (i.e. the number of unique non-`undefined` entries in
-  `mesh.faceMaterials` whose name resolved to a color in the
-  merged MTL lookup). `0` for models with no `.mtl`. Summary
+  of *distinct material names that are both attached to at
+  least one face AND resolve to a color in the merged MTL
+  lookup* per model. Names declared in MTL but never `usemtl`'d
+  do NOT count; names `usemtl`'d but not present in any loaded
+  MTL also do NOT count. `0` for models with no `.mtl`. Summary
   line names per-corpus total distinct materials and the count
-  of models with any color data — exact wording is illustrative,
-  not verbatim, so long as both numbers appear.
+  of models with any color data — exact wording is illustrative
+  (sample: "Materials: 7 distinct across 3 models with color
+  data."), so long as both numbers appear and the format is
+  stable run-to-run.
 
 - **Invariants under the refactor:**
 
@@ -211,23 +239,33 @@ Standard gates; **report the test count, do not predict it**:
 1. `pnpm test:run` — all passing
 2. `pnpm type-check` — clean
 3. `pnpm build` — clean
-4. **Hard gate (no-color invariant):** for any corpus model
-   without a `.mtl` (e.g. `cube.obj`, `octahedron.stl`), the
-   emitted SVG strings are byte-identical to a pre-0028
-   reference. Capture the references in plan mode (before
-   Task 6); diff after Task 6 lands. Stop and investigate
-   any diff.
+4. **Hard gate (no-color invariant):** for at least two corpus
+   models without a `.mtl` (e.g. `cube.obj` and `octahedron.stl`,
+   covering both OBJ and STL parsers), the emitted SVG strings
+   are byte-identical to a pre-0028 reference. Mechanism:
+   before Task 6 lands, run a transient `vite-node` (or
+   equivalent) probe that calls `runPipeline` + `emitSvg` on
+   each model and writes the SVG strings to a scratch path
+   outside the repo (or to `/tmp`); after Task 6 lands, re-run
+   the probe and diff the new SVGs against the captured
+   references. Any non-empty diff means the no-color path
+   regressed — stop and investigate.
 5. **Hard gate (baseline diff):** `git diff
    docs/baseline-pipeline.md` shows only the new `materials`
    column + summary line; existing columns byte-identical.
 6. **Visual gate per `CLAUDE.md` §1** ("Verify UI/CSS against
-   real renders"): dev-server screenshot at a viewport showing
-   the colored demo model. Face fills must be visible, line
-   work crisp on top, foldability tints discernible as hue
+   real renders"): run `pnpm dev`, open the served app in a
+   browser at the default Vite URL, screenshot the 2D pane
+   showing the colored demo model. Face fills must be visible,
+   line work crisp on top, foldability tints discernible as hue
    overlays (not obliterating the fill). Sanity-check the
    colors against the authored MTL — the named diffuse values
    should read as the intended hue (e.g. gingerbread-brown
-   actually reads brown, not olive or maroon).
+   actually reads brown, not olive or maroon). For corpus-wide
+   coverage, also generate a `pnpm baseline` run and confirm
+   the `materials` column populates only for models with `.mtl`
+   present (currently the single authored fixture, plus zero
+   for everything else).
 
 ## Appendix
 
