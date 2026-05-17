@@ -37,7 +37,12 @@ export function reconstructOutline(edges: RenderEdge[]): Vec2[] {
   const cuts: RenderEdge[] = edges.filter((e) => e.kind === "cut");
   if (cuts.length === 0) return [];
 
-  const key = (v: Vec2): string => `${v[0]},${v[1]}`;
+  // Vertices duplicated across face transforms in buildLayout drift
+  // by ~1e-12 mm; round to micron precision (0.001 mm) — well below
+  // any printing-meaningful tolerance — so shared vertices bucket
+  // together and the adjacency walk doesn't break at near-duplicates.
+  const key = (v: Vec2): string =>
+    `${Math.round(v[0] * 1000)},${Math.round(v[1] * 1000)}`;
   const adj = new Map<string, Array<{ idx: number; other: Vec2 }>>();
   const push = (k: string, entry: { idx: number; other: Vec2 }): void => {
     const list = adj.get(k);

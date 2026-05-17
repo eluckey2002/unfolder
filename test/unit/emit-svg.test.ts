@@ -11,7 +11,9 @@ import type { Vec2 } from "../../src/core/flatten.js";
 import { buildLayout } from "../../src/core/flatten.js";
 import { detectOverlaps } from "../../src/core/overlap.js";
 import { LETTER, paginate } from "../../src/core/paginate.js";
+import { parseObj } from "../../src/core/parse-obj.js";
 import { parseStl } from "../../src/core/parse-stl.js";
+import { runPipeline } from "../../src/core/pipeline.js";
 import { recut } from "../../src/core/recut.js";
 import { buildSpanningTree } from "../../src/core/spanning-tree.js";
 import type { Page } from "../../src/core/paginate.js";
@@ -219,5 +221,15 @@ describe("emitSvg — foldability tint", () => {
     };
     const svg = emitSvg(pageWith([piece]));
     expect(svg).not.toContain("foldability-tint");
+  });
+
+  it("emits one outline polygon per piece on ginger-bread (real corpus, shared-vertex FP drift)", () => {
+    const objText = readFileSync(join(corpusDir, "ginger-bread.obj"), "utf-8");
+    const mesh = parseObj(objText);
+    const { pages } = runPipeline(mesh);
+    const svg = emitSvg(pages[0]);
+    const tintMatches = svg.match(/<polygon class="foldability-tint"/g) ?? [];
+    // ginger-bread is 2 pieces on 1 page per baseline — should be 2 tints.
+    expect(tintMatches.length).toBe(pages[0].pieces.length);
   });
 });
