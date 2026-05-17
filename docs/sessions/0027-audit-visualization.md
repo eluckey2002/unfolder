@@ -13,7 +13,7 @@ findings.
 
 ## What shipped
 
-### Ten commits on `session/0027-audit-visualization`
+### Thirteen commits on `session/0027-audit-visualization`
 
 1. `aff213f feat(foldability): edge-length signal classifier` — Task 1
 2. `9b36aa2 feat(foldability): face-corner-angle signal + aggregation` — Task 2
@@ -25,6 +25,9 @@ findings.
 8. `d3a2222 feat(baseline): foldability column + per-class totals` — Task 8
 9. `56df948 docs(0027): baseline-v3 trajectory note + decisions-log entry` — Task 9
 10. `f173abb docs(decisions-log): foldability classifier metrics + thresholds` — Task 10
+11. `19bbbc9 docs(0027): session log` — Task 11
+12. `d088fd3 feat(app): demo ginger-bread.obj instead of deer.obj` — in-session tweak (Evan's call: a 2-piece model with both caution + warn visible reads better as the everyday demo than deer's wash of red)
+13. `a57b4a7 fix(emit-svg): bucket reconstructOutline vertices to micron precision` — visual-gate caught a latent bug: shared vertices across `buildLayout` face transforms drift by ~1e-12 mm; exact float keying broke the adjacency walk on real corpus pieces. Fix rounds to 0.001 mm (well below any printing-meaningful tolerance) so duplicates bucket together. Added a ginger-bread integration test that exercises real transform drift; the prior synthetic tests reused Vec2 references and missed it.
 
 ### Code surface
 
@@ -66,3 +69,18 @@ Nothing carried out of this session. The area-based tab-placement
 enhancement remains in `docs/queue.md` — touched `tabs.ts` only for
 the optional `foldability` field, no logic change to placement, no
 interaction with the queue item.
+
+## Handoff
+
+- **Branch / worktree:** `session/0027-audit-visualization` at `.claude/worktrees/session+0027-audit-visualization/`
+- **Commits:** `feat(foldability): edge-length signal classifier` → `feat(foldability): face-corner-angle signal + aggregation` → `feat(tabs): optional foldability field on RenderablePiece` → `feat(pipeline): classify foldability post-paginate` → `feat(emit-svg): outline-polygon reconstruction helper` → `feat(emit-svg): per-piece foldability tint` → `feat(app): swap to deer.obj for multi-piece classifier exercise` → `feat(baseline): foldability column + per-class totals` → `docs(0027): baseline-v3 trajectory note + decisions-log entry` → `docs(decisions-log): foldability classifier metrics + thresholds` → `docs(0027): session log` → `feat(app): demo ginger-bread.obj instead of deer.obj` → `fix(emit-svg): bucket reconstructOutline vertices to micron precision`
+- **Verification:** `pnpm test:run` 168 passing; `pnpm type-check` clean; `pnpm build` clean; baseline-pipeline.md diff shows only the new `foldability (c/c/w)` column + summary line (pre-0027 columns byte-identical); visual gate confirmed on `ginger-bread.obj` post-fix (2 piece outlines, one caution + one warn).
+- **Decisions made or deferred:**
+  - [flowed-silently] Data-flow seam: optional `foldability?` field on `RenderablePiece` over a parallel array — `Page → PlacedPiece → piece` already reaches `emitSvg`.
+  - [flowed-silently] Classifier input shape: `RenderablePiece` direct, leaning on the existing face-triplet edge invariant in `buildRenderablePieces`. No new type field for face data.
+  - [flowed-silently] Outline reconstruction lives in `emit-svg.ts` as an exported (for testability) helper, not its own module.
+  - [surfaced-and-proceeded] Threshold seed values held without tuning. Logged in `docs/decisions-log.md` with the rationale + the dropped diameter signal.
+  - [surfaced-and-proceeded] App demo model: `ginger-bread.obj` instead of `deer.obj` per Evan's preference (deer is the visual-gate model; ginger-bread is the everyday demo).
+  - No ADR — this is a downstream-only feature on the existing pipeline contract, not a structural change.
+- **Queue / roadmap deltas:** None added; none closed. Area-based tab-placement queue item untouched (we modified `tabs.ts` for the `foldability?` field only).
+- **Open questions for the strategist:** None. Classifier carries forward into v4 as the foundation for interactive buildability badges per the 2026-05-16 v4 user-research findings.
