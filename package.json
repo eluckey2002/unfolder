@@ -15,16 +15,28 @@
     "spike": "vite-node spikes/2026-05-15-topological-surgery/run.ts"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "@testing-library/react": "^16.3.2",
     "@types/node": "^25.7.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
     "@types/three": "^0.184.1",
+    "@vitejs/plugin-react": "^6.0.2",
     "fast-check": "^4.8.0",
+    "jsdom": "^29.1.1",
     "typescript": "^6.0.3",
     "vite": "^8.0.12",
     "vite-node": "^6.0.0",
     "vitest": "^4.1.6"
   },
   "dependencies": {
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.1",
+    "immer": "^11.1.8",
     "polygon-clipping": "^0.15.7",
-    "three": "^0.184.0"
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "three": "^0.184.0",
+    "zustand": "^5.0.13"
   }
 }
