@@ -28,6 +28,12 @@ const LABEL_OFFSET_MM = LABEL_FONT_MM * 0.6;
 const PAGE_BORDER_STROKE_MM = 0.15;
 const PAGE_BORDER_COLOR = "#ccc";
 
+const rgbToHex = (rgb: readonly [number, number, number]): string => {
+  const channel = (c: number): string =>
+    Math.round(c * 255).toString(16).padStart(2, "0");
+  return `#${channel(rgb[0])}${channel(rgb[1])}${channel(rgb[2])}`;
+};
+
 /**
  * Walk a piece's cut edges (boundary) into an ordered outline polygon.
  * Folds are ignored — they're interior. Exported for direct unit
@@ -79,6 +85,27 @@ export function emitSvg(page: Page): string {
   elems.push(
     `<rect x="0" y="0" width="${page.widthMm}" height="${page.heightMm}" fill="none" stroke="${PAGE_BORDER_COLOR}" stroke-width="${PAGE_BORDER_STROKE_MM}" />`,
   );
+
+  // Per-face fill pass: earlier in document order than the foldability
+  // tint and line work, so each tint composites onto the fill and the
+  // cut/fold lines sit on top crisply. Faces with no resolved color
+  // emit nothing; the foldability tint composites onto white instead.
+  for (const placed of page.pieces) {
+    const colors = placed.piece.faceColors;
+    if (!colors) continue;
+    const edges = placed.piece.edges;
+    for (let k = 0; k < colors.length; k++) {
+      const color = colors[k];
+      if (color === undefined) continue;
+      const e0 = edges[3 * k];
+      const e1 = edges[3 * k + 1];
+      const e2 = edges[3 * k + 2];
+      const pts = `${e0.from[0]},${e0.from[1]} ${e1.from[0]},${e1.from[1]} ${e2.from[0]},${e2.from[1]}`;
+      elems.push(
+        `<polygon class="face-fill" points="${pts}" fill="${rgbToHex(color)}" stroke="none" />`,
+      );
+    }
+  }
 
   // Foldability tint pass: earlier in document order than the line
   // work, so each tint sits behind its piece's edges/labels.

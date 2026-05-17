@@ -233,3 +233,56 @@ describe("emitSvg — foldability tint", () => {
     expect(tintMatches.length).toBe(pages[0].pieces.length);
   });
 });
+
+const triangleFacePiece = (
+  colors: ((readonly [number, number, number]) | undefined)[],
+): RenderablePiece => {
+  // Build n triangles, each as 3 face-triplet edges. Coordinates are
+  // dummy — the fill pass only reads vertex `from` of each edge in
+  // triplet order.
+  const edges: RenderEdge[] = [];
+  for (let k = 0; k < colors.length; k++) {
+    const base = k * 2;
+    edges.push(foldEdge([base, 0], [base + 1, 0]));
+    edges.push(foldEdge([base + 1, 0], [base, 1]));
+    edges.push(foldEdge([base, 1], [base, 0]));
+  }
+  return { edges, faceColors: colors as RenderablePiece["faceColors"] };
+};
+
+describe("emitSvg — per-face fill", () => {
+  it("emits per-face fill polygons before line work when faceColors set", () => {
+    const piece = triangleFacePiece([[1, 0, 0]]);
+    const svg = emitSvg(pageWith([piece]));
+    expect(svg).toMatch(/<polygon[^>]*fill="#ff0000"[^>]*\/>/);
+    const fillIdx = svg.indexOf('fill="#ff0000"');
+    const firstLineIdx = svg.indexOf("<line");
+    expect(fillIdx).toBeLessThan(firstLineIdx);
+  });
+
+  it("emits no fill when faceColors absent (no-color invariant)", () => {
+    const piece: RenderablePiece = {
+      edges: [
+        foldEdge([0, 0], [1, 0]),
+        foldEdge([1, 0], [0, 1]),
+        foldEdge([0, 1], [0, 0]),
+      ],
+    };
+    const svg = emitSvg(pageWith([piece]));
+    expect(svg).not.toContain("<polygon");
+  });
+
+  it("skips undefined entries within faceColors", () => {
+    const piece = triangleFacePiece([[0, 1, 0], undefined]);
+    const svg = emitSvg(pageWith([piece]));
+    expect(svg).toContain('fill="#00ff00"');
+    const matches = svg.match(/<polygon[^>]*fill="#[0-9a-f]{6}"/g) ?? [];
+    expect(matches.length).toBe(1);
+  });
+
+  it("hex encoding: 0.5 → 80 (round-to-nearest)", () => {
+    const piece = triangleFacePiece([[0.5, 0, 1]]);
+    const svg = emitSvg(pageWith([piece]));
+    expect(svg).toContain('fill="#8000ff"');
+  });
+});
