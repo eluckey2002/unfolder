@@ -137,3 +137,28 @@ across 1 model with color data**; remaining 10 models render
 unchanged. One paginate refactor along the way: `transformPiece` now
 preserves `faceColors` through placement (it previously returned only
 `{ edges }`, silently dropping all other piece fields).
+
+---
+
+## v3 closes (session 0029)
+
+Visual-sweep verdict (corpus-wide, 14 SVG pages across 11 models):
+every page renders structurally complete with the expected piece
+outlines, edge labels, tab polygons, foldability tints, and — on
+`ginger-bread.obj` — per-face color fills composited cleanly behind
+the tints. Foldability distribution exactly matches the post-0028
+baseline state (7 clean / 4 caution / 19 warn across 30 pieces);
+`deer.obj` is the model that sits closest to the quality bar with 15
+of its 17 pieces warn-classified, the honest "this will be tricky"
+signal from the foldability classifier on the corpus's 720-face
+concave-organic input.
+
+Aggregate frozen-metric trajectory (0021 → post-0028 live baseline):
+total pieces **58 → 30** (−48 %); total pages **18 → 14** (−22 %);
+total cut length **18,839.9 mm → 15,609.7 mm** (−17 %); total tabs
+**777 → 749** (−4 %); average paper efficiency **22.9 % → 26.5 %**
+(+3.6 pp).
+
+v3 closes; v4 begins per
+`docs/retrospectives/v3-complete.md` and the v4 design spec at
+`docs/superpowers/specs/2026-05-16-v4-interactive-editor-design.md`.
