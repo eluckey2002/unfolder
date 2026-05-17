@@ -1,4 +1,4 @@
-import deerObj from "../../test/corpus/deer.obj?raw";
+import gingerBreadObj from "../../test/corpus/ginger-bread.obj?raw";
 
 import { emitSvg } from "../core/emit-svg.js";
 import { parseObj } from "../core/parse-obj.js";
@@ -14,7 +14,7 @@ if (!(netContainer instanceof HTMLElement)) {
   throw new Error("main.ts: #net element not found.");
 }
 
-const mesh = parseObj(deerObj);
+const mesh = parseObj(gingerBreadObj);
 console.log(
   `unfolder: parsed mesh with ${mesh.vertices.length} vertices, ${mesh.faces.length} faces.`,
 );

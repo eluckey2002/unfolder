@@ -35,7 +35,7 @@ findings.
   - clean → `hsla(120, 50%, 70%, 0.18)` (light green)
   - caution → `hsla(48, 90%, 65%, 0.22)` (light amber)
   - warn → `hsla(0, 70%, 65%, 0.25)` (light red)
-- **`src/app/main.ts`** — swapped hardcoded `tetrahedronStl` to `deer.obj` via the existing `parseObj`. Tetrahedron is single-piece so it never exercised the classifier; deer.obj is the corpus's most complex model (17 pieces).
+- **`src/app/main.ts`** — swapped hardcoded `tetrahedronStl` to `ginger-bread.obj` via the existing `parseObj`. Tetrahedron is single-piece so it never exercised the classifier; `deer.obj` was used for the visual gate (17 pieces — exercises every code path including warn-class), but the shipped app demos `ginger-bread.obj` (2 pieces, 0/1/1) for a tidier everyday preview that shows caution and warn side-by-side without a wash of red.
 - **`scripts/baseline-pipeline.ts`** — added `foldability (c/c/w)` column with per-row `clean/caution/warn` counts; added per-corpus totals line to the summary. Pre-0027 columns are byte-identical (hard gate verified).
 - **Tests** — added 6 unit tests in `test/unit/foldability.test.ts` (3 edge-length + 2 angle + 1 aggregation); 3 outline-reconstruction tests and 3 tint-emission tests in `test/unit/emit-svg.test.ts`; 1 pipeline-level integration assertion in `test/unit/pipeline.test.ts`. **Suite: 167 passing** (was 154 after 0026).
 
