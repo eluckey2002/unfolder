@@ -1,7 +1,7 @@
-import tetrahedronStl from "../../test/corpus/tetrahedron.stl?raw";
+import gingerBreadObj from "../../test/corpus/ginger-bread.obj?raw";
 
 import { emitSvg } from "../core/emit-svg.js";
-import { parseStl } from "../core/parse-stl.js";
+import { parseObj } from "../core/parse-obj.js";
 import { runPipeline } from "../core/pipeline.js";
 import { createViewport } from "./render.js";
 
@@ -14,7 +14,7 @@ if (!(netContainer instanceof HTMLElement)) {
   throw new Error("main.ts: #net element not found.");
 }
 
-const mesh = parseStl(tetrahedronStl);
+const mesh = parseObj(gingerBreadObj);
 console.log(
   `unfolder: parsed mesh with ${mesh.vertices.length} vertices, ${mesh.faces.length} faces.`,
 );

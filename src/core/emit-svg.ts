@@ -7,7 +7,16 @@
  * numbers across pieces. Pure function.
  */
 
+import type { FoldabilityClass } from "./foldability.js";
+import type { Vec2 } from "./flatten.js";
 import type { Page } from "./paginate.js";
+import type { RenderEdge } from "./tabs.js";
+
+const TINT_BY_CLASS: Record<FoldabilityClass, string> = {
+  clean: "hsla(120, 50%, 70%, 0.18)",
+  caution: "hsla(48, 90%, 65%, 0.22)",
+  warn: "hsla(0, 70%, 65%, 0.25)",
+};
 
 const CUT_STROKE_MM = 0.3;
 const FOLD_STROKE_MM = 0.3;
@@ -19,12 +28,70 @@ const LABEL_OFFSET_MM = LABEL_FONT_MM * 0.6;
 const PAGE_BORDER_STROKE_MM = 0.15;
 const PAGE_BORDER_COLOR = "#ccc";
 
+/**
+ * Walk a piece's cut edges (boundary) into an ordered outline polygon.
+ * Folds are ignored — they're interior. Exported for direct unit
+ * testing; the only production caller is emitSvg's tint emission.
+ */
+export function reconstructOutline(edges: RenderEdge[]): Vec2[] {
+  const cuts: RenderEdge[] = edges.filter((e) => e.kind === "cut");
+  if (cuts.length === 0) return [];
+
+  // Vertices duplicated across face transforms in buildLayout drift
+  // by ~1e-12 mm; round to micron precision (0.001 mm) — well below
+  // any printing-meaningful tolerance — so shared vertices bucket
+  // together and the adjacency walk doesn't break at near-duplicates.
+  const key = (v: Vec2): string =>
+    `${Math.round(v[0] * 1000)},${Math.round(v[1] * 1000)}`;
+  const adj = new Map<string, Array<{ idx: number; other: Vec2 }>>();
+  const push = (k: string, entry: { idx: number; other: Vec2 }): void => {
+    const list = adj.get(k);
+    if (list) list.push(entry);
+    else adj.set(k, [entry]);
+  };
+  for (let i = 0; i < cuts.length; i++) {
+    const e = cuts[i];
+    push(key(e.from), { idx: i, other: e.to });
+    push(key(e.to), { idx: i, other: e.from });
+  }
+
+  const used = new Set<number>();
+  const start = cuts[0].from;
+  const outline: Vec2[] = [start];
+  used.add(0);
+  let current = cuts[0].to;
+  while (true) {
+    if (key(current) === key(start)) break;
+    outline.push(current);
+    const choices = adj.get(key(current));
+    if (!choices) break;
+    const next = choices.find((c) => !used.has(c.idx));
+    if (!next) break;
+    used.add(next.idx);
+    current = next.other;
+  }
+  return outline;
+}
+
 export function emitSvg(page: Page): string {
   const elems: string[] = [];
 
   elems.push(
     `<rect x="0" y="0" width="${page.widthMm}" height="${page.heightMm}" fill="none" stroke="${PAGE_BORDER_COLOR}" stroke-width="${PAGE_BORDER_STROKE_MM}" />`,
   );
+
+  // Foldability tint pass: earlier in document order than the line
+  // work, so each tint sits behind its piece's edges/labels.
+  for (const placed of page.pieces) {
+    const klass = placed.piece.foldability;
+    if (!klass) continue;
+    const outline = reconstructOutline(placed.piece.edges);
+    if (outline.length < 3) continue;
+    const pts = outline.map(([x, y]) => `${x},${y}`).join(" ");
+    elems.push(
+      `<polygon class="foldability-tint" points="${pts}" fill="${TINT_BY_CLASS[klass]}" stroke="none" />`,
+    );
+  }
 
   for (const placed of page.pieces) {
     for (const edge of placed.piece.edges) {

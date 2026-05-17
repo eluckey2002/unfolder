@@ -41,6 +41,10 @@ type Result = {
   tabs: string;
   tabOverlapsOwn: string;
   efficiency: string;
+  foldability: string;
+  foldabilityClean: number;
+  foldabilityCaution: number;
+  foldabilityWarn: number;
   piecesClean: boolean;
 };
 
@@ -87,6 +91,10 @@ for (const fname of entries) {
     tabs: "—",
     tabOverlapsOwn: "—",
     efficiency: "—",
+    foldability: "—",
+    foldabilityClean: 0,
+    foldabilityCaution: 0,
+    foldabilityWarn: 0,
     piecesClean: true,
   };
 
@@ -188,6 +196,16 @@ for (const fname of entries) {
   const totalPrintable = result.pages.length * printableW * printableH;
   r.efficiency = ((faceAreaPost / totalPrintable) * 100).toFixed(1);
 
+  for (const page of result.pages) {
+    for (const placed of page.pieces) {
+      const klass = placed.piece.foldability;
+      if (klass === "clean") r.foldabilityClean++;
+      else if (klass === "caution") r.foldabilityCaution++;
+      else if (klass === "warn") r.foldabilityWarn++;
+    }
+  }
+  r.foldability = `${r.foldabilityClean}/${r.foldabilityCaution}/${r.foldabilityWarn}`;
+
   results.push(r);
 }
 
@@ -203,6 +221,7 @@ const headers = [
   "tabs",
   "tab overlap (own)",
   "paper efficiency",
+  "foldability (c/c/w)",
 ];
 const rows = results.map((r) => [
   r.model,
@@ -216,6 +235,7 @@ const rows = results.map((r) => [
   r.tabs,
   r.tabOverlapsOwn,
   r.efficiency === "—" ? "—" : `${r.efficiency}%`,
+  r.foldability,
 ]);
 const widths = headers.map((h, i) =>
   Math.max(h.length, ...rows.map((row) => row[i].length)),
@@ -278,6 +298,16 @@ if (tabOverlapDirty.length === 0) {
     `WARNING: ${total} self-clipping tab(s) in: ${tabOverlapDirty.map((r) => r.model).join(", ")}.`,
   );
 }
+
+const totalFoldClean = completed.reduce((s, r) => s + r.foldabilityClean, 0);
+const totalFoldCaution = completed.reduce(
+  (s, r) => s + r.foldabilityCaution,
+  0,
+);
+const totalFoldWarn = completed.reduce((s, r) => s + r.foldabilityWarn, 0);
+summaryLines.push(
+  `Foldability: ${totalFoldClean} clean / ${totalFoldCaution} caution / ${totalFoldWarn} warn pieces across the corpus.`,
+);
 
 const md = [
   "# Pipeline baseline",

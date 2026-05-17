@@ -103,3 +103,18 @@ flag) is documented as a follow-up; would discriminate
 **Summary:** 11 models completed the pipeline; recut produced 58 pieces total (per-model range 1–28); paginate produced 18 pages total.
 Total cut length 18839.9 mm; total tabs 777; average paper efficiency 22.9%.
 Every piece is internally overlap-free.
+
+---
+
+## v3 trajectory — after session 0027 (audit visualization)
+
+Session 0027 adds per-piece foldability classification (`clean` /
+`caution` / `warn`) and a low-alpha SVG tint overlay per class. Pure
+downstream pass — no upstream algorithm changes; piece count, page
+count, tab count, and cut length all byte-identical to post-0026.
+Corpus-wide today: **7 clean / 4 caution / 19 warn pieces across 11
+models**. Platonic solids and uv-sphere all clean; deer.obj is 2/0/15
+(15-of-17 warns reflect cut-removal sliver faces). Threshold seed
+values (angle <30°/<15°, edge <5 mm/<2 mm) held without tuning.
+Classifier carries forward as v4's foundation for interactive
+buildability badges per the 2026-05-16 v4 user-research findings.

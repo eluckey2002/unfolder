@@ -53,4 +53,22 @@ describe("runPipeline", () => {
 
     expect(result.curvature.violations).toEqual([]);
   });
+
+  it("classifies foldability on every paginated piece post-paginate", () => {
+    const stl = readFileSync(join(corpusDir, "tetrahedron.stl"), "utf-8");
+    const mesh = parseStl(stl);
+
+    const result = runPipeline(mesh);
+
+    const labels = new Set(["clean", "caution", "warn"]);
+    let pieceCount = 0;
+    for (const page of result.pages) {
+      for (const placed of page.pieces) {
+        expect(placed.piece.foldability).toBeDefined();
+        expect(labels.has(placed.piece.foldability as string)).toBe(true);
+        pieceCount++;
+      }
+    }
+    expect(pieceCount).toBeGreaterThan(0);
+  });
 });
