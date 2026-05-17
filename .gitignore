@@ -23,5 +23,17 @@ test/corpus/OBJ format/
 # Brainstorm skill runtime state (HTML scratchpads, server PIDs)
 .superpowers/
 
+# Session 0030+ visual-gate captures (transient, regenerated per session)
+docs/sessions/*/before.png
+docs/sessions/*/after.png
+
+# Throwaway probe scripts (per-session diagnostic tooling)
+scripts/probe-*.ts
+
+# Playwright artifacts
+test-results/
+playwright-report/
+.playwright/
+
 # macOS
 .DS_Store
