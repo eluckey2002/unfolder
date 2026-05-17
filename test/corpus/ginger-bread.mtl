@@ -1,0 +1,5 @@
+# Gingerbread material for ginger-bread.obj - session 0028 demo.
+# Naive-first: Kd only. sRGB-ish gingerbread brown.
+
+newmtl colormap
+Kd 0.55 0.30 0.10
