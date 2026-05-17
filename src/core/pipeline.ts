@@ -25,6 +25,7 @@ import {
   type PageSpec,
   paginate,
 } from "./paginate.js";
+import type { RGB } from "./parse-mtl.js";
 import {
   buildRenderablePieces,
   type RenderablePiece,
@@ -41,10 +42,24 @@ export interface PipelineResult {
 export function runPipeline(
   mesh: Mesh3D,
   page: PageSpec = LETTER,
+  materials?: Map<string, RGB>,
 ): PipelineResult {
   const dual = buildAdjacency(mesh);
   const recut = runCutRemoval(mesh, dual);
   const renderable = buildRenderablePieces(recut);
+  if (materials !== undefined && mesh.faceMaterials !== undefined) {
+    for (let p = 0; p < renderable.length; p++) {
+      const piece = renderable[p];
+      const meshFaceIndices = recut.pieces[p].faces;
+      const colors: (RGB | undefined)[] = meshFaceIndices.map((mfi) => {
+        const name = mesh.faceMaterials?.[mfi];
+        return name === undefined ? undefined : materials.get(name);
+      });
+      if (colors.some((c) => c !== undefined)) {
+        piece.faceColors = colors;
+      }
+    }
+  }
   const pages = paginate(renderable, page);
   for (const p of pages) {
     for (const placed of p.pieces) {
