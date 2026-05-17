@@ -1,8 +1,9 @@
-import { readFileSync, readdirSync, writeFileSync } from "node:fs";
-import { dirname, extname, join } from "node:path";
+import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { basename, dirname, extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { LETTER } from "../src/core/paginate.js";
+import { parseMtl, type RGB } from "../src/core/parse-mtl.js";
 import { parseStl } from "../src/core/parse-stl.js";
 import { parseObj } from "../src/core/parse-obj.js";
 import { runPipeline } from "../src/core/pipeline.js";
@@ -46,6 +47,7 @@ type Result = {
   foldabilityCaution: number;
   foldabilityWarn: number;
   piecesClean: boolean;
+  materials: string;
 };
 
 const results: Result[] = [];
@@ -96,6 +98,7 @@ for (const fname of entries) {
     foldabilityCaution: 0,
     foldabilityWarn: 0,
     piecesClean: true,
+    materials: "0",
   };
 
   let mesh;
@@ -108,9 +111,26 @@ for (const fname of entries) {
     continue;
   }
 
+  // Sibling .mtl files referenced by the OBJ. Merge later-wins
+  // semantics matches common MTL behavior. STL has no materials.
+  const merged = new Map<string, RGB>();
+  if (ext === ".obj" && mesh.mtllibs) {
+    for (const lib of mesh.mtllibs) {
+      const libPath = join(corpusDir, basename(lib));
+      if (existsSync(libPath)) {
+        const sub = parseMtl(readFileSync(libPath, "utf8"));
+        for (const [k, v] of sub) merged.set(k, v);
+      }
+    }
+  }
+
   let result;
   try {
-    result = runPipeline(mesh);
+    result = runPipeline(
+      mesh,
+      undefined,
+      merged.size > 0 ? merged : undefined,
+    );
   } catch (e) {
     r.pipeline = `failed: ${(e as Error).message}`;
     results.push(r);
@@ -206,6 +226,16 @@ for (const fname of entries) {
   }
   r.foldability = `${r.foldabilityClean}/${r.foldabilityCaution}/${r.foldabilityWarn}`;
 
+  // Materials column: count of distinct names that are BOTH attached
+  // to at least one face AND resolve to a color in the merged lookup.
+  const usedNames = new Set<string>();
+  if (mesh.faceMaterials) {
+    for (const name of mesh.faceMaterials) {
+      if (name !== undefined && merged.has(name)) usedNames.add(name);
+    }
+  }
+  r.materials = String(usedNames.size);
+
   results.push(r);
 }
 
@@ -222,6 +252,7 @@ const headers = [
   "tab overlap (own)",
   "paper efficiency",
   "foldability (c/c/w)",
+  "materials",
 ];
 const rows = results.map((r) => [
   r.model,
@@ -236,6 +267,7 @@ const rows = results.map((r) => [
   r.tabOverlapsOwn,
   r.efficiency === "—" ? "—" : `${r.efficiency}%`,
   r.foldability,
+  r.materials,
 ]);
 const widths = headers.map((h, i) =>
   Math.max(h.length, ...rows.map((row) => row[i].length)),
@@ -307,6 +339,17 @@ const totalFoldCaution = completed.reduce(
 const totalFoldWarn = completed.reduce((s, r) => s + r.foldabilityWarn, 0);
 summaryLines.push(
   `Foldability: ${totalFoldClean} clean / ${totalFoldCaution} caution / ${totalFoldWarn} warn pieces across the corpus.`,
+);
+
+const totalMaterials = completed.reduce(
+  (s, r) => s + (Number.parseInt(r.materials, 10) || 0),
+  0,
+);
+const modelsWithColor = completed.filter(
+  (r) => Number.parseInt(r.materials, 10) > 0,
+).length;
+summaryLines.push(
+  `Materials: ${totalMaterials} distinct across ${modelsWithColor} model(s) with color data.`,
 );
 
 const md = [
