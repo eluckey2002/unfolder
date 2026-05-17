@@ -99,10 +99,9 @@ describe("parseObj", () => {
     expect(parseObj(obj).faceMaterials).toEqual([undefined, "red"]);
   });
 
-  it("ignores vn, vt, vp, g, o, usemtl, mtllib, s, and comments", () => {
+  it("ignores vn, vt, vp, g, o, s, and comments", () => {
     const withNoise = [
       "# leading whole-line comment",
-      "mtllib something.mtl",
       "o thing",
       "g group",
       "v 0 0 0",
@@ -111,7 +110,6 @@ describe("parseObj", () => {
       "vt 0 0",
       "v 0 1 0",
       "vp 0 0",
-      "usemtl material",
       "s 1",
       "f 1 2 3",
       "# trailing comment line",
@@ -123,6 +121,67 @@ describe("parseObj", () => {
       "f 1 2 3",
     ].join("\n");
     expect(parseObj(withNoise)).toEqual(parseObj(without));
+  });
+
+  it("captures usemtl/mtllib without affecting geometry", () => {
+    const withMaterials = [
+      "mtllib something.mtl",
+      "v 0 0 0",
+      "v 1 0 0",
+      "v 0 1 0",
+      "usemtl material",
+      "f 1 2 3",
+    ].join("\n");
+    const without = [
+      "v 0 0 0",
+      "v 1 0 0",
+      "v 0 1 0",
+      "f 1 2 3",
+    ].join("\n");
+    const a = parseObj(withMaterials);
+    const b = parseObj(without);
+    expect(a.vertices).toEqual(b.vertices);
+    expect(a.faces).toEqual(b.faces);
+  });
+
+  it("propagates current material across fan-triangulation", () => {
+    const obj = [
+      "v 0 0 0",
+      "v 1 0 0",
+      "v 2 0 0",
+      "v 2 1 0",
+      "v 0 1 0",
+      "usemtl alpha",
+      "f 1 2 3 4 5",
+    ].join("\n");
+    const mesh = parseObj(obj);
+    expect(mesh.faces.length).toBe(3);
+    expect(mesh.faceMaterials).toEqual(["alpha", "alpha", "alpha"]);
+  });
+
+  it("clears current material on bare 'usemtl' and on 'usemtl off'", () => {
+    const obj = [
+      "v 0 0 0",
+      "v 1 0 0",
+      "v 0 1 0",
+      "v 1 1 0",
+      "v 2 0 0",
+      "v 2 1 0",
+      "usemtl red",
+      "f 1 2 3",
+      "usemtl",
+      "f 2 3 4",
+      "usemtl green",
+      "f 3 4 5",
+      "usemtl off",
+      "f 4 5 6",
+    ].join("\n");
+    expect(parseObj(obj).faceMaterials).toEqual([
+      "red",
+      undefined,
+      "green",
+      undefined,
+    ]);
   });
 
   it("deduplicates coincident vertices", () => {
