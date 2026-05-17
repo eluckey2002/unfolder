@@ -92,7 +92,12 @@ const transformPiece = (
       tab: edge.tab ? edge.tab.map(map) : null,
     };
   });
-  return { edges };
+  // Preserve per-face attributes that don't depend on layout placement.
+  // foldability is intentionally NOT preserved here — it's (re-)assigned
+  // post-paginate by runPipeline so it always reflects post-placement geometry.
+  const out: RenderablePiece = { edges };
+  if (piece.faceColors !== undefined) out.faceColors = piece.faceColors;
+  return out;
 };
 
 export function paginate(
